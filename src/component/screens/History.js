@@ -4,19 +4,20 @@ import ThemedButton from "../ThemedButton";
 import "../../styles/History.css";
 import "../../styles/App.css";
 import axios from "axios";
-import copy from "copy-to-clipboard";
 import Header from "../Header";
 import Footer from "../Footer";
+import HistoryDetailsModal from "../HistoryDetailsModal";
 
 const BASEURL = "https://shorty--urls-server.herokuapp.com/";
-const AUTHORIZATION = `05d5f47a-b131-4523-bffe-f0e918afd3cb`;
+const AUTHORIZATION = "05d5f47ab1314523bffef0e918afd3cb";
 
-const HistoryModal = () => {
+const History = () => {
   const [loading, setLoading] = useState(false);
   const [limit, setLimit] = useState("10");
   const [error, setError] = useState("");
   const [history, setHistory] = useState([]);
-  const [success, setSuccess] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [historyIndex, setHistoryIndex] = useState(-1);
 
   const fetchHistory = () => {
     if ((validator.isInt(limit) && parseInt(limit) >= 0) || limit === "") {
@@ -30,8 +31,23 @@ const HistoryModal = () => {
           },
         })
         .then((value) => {
-          console.log("value", value.data);
-          setHistory(value.data.history);
+          console.log("value", value.data.history);
+          let dataToSend = [];
+          for (let i = 0; i < value.data.history.length; i++) {
+            const { created_at } = value.data.history[i];
+            const dateString = new Date(created_at);
+            const created_at_date = dateString.getDate();
+            const created_at_month = dateString.getMonth();
+            const created_at_year = dateString.getFullYear();
+            const created_at_hour = dateString.getHours();
+            const created_at_min = dateString.getMinutes();
+
+            dataToSend.push({
+              ...value.data.history[i],
+              created_at: `${created_at_date}/${created_at_month}/${created_at_year} - ${created_at_hour}:${created_at_min}`,
+            });
+          }
+          setHistory(dataToSend);
         })
         .catch((e) => setError("Unable to fetch history."))
         .finally(() => setLoading(false));
@@ -89,48 +105,47 @@ const HistoryModal = () => {
                   <input class="column column4 header-col" value="Visits" />
                 </div>
                 {history.map((data, index) => {
-                  const created_at = new Date(data.created_at);
-                  const created_at_date = created_at.getDate();
-                  const created_at_month = created_at.getMonth();
-                  const created_at_year = created_at.getFullYear();
-                  const created_at_hour = created_at.getHours();
-                  const created_at_min = created_at.getMinutes();
                   return (
-                    <div class="table-row" key={index}>
-                      <input class="column column1" value={data.url} />
+                    <div
+                      class="table-row"
+                      key={index}
+                      onClick={() => {
+                        setHistoryIndex(index);
+                        setShowModal(true);
+                        console.log("clicking", index, showModal);
+                      }}
+                    >
+                      <input
+                        title={data.url}
+                        class="column column1"
+                        value={data.url}
+                        contentEditable={false}
+                      />
                       <span> | </span>
                       <input
                         class="column column2"
-                        value={`${BASEURL}${data.short_url}`}
-                        contentEditable="false"
-                        onDoubleClick={() => {
-                          copy(BASEURL + data.short_url);
-                          setSuccess("URL Copied");
-                          setTimeout(() => {
-                            setSuccess("");
-                          }, 1500);
-                        }}
+                        value={data.short_url}
+                        title={data.short_url}
+                        contentEditable={false}
                       />
                       <span> | </span>
                       <input
                         class="column column3"
-                        value={`${created_at_date}/${created_at_month}/${created_at_year} - ${created_at_hour}:${created_at_min}`}
+                        value={data.created_at}
+                        contentEditable={false}
                       />
                       <span> | </span>
                       <input
                         class="column column4"
                         value={data.num_of_visits}
+                        contentEditable={false}
                       />
                     </div>
                   );
                 })}
                 <div class="mainbox-footer">
                   <div>
-                    {success !== "" ? (
-                      <p class="success">{success}</p>
-                    ) : (
-                      <p class="error">{error}</p>
-                    )}
+                    <p class="error">{error}</p>
                   </div>
                   <div class="div_2">
                     <label>Limit: </label>
@@ -164,7 +179,15 @@ const HistoryModal = () => {
         </div>
       )}
       <Footer />
+      <HistoryDetailsModal
+        data={historyIndex !== -1 ? history[historyIndex] : null}
+        visible={showModal}
+        onClose={() => {
+          setShowModal(false);
+        }}
+        fetchHistory={fetchHistory}
+      />
     </div>
   );
 };
-export default HistoryModal;
+export default History;

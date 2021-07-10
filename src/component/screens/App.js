@@ -8,7 +8,7 @@ import Header from "../Header";
 import Footer from "../Footer";
 
 const BASE_URL = "https://shorty--urls-server.herokuapp.com/";
-const AUTHORIZATION = `05d5f47a-b131-4523-bffe-f0e918afd3cb`;
+const AUTHORIZATION = "05d5f47ab1314523bffef0e918afd3cb";
 
 export const App = () => {
   let url = useRef();
@@ -51,13 +51,13 @@ export const App = () => {
             }
           )
           .then((value) => {
-            set_short_url(BASE_URL + value.data.short_url);
+            set_short_url(value.data.short_url);
           })
           .catch((e) => {
             console.log("error", e.response);
             if (e.response) {
               if (e.response.status === 409) {
-                set_short_url(BASE_URL + e.response.data.short_url);
+                set_short_url(e.response.data.short_url);
               } else {
                 setError("Unable to short this url. Try again.");
               }
@@ -82,7 +82,7 @@ export const App = () => {
     setSuccess("URL Copied!");
     setTimeout(() => {
       setSuccess("");
-    }, 1500);
+    }, 2000);
   };
 
   const onOpenURL = () => {
@@ -111,7 +111,7 @@ export const App = () => {
             url.current = e.target.value;
           }}
           onKeyPress={(e) => {
-            if (e.key==='Enter') {
+            if (e.key === "Enter") {
               onSubmit();
             }
           }}
