@@ -1,5 +1,8 @@
 .historyBox {
   min-width: 800px;
+  margin-top: 150px;
+  height: max-content;
+  margin-bottom: 100px;
 }
 
 .historyHeader {
@@ -54,7 +57,7 @@
 .table-header {
   border: 2px solid black;
   background-color: cornflowerblue;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 }
 
 .header-col {

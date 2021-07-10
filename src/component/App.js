@@ -4,7 +4,7 @@ import ThemedButton from "./ThemedButton";
 import "../styles/App.css";
 import axios from "axios";
 
-const BASE_URL = "https://shorty--urls-api.herokuapp.com/";
+const BASE_URL = "https://shorty--urls-server.herokuapp.com/";
 const AUTHORIZATION = `05d5f47a-b131-4523-bffe-f0e918afd3cb`;
 
 export const App = () => {
@@ -43,14 +43,17 @@ export const App = () => {
               },
             }
           )
-          .then((response) => response.json())
-          .then((data) => {
-            set_short_url(BASE_URL + data.short_url);
+          .then((value) => {
+            set_short_url(BASE_URL + value.data.short_url);
           })
           .catch((e) => {
-            console.log(e.response);
-            if (e.response.status === 409) {
-              set_short_url(BASE_URL + e.response.data.short_url);
+            console.log("error", e.response);
+            if (e.response) {
+              if (e.response.status === 409) {
+                set_short_url(BASE_URL + e.response.data.short_url);
+              } else {
+                setError("Unable to short this url. Try again.");
+              }
             } else {
               setError("Unable to short this url. Try again.");
             }
