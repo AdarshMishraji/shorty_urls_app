@@ -101,6 +101,7 @@ export const App = () => {
         <h1>Enter the URL</h1>
         <input
           class="root-entry"
+          placeholder="e.g. https://example.com"
           onChange={(e) => {
             setError("");
             if (short_url) {
