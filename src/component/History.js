@@ -128,8 +128,14 @@ const HistoryModal = () => {
                     <input
                       class="number-input"
                       value={limit}
-                      placeholder={limit === "" ? "All" : ""}
-                      onChange={(e) => setLimit(e.target.value)}
+                      placeholder="All"
+                      onChange={(e) => {
+                        if (e.target.value <= 0) {
+                          setLimit("");
+                        } else {
+                          setLimit(e.target.value);
+                        }
+                      }}
                     />
                     <ThemedButton title="Fetch" onClickHandler={fetchHistory} />
                   </div>
