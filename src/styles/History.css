@@ -1,0 +1,133 @@
+.historyBox {
+  min-width: 800px;
+}
+
+.historyHeader {
+  min-width: 850px;
+}
+
+.historyRoot {
+  min-width: 850px;
+}
+
+.history-table {
+  width: 90%;
+}
+
+.table-row {
+  width: 100%;
+  display: flex;
+  flex-direction: "row";
+  margin-bottom: 10px;
+  border-radius: 25px;
+  box-shadow: 0px 5px 25px 5px black;
+}
+
+.column {
+  /* color: white; */
+  font-size: 20px;
+  margin: 0;
+  width: 25%;
+  padding: 5px 5px 5px 10px;
+  outline: none;
+  border-width: 0;
+  background-color: #e3f2fd;
+}
+
+.column1 {
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+}
+
+.column4 {
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+}
+
+.history-table span {
+  font-size: 30px;
+  background-color: #fff;
+  padding-bottom: 5px;
+  background-color: #e3f2fd;
+}
+
+.table-header {
+  border: 2px solid black;
+  background-color: cornflowerblue;
+  margin-bottom: 15px;
+}
+
+.header-col {
+  text-align: center;
+  font-weight: bold;
+  padding-left: 0;
+  background-color: cornflowerblue;
+  color: white;
+}
+
+.table-header span {
+  background-color: cornflowerblue;
+}
+
+.no-urls {
+  font-size: 50px;
+  color: white;
+}
+
+.mainbox-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  /* border: 1px solid black; */
+  width: 100%;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.mainbox-footer div {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+}
+
+.mainbox-footer label {
+  color: white;
+  font-size: 20px;
+  margin-right: 10px;
+  text-shadow: 0px 10px 10px black;
+}
+
+.mainbox-footer div div {
+  height: 50px;
+  justify-content: center;
+}
+
+.mainbox-footer div div span {
+  background-color: #2225ff;
+}
+
+.number-input {
+  border-radius: 25px;
+  padding: 10px;
+  width: 100px;
+  font-size: 20px;
+  border-width: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #e3f2fd;
+  text-align: center;
+  box-shadow: 0px 5px 25px 5px black;
+}
+
+.number-input:focus {
+  outline: none;
+  box-shadow: 0px 5px 15px 5px black;
+}
+
+.error {
+  margin-left: 30px;
+}
+
+.loader {
+  min-width: 500px;
+}
