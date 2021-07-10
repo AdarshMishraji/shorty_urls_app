@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import validator from "validator";
-import ThemedButton from "./ThemedButton";
-import "../styles/History.css";
-import "../styles/App.css";
+import ThemedButton from "../ThemedButton";
+import "../../styles/History.css";
+import "../../styles/App.css";
 import axios from "axios";
+import copy from "copy-to-clipboard";
+import Header from "../Header";
+import Footer from "../Footer";
 
 const BASEURL = "https://shorty--urls-server.herokuapp.com/";
 const AUTHORIZATION = `05d5f47a-b131-4523-bffe-f0e918afd3cb`;
@@ -13,6 +16,7 @@ const HistoryModal = () => {
   const [limit, setLimit] = useState("10");
   const [error, setError] = useState("");
   const [history, setHistory] = useState([]);
+  const [success, setSuccess] = useState("");
 
   const fetchHistory = () => {
     if ((validator.isInt(limit) && parseInt(limit) >= 0) || limit === "") {
@@ -42,18 +46,12 @@ const HistoryModal = () => {
 
   return (
     <div id="body" class="historyRoot">
-      <header class="historyHeader">
-        <h1> Shorty URLs </h1>
-        <div class="nav">
-          <p
-            onClick={() => {
-              window.location.pathname = "/";
-            }}
-          >
-            Home
-          </p>
-        </div>
-      </header>
+      <Header
+        navText="Home"
+        onNavClick={() => {
+          window.location.pathname = "/";
+        }}
+      />
       {loading ? (
         <div class="historyBox mainbox loader" style={{ opacity: 0.7 }}>
           <h1>History</h1>
@@ -105,6 +103,13 @@ const HistoryModal = () => {
                         class="column column2"
                         value={`${BASEURL}${data.short_url}`}
                         contentEditable="false"
+                        onDoubleClick={() => {
+                          copy(BASEURL + data.short_url);
+                          setSuccess("URL Copied");
+                          setTimeout(() => {
+                            setSuccess("");
+                          }, 1500);
+                        }}
                       />
                       <span> | </span>
                       <input
@@ -121,9 +126,13 @@ const HistoryModal = () => {
                 })}
                 <div class="mainbox-footer">
                   <div>
-                    <p class="error">{error} </p>
+                    {success !== "" ? (
+                      <p class="success">{success}</p>
+                    ) : (
+                      <p class="error">{error}</p>
+                    )}
                   </div>
-                  <div>
+                  <div class="div_2">
                     <label>Limit: </label>
                     <input
                       class="number-input"
@@ -134,6 +143,11 @@ const HistoryModal = () => {
                           setLimit("");
                         } else {
                           setLimit(e.target.value);
+                        }
+                      }}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          fetchHistory();
                         }
                       }}
                     />
@@ -149,6 +163,7 @@ const HistoryModal = () => {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   );
 };

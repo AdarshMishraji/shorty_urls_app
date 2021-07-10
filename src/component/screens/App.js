@@ -1,8 +1,11 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import validator from "validator";
-import ThemedButton from "./ThemedButton";
-import "../styles/App.css";
+import ThemedButton from "../ThemedButton";
+import "../../styles/App.css";
 import axios from "axios";
+import copy from "copy-to-clipboard";
+import Header from "../Header";
+import Footer from "../Footer";
 
 const BASE_URL = "https://shorty--urls-server.herokuapp.com/";
 const AUTHORIZATION = `05d5f47a-b131-4523-bffe-f0e918afd3cb`;
@@ -13,7 +16,11 @@ export const App = () => {
   const [short_url, set_short_url] = useState();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  let textAreaRef = useRef();
+  let textRef = useRef();
+
+  useEffect(() => {
+    textRef.current.focus();
+  }, []);
 
   const makeURLValid = () => {
     if (
@@ -71,8 +78,7 @@ export const App = () => {
   };
 
   const onCopy = () => {
-    textAreaRef.current.select();
-    document.execCommand("copy");
+    copy(short_url);
     setSuccess("URL Copied!");
     setTimeout(() => {
       setSuccess("");
@@ -85,21 +91,16 @@ export const App = () => {
 
   return (
     <div id="body" class="mainRoot">
-      <header>
-        <h1> Shorty URLs </h1>
-        <div class="nav">
-          <p
-            onClick={() => {
-              window.location.pathname = "/history";
-            }}
-          >
-            History
-          </p>
-        </div>
-      </header>
+      <Header
+        navText="History"
+        onNavClick={() => {
+          window.location.pathname = "/history";
+        }}
+      />
       <div class="mainbox">
         <h1>Enter the URL</h1>
         <input
+          ref={textRef}
           class="root-entry"
           placeholder="e.g. https://example.com"
           onChange={(e) => {
@@ -108,6 +109,11 @@ export const App = () => {
               set_short_url();
             }
             url.current = e.target.value;
+          }}
+          onKeyPress={(e) => {
+            if (e.key==='Enter') {
+              onSubmit();
+            }
           }}
         />
         <p class="error">{error}</p>
@@ -124,7 +130,6 @@ export const App = () => {
           <div class="after-short">
             <input
               class="root-entry"
-              ref={textAreaRef}
               value={short_url}
               style={{
                 marginTop: 25,
@@ -139,6 +144,7 @@ export const App = () => {
           </div>
         ) : null}
       </div>
+      <Footer />
     </div>
   );
 };

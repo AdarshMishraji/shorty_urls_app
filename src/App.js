@@ -1,5 +1,5 @@
-import { App as RootApp } from "./component/App";
-import History from "./component/History";
+import { App as RootApp } from "./component/screens/App";
+import History from "./component/screens/History";
 
 const Route = ({ path, children }) => {
   return window.location.pathname === path ? children : null;
