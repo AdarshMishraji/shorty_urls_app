@@ -20,9 +20,12 @@ const History = () => {
   const [historyIndex, setHistoryIndex] = useState(-1);
 
   const fetchHistory = () => {
+    setError("");
     if ((validator.isInt(limit) && parseInt(limit) >= 0) || limit === "") {
       setLoading(true);
-      const url = `${BASEURL}history/${limit === "" ? null : limit}`;
+      const url = `${BASEURL}history${
+        limit === "" ? "?limit=" : "?limit=" + limit
+      }`;
       console.log(url);
       axios
         .get(url, {

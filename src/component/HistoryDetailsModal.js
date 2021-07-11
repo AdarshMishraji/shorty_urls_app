@@ -136,7 +136,11 @@ const HistoryDetailsModal = ({ data, visible, onClose, fetchHistory }) => {
                 })}
               </div>
             </div>
-          ) : null}
+          ) : (
+            <div>
+              <p class="no-urls">Not visited yet</p>
+            </div>
+          )}
           <div class="footer">
             <ThemedButton title="Close" onClickHandler={onClose} />
           </div>
