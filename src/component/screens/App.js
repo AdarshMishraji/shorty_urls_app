@@ -124,7 +124,7 @@ export const App = () => {
             </div>
           </div>
         ) : (
-          <ThemedButton title="Submit URL" onClickHandler={onSubmit} />
+          <ThemedButton title="Generate URL" onClickHandler={onSubmit} />
         )}
         {short_url ? (
           <div class="after-short">
@@ -138,8 +138,8 @@ export const App = () => {
             />
             <p class="success">{success}</p>
             <div class="row-buttons">
-              <ThemedButton title="Copy URL" onClickHandler={onCopy} />
-              <ThemedButton title="Open URL" onClickHandler={onOpenURL} />
+              <ThemedButton title="Copy" onClickHandler={onCopy} />
+              <ThemedButton title="Open" onClickHandler={onOpenURL} />
             </div>
           </div>
         ) : null}

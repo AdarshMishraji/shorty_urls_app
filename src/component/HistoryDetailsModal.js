@@ -69,7 +69,7 @@ const HistoryDetailsModal = ({ data, visible, onClose, fetchHistory }) => {
               {success}
             </p>
             <ThemedButton
-              title="Open URL"
+              title="Open"
               onClickHandler={() => {
                 window.open(data.short_url, "_blank");
                 fetchHistory();
