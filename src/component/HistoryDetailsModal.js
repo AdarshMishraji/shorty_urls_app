@@ -96,7 +96,10 @@ const HistoryDetailsModal = ({ data, visible, onClose, fetchHistory }) => {
               </div>
               <div class="table-data-root">
                 {data.from_visited.map((value, index) => {
-                  const location = `${value.location.city}, ${value.location.country}. ${value.location.zipCode}`;
+                  console.log(value);
+                  const location = value.location
+                    ? `${value.location.city}, ${value.location.country}. ${value.location.zipCode}`
+                    : "Not Available";
                   const { requested_at } = value;
                   const dateString = new Date(requested_at);
                   const requested_at_date = dateString.getDate();
