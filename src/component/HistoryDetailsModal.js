@@ -11,6 +11,7 @@ const HistoryDetailsModal = ({ data, visible, onClose, fetchHistory }) => {
   if (data && visible) {
     return (
       <div class="history-root">
+        <div class="history-root" style={{ zIndex: 0 }} onClick={onClose}></div>
         <div class="history-mainbox mainbox">
           <h1>Details</h1>
           <div class="history-details">
@@ -20,6 +21,7 @@ const HistoryDetailsModal = ({ data, visible, onClose, fetchHistory }) => {
                 value={data.url}
                 title={data.url}
                 contentEditable={false}
+                disabled
               />
               <ThemedButton
                 title="Copy"
@@ -38,6 +40,7 @@ const HistoryDetailsModal = ({ data, visible, onClose, fetchHistory }) => {
                 value={data.short_url}
                 title={data.short_url}
                 contentEditable={false}
+                disabled
               />
               <ThemedButton
                 title="Copy"
@@ -52,11 +55,15 @@ const HistoryDetailsModal = ({ data, visible, onClose, fetchHistory }) => {
             </p>
             <p>
               <label>Created At :</label>
-              <input value={data.created_at} contentEditable={false} />
+              <input value={data.created_at} contentEditable={false} disabled />
             </p>
             <p>
               <label>No. of Visits :</label>
-              <input value={data.num_of_visits} contentEditable={false} />
+              <input
+                value={data.num_of_visits}
+                contentEditable={false}
+                disabled
+              />
             </p>
             <p class="success" style={{ alignSelf: "center" }}>
               {success}
@@ -73,48 +80,61 @@ const HistoryDetailsModal = ({ data, visible, onClose, fetchHistory }) => {
             <div class="locations history-table">
               <h1>IP - Location</h1>
               <div class="table-row table-header">
-                <input class="column column1 header-col" value="IP" />
+                <input class="column column1 header-col" value="IP" disabled />
                 <span> | </span>
-                <input class="column column2 header-col" value="Location" />
+                <input
+                  class="column column2 header-col"
+                  value="Location"
+                  disabled
+                />
                 <span> | </span>
-                <input class="column column4 header-col" value="Requested At" />
+                <input
+                  class="column column4 header-col"
+                  value="Requested At"
+                  disabled
+                />
               </div>
-              {data.from_visited.map((value, index) => {
-                const location = `${value.location.city}, ${value.location.country}. ${value.location.zipCode}`;
-                const { requested_at } = value;
-                const dateString = new Date(requested_at);
-                const requested_at_date = dateString.getDate();
-                const requested_at_month = dateString.getMonth();
-                const requested_at_year = dateString.getFullYear();
-                const requested_at_hour = dateString.getHours();
-                const requested_at_min = dateString.getMinutes();
-                const requested_at_date_string = `${requested_at_date}/${requested_at_month}/${requested_at_year} - ${requested_at_hour}:${requested_at_min}`;
+              <div class="table-data-root">
+                {data.from_visited.map((value, index) => {
+                  const location = `${value.location.city}, ${value.location.country}. ${value.location.zipCode}`;
+                  const { requested_at } = value;
+                  const dateString = new Date(requested_at);
+                  const requested_at_date = dateString.getDate();
+                  const requested_at_month = dateString.getMonth();
+                  const requested_at_year = dateString.getFullYear();
+                  const requested_at_hour = dateString.getHours();
+                  const requested_at_min = dateString.getMinutes();
+                  const requested_at_date_string = `${requested_at_date}/${requested_at_month}/${requested_at_year} - ${requested_at_hour}:${requested_at_min}`;
 
-                return (
-                  <div class="table-row" key={index}>
-                    <input
-                      title={value.ip}
-                      class="column column1"
-                      value={value.ip}
-                      contentEditable={false}
-                    />
-                    <span> | </span>
-                    <input
-                      title={location}
-                      class="column column2"
-                      value={location}
-                      contentEditable={false}
-                    />
-                    <span> | </span>
-                    <input
-                      title={requested_at_date_string}
-                      class="column column4"
-                      value={requested_at_date_string}
-                      contentEditable={false}
-                    />
-                  </div>
-                );
-              })}
+                  return (
+                    <div class="table-row" key={index}>
+                      <input
+                        title={value.ip}
+                        class="column column1"
+                        value={value.ip}
+                        contentEditable={false}
+                        disabled
+                      />
+                      <span> | </span>
+                      <input
+                        title={location}
+                        class="column column2"
+                        value={location}
+                        contentEditable={false}
+                        disabled
+                      />
+                      <span> | </span>
+                      <input
+                        title={requested_at_date_string}
+                        class="column column4"
+                        value={requested_at_date_string}
+                        contentEditable={false}
+                        disabled
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ) : null}
           <div class="footer">

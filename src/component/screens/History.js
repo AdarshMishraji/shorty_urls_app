@@ -61,7 +61,7 @@ const History = () => {
   }, []);
 
   return (
-    <div id="body" class="historyRoot">
+    <div class="body" class="historyRoot">
       <Header
         navText="Home"
         onNavClick={() => {
@@ -91,58 +91,76 @@ const History = () => {
             {history.length > 0 ? (
               <div class="history-table">
                 <div class="table-row table-header">
-                  <input class="column column1 header-col" value="URL" />
+                  <input
+                    class="column column1 header-col"
+                    value="URL"
+                    disabled
+                  />
                   <span> | </span>
                   <input
                     class="column column2 header-col"
                     value="Short URL"
                     contentEditable="false"
-                    onDoubleClick={() => {}}
+                    disabled
                   />
                   <span> | </span>
-                  <input class="column column3 header-col" value="Created At" />
+                  <input
+                    class="column column3 header-col"
+                    value="Created At"
+                    disabled
+                  />
                   <span> | </span>
-                  <input class="column column4 header-col" value="Visits" />
+                  <input
+                    class="column column4 header-col"
+                    value="Visits"
+                    disabled
+                  />
                 </div>
-                {history.map((data, index) => {
-                  return (
-                    <div
-                      class="table-row"
-                      key={index}
-                      onClick={() => {
-                        setHistoryIndex(index);
-                        setShowModal(true);
-                        console.log("clicking", index, showModal);
-                      }}
-                    >
-                      <input
-                        title={data.url}
-                        class="column column1"
-                        value={data.url}
-                        contentEditable={false}
-                      />
-                      <span> | </span>
-                      <input
-                        class="column column2"
-                        value={data.short_url}
-                        title={data.short_url}
-                        contentEditable={false}
-                      />
-                      <span> | </span>
-                      <input
-                        class="column column3"
-                        value={data.created_at}
-                        contentEditable={false}
-                      />
-                      <span> | </span>
-                      <input
-                        class="column column4"
-                        value={data.num_of_visits}
-                        contentEditable={false}
-                      />
-                    </div>
-                  );
-                })}
+                <div class="table-data-root">
+                  {history.map((data, index) => {
+                    return (
+                      <div
+                        class="table-row"
+                        key={index}
+                        onClick={() => {
+                          setHistoryIndex(index);
+                          setShowModal(true);
+                          console.log("clicking", index, showModal);
+                        }}
+                      >
+                        <input
+                          title={data.url}
+                          class="column column1"
+                          value={data.url}
+                          contentEditable={false}
+                          disabled
+                        />
+                        <span> | </span>
+                        <input
+                          class="column column2"
+                          value={data.short_url}
+                          title={data.short_url}
+                          contentEditable={false}
+                          disabled
+                        />
+                        <span> | </span>
+                        <input
+                          class="column column3"
+                          value={data.created_at}
+                          contentEditable={false}
+                          disabled
+                        />
+                        <span> | </span>
+                        <input
+                          class="column column4"
+                          value={data.num_of_visits}
+                          contentEditable={false}
+                          disabled
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
                 <div class="mainbox-footer">
                   <div>
                     <p class="error">{error}</p>

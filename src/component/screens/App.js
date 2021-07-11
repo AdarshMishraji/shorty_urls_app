@@ -90,7 +90,7 @@ export const App = () => {
   };
 
   return (
-    <div id="body" class="mainRoot">
+    <div class="body mainRoot">
       <Header
         navText="History"
         onNavClick={() => {
