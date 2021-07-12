@@ -2,7 +2,7 @@ import { App as RootApp } from "./component/screens/App";
 import History from "./component/screens/History";
 
 const Route = ({ path, children }) => {
-  return window.location.pathname === path ? children : null;
+  return window.location.pathname === path ? children : <RootApp />;
 };
 
 const App = () => {
