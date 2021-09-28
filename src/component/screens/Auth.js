@@ -7,6 +7,8 @@ import "../../styles/Auth.css";
 import "../../config";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { useHistory } from "react-router";
+import axios from "axios";
+import { Authorization, BASE_URL } from "../../constants";
 
 export const Auth = () => {
     const { state, setUserDetails, tryLocalLogin } = useContext(AuthContext);
@@ -32,9 +34,12 @@ export const Auth = () => {
         signInWithPopup(getAuth(), googleAuthProvider)
             .then((res) => {
                 res.user.getIdToken().then((token) => {
-                    setUserDetails({ ...res.user, token });
-                    history.push("/home");
-                    setLoading(false);
+                    axios.post(`${BASE_URL}authenticate`, { token }, { headers: { Authorization } }).then((res1) => {
+                        console.log(res1.data.token);
+                        setUserDetails({ ...res.user, token: res1.data.token });
+                        history.replace("/home");
+                        setLoading(false);
+                    });
                 });
             })
             .catch((e) => {
@@ -72,33 +77,6 @@ export const Auth = () => {
                         "Log in using Google"
                     )}
                 </button>
-                {/* <input
-                    ref={textRef}
-                    class="root-entry"
-                    placeholder="e.g. https://example.com"
-                    onChange={(e) => {
-                        setError("");
-                        if (short_url) {
-                            set_short_url();
-                        }
-                        url.current = e.target.value;
-                    }}
-                    onKeyPress={(e) => {
-                        if (e.key === "Enter") {
-                            onSubmit();
-                        }
-                    }}
-                /> */}
-                {/* <p class="error">{error}</p> */}
-                {/* {loading ? (
-                    <div class="loading">
-                        <div class="spinner-grow" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                    </div>
-                ) : (
-                    <ThemedButton title="Generate URL" onClickHandler={onSubmit} />
-                )} */}
             </div>
             <Footer />
         </div>

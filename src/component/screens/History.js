@@ -9,9 +9,7 @@ import Footer from "../Footer";
 import HistoryDetailsModal from "../HistoryDetailsModal";
 import { Context as AuthContext } from "../../context";
 import { useHistory } from "react-router";
-
-const BASEURL = "https://shorty--urls-server.herokuapp.com/";
-const AUTHORIZATION = "05d5f47ab1314523bffef0e918afd3cb";
+import { Authorization, BASE_URL } from "../../constants";
 
 export const History = () => {
     const [loading, setLoading] = useState(false);
@@ -23,28 +21,19 @@ export const History = () => {
 
     const { state, tryLocalLogin } = useContext(AuthContext);
     const nav = useHistory();
-
-    useEffect(() => {
-        tryLocalLogin(
-            () => {
-                //  history.replace("/home");
-            },
-            () => {
-                nav.replace("/login");
-            }
-        );
-    }, []);
+    console.log(state);
 
     const fetchHistory = () => {
         setError("");
         if ((validator.isInt(limit) && parseInt(limit) >= 0) || limit === "") {
             setLoading(true);
-            const url = `${BASEURL}history${limit === "" ? "?limit=" : "?limit=" + limit}`;
+            const url = `${BASE_URL}history${limit === "" ? "?limit=" : "?limit=" + limit}`;
             console.log(url);
             axios
                 .get(url, {
                     headers: {
-                        Authorization: AUTHORIZATION,
+                        Authorization,
+                        accessToken: state.token,
                     },
                 })
                 .then((value) => {
@@ -74,6 +63,14 @@ export const History = () => {
     };
 
     useEffect(() => {
+        tryLocalLogin(
+            () => {
+                //  history.replace("/home");
+            },
+            () => {
+                nav.replace("/login");
+            }
+        );
         fetchHistory();
     }, []);
 
@@ -82,7 +79,7 @@ export const History = () => {
             <Header
                 navText="Home"
                 onNavClick={() => {
-                    window.location.pathname = "/";
+                    nav.replace("/home");
                 }}
             />
             {loading ? (

@@ -8,9 +8,7 @@ import Header from "../Header";
 import Footer from "../Footer";
 import { Context as AuthContext } from "../../context";
 import { useHistory } from "react-router";
-
-const BASE_URL = "https://shorty--urls-server.herokuapp.com/";
-const AUTHORIZATION = "05d5f47ab1314523bffef0e918afd3cb";
+import { Authorization, BASE_URL } from "../../constants";
 
 export const App = () => {
     let url = useRef();
@@ -22,6 +20,7 @@ export const App = () => {
 
     const { state, tryLocalLogin } = useContext(AuthContext);
     const history = useHistory();
+    console.log(state);
     useEffect(() => {
         tryLocalLogin(
             () => {
@@ -35,8 +34,13 @@ export const App = () => {
     }, []);
 
     const makeURLValid = () => {
-        if (url.current.search("https://") === -1 && url.current.search("http://") === -1) {
-            url.current = "https://" + url.current;
+        let temp = url.current;
+        if (temp.search("https://") === -1 && temp.search("http://") === -1) {
+            const www_index = temp.search("www");
+            if (www_index !== -1) {
+                temp = temp.replace("www.", "");
+            }
+            url.current = "https://" + temp;
             console.log("new url", url);
         }
     };
@@ -55,7 +59,8 @@ export const App = () => {
                         },
                         {
                             headers: {
-                                Authorization: AUTHORIZATION,
+                                Authorization,
+                                accessToken: state.token,
                             },
                         }
                     )
@@ -103,7 +108,7 @@ export const App = () => {
             <Header
                 navText="History"
                 onNavClick={() => {
-                    window.location.pathname = "/history";
+                    history.replace("/history");
                 }}
             />
             <div class="mainbox">
