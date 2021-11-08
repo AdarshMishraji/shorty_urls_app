@@ -14,6 +14,7 @@ import Logo from "../assets/images/logo.png";
 import Footer from "../component/Footer";
 import { ClicksGraph } from "../component/ClicksGraph";
 import { Stats } from "../component/Stats";
+import { GraphDropdown } from "../component/GraphDropdown";
 
 const makeURLValid = (url) => {
     let temp = url;
@@ -212,22 +213,34 @@ export const Home = () => {
             </div>
 
             <div className="flex flex-col self-center bg-white text-white p-3">
-                <div className="flex md:flex-row flex-col border-2 p-2 rounded-xl mb-3" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
-                    <Stats title="ALL URLS" value={meta?.allLinks} icon={Logo} color="bg-green-200" />
-                    <Stats title="TOTAL CLICKS" value={meta?.allClicks} icon={Cursor} color="bg-blue-200" />
-                    <Stats
-                        title="LINKS ADDED THIS MONTH"
-                        value={meta?.monthlyClicks?.[currDate.getFullYear()]?.[currDate.toLocaleString("default", { month: "long" })]}
-                        icon={NewLink}
-                        color="bg-blue-200"
-                    />
+                <div className="flex flex-col border-2 p-2 rounded-xl mb-3" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
+                    <div className="flex flex-1 md:flex-row flex-col">
+                        <Stats title="ALL URLS" value={meta?.allLinks} icon={Logo} color="bg-green-200" />
+                        <Stats title="TOTAL CLICKS" value={meta?.allClicks} icon={Cursor} color="bg-blue-200" />
+                    </div>
+                    <div className="flex flex-1 md:flex-row flex-col">
+                        <Stats
+                            title="LINKS ADDED THIS MONTH"
+                            value={meta?.clicks?.[currDate.getFullYear()]?.[currDate.toLocaleString("default", { month: "long" })]?.count}
+                            icon={NewLink}
+                            color="bg-blue-200"
+                        />
+                        <Stats
+                            title="LINKS ADDED THIS YEAR"
+                            value={meta?.clicks?.[currDate.getFullYear()]?.count}
+                            icon={NewLink}
+                            color="bg-blue-200"
+                        />
+                    </div>
                 </div>
                 <div className="flex flex-col border-2 p-2 rounded-xl mb-3" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
-                    <h1 className="text-xl text-gray-500 font-bold mb-2">
-                        <img src={Cursor} height="35" width="35" className="bg-blue-300 rounded-full p-2 mr-2 inline" />
-                        Monthly Clicks (This Year)
-                    </h1>
-                    <ClicksGraph data={meta?.monthlyClicks?.[currDate.getFullYear()]} />
+                    <div className="flex items-center">
+                        <div className="my-2">
+                            <img src={Cursor} height="35px" width="35px" className="bg-blue-300 rounded-full p-2 mr-2 inline" />
+                        </div>
+                        <h1 className="text-xl text-gray-500 font-bold mb-2 inline">Clicks</h1>
+                    </div>
+                    <ClicksGraph data={meta?.clicks} type="daily" params={{ year: 2021, month: "November" }} />
                 </div>
             </div>
             <Footer />

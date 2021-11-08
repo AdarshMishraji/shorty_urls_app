@@ -12,7 +12,7 @@ body {
     height: max-content;
 }
 
-body::-webkit-scrollbar {
+*::-webkit-scrollbar {
     display: none;
 }
 
