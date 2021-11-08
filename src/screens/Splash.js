@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { Redirect, useHistory } from "react-router-dom";
-import { Context as AuthContext } from "../../context";
+import { Context as AuthContext } from "../context";
 
 export const Splash = () => {
     const { tryLocalLogin } = useContext(AuthContext);

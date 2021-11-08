@@ -1,15 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 import validator from "validator";
-import ThemedButton from "../ThemedButton";
-import "../../styles/History.css";
-import "../../styles/App.css";
+// import "../../styles/History.css";
+// import "../../styles/App.css";
 import axios from "axios";
-import Header from "../Header";
-import Footer from "../Footer";
-import HistoryDetailsModal from "../HistoryDetailsModal";
-import { Context as AuthContext } from "../../context";
+import Header from "../component/Header";
+import Footer from "../component/Footer";
+import ThemedButton from "../component/ThemedButton";
+import HistoryDetailsModal from "../component/HistoryDetailsModal";
+import { Context as AuthContext } from "../context";
 import { useHistory } from "react-router";
-import { Authorization, BASE_URL } from "../../constants";
+import { Authorization, BASE_URL } from "../configs/constants";
 
 export const History = () => {
     const [loading, setLoading] = useState(false);

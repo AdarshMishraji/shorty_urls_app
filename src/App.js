@@ -1,14 +1,17 @@
-import { Context as AuthContext, Provider as AuthProvider } from "./context";
-import { App as Home } from "./component/screens/App";
-import { Auth } from "./component/screens/Auth";
-import { Route, BrowserRouter as Router, Switch, Redirect } from "react-router-dom";
-import { History } from "./component/screens/History";
-import { Splash } from "./component/screens/Splash";
+import { Provider as AuthProvider } from "./context";
+import { Home } from "./screens/Home";
+import { Auth } from "./screens/Auth";
+import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
+import { History } from "./screens/History";
+import { Splash } from "./screens/Splash";
+import { Account } from "./screens/Account";
+import Header from "./component/Header";
 
 const App = () => {
     return (
         <AuthProvider>
             <Router>
+                <Header />
                 <SwitchScreens />
             </Router>
         </AuthProvider>
@@ -21,6 +24,7 @@ const SwitchScreens = () => {
             <Route exact path="/login" component={Auth} />
             <Route exact path="/history" component={History} />
             <Route exact path="/home" component={Home} />
+            <Route exact path="/account" component={Account} />
             <Route path="/" component={Splash} />
         </Switch>
     );
