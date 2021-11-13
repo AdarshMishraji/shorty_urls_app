@@ -2,7 +2,7 @@ export const Stats = ({ title, value, icon, color }) => {
     return (
         <div className={`px-4 py-2 rounded-xl ${color} mx-2 flex flex-1 justify-between items-center my-2`}>
             <div>
-                <h1 className="text-sm text-gray-500 font-bold" style={{ minWidth: 100 }}>
+                <h1 className="text-sm text-blue-600 font-bold" style={{ minWidth: 100 }}>
                     {title}
                 </h1>
                 <h1 className="text-sm text-gray-700">{value || 0}</h1>

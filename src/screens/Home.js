@@ -9,12 +9,11 @@ import { Authorization, BASE_URL } from "../configs/constants";
 import Link from "../assets/svgs/link.svg";
 import Cursor from "../assets/svgs/cursor.svg";
 import NewLink from "../assets/svgs/newLink.svg";
-import BackgroundWave from "../assets/svgs/BackgroundWave.svg";
 import Logo from "../assets/images/logo.png";
 import Footer from "../component/Footer";
 import { ClicksGraph } from "../component/ClicksGraph";
 import { Stats } from "../component/Stats";
-import { GraphDropdown } from "../component/GraphDropdown";
+import { TypingText } from "../component/TypingText";
 
 const makeURLValid = (url) => {
     let temp = url;
@@ -48,84 +47,81 @@ export const Home = () => {
 
     useEffect(() => {
         tryLocalLogin(
-            () => {
-                // history.replace("/home");
-            },
-            () => {
-                history.replace("/login");
-            }
+            () => {},
+            () => {}
         );
         textRef.current.focus();
     }, []);
 
     useEffect(() => {
-        if (state.token) {
-            axios
-                .get(`${BASE_URL}meta`, {
-                    headers: {
-                        Authorization,
-                        accessToken: state.token,
-                    },
-                })
-                .then((res) => {
-                    setMeta(res.data);
-                    console.log(res.data);
-                })
-                .catch((e) => console.log(e));
-        }
+        axios
+            .get(`${BASE_URL}meta${state.token ? "" : "?withoutAuth=true"}`, {
+                headers: {
+                    Authorization,
+                    accessToken: state.token,
+                },
+            })
+            .then((res) => {
+                setMeta(res.data);
+                console.log(res.data);
+            })
+            .catch((e) => console.log(e));
     }, [state]);
 
-    console.log(state);
     const onSubmit = async () => {
-        setLoading(true);
-        set_short_url();
-        if (url) {
-            if (validator.isURL(url)) {
-                const newURL = makeURLValid(url);
-                if (await isURLExists(newURL)) {
-                    axios
-                        .post(
-                            `${BASE_URL}generate_short_url`,
-                            {
-                                url: newURL,
-                            },
-                            {
-                                headers: {
-                                    Authorization,
-                                    accessToken: state.token,
+        if (state.token) {
+            setLoading(true);
+            set_short_url();
+            if (url) {
+                if (validator.isURL(url)) {
+                    const newURL = makeURLValid(url);
+                    if (await isURLExists(newURL)) {
+                        axios
+                            .post(
+                                `${BASE_URL}generate_short_url`,
+                                {
+                                    url: newURL,
                                 },
-                            }
-                        )
-                        .then((value) => {
-                            set_short_url(value.data.short_url);
-                        })
-                        .catch((e) => {
-                            console.log("error", e.response);
-                            if (e.response) {
-                                if (e.response.status === 409) {
-                                    set_short_url(e.response.data.short_url);
+                                {
+                                    headers: {
+                                        Authorization,
+                                        accessToken: state.token,
+                                    },
+                                }
+                            )
+                            .then((value) => {
+                                set_short_url(value.data.short_url);
+                            })
+                            .catch((e) => {
+                                console.log("error", e.response);
+                                if (e.response) {
+                                    if (e.response.status === 409) {
+                                        set_short_url(e.response.data.short_url);
+                                    } else {
+                                        setError("Unable to short this url. Try again.");
+                                    }
                                 } else {
                                     setError("Unable to short this url. Try again.");
                                 }
-                            } else {
-                                setError("Unable to short this url. Try again.");
-                            }
-                        })
-                        .finally(() => setLoading(false));
-                    console.log("image exists");
+                            })
+                            .finally(() => setLoading(false));
+                        console.log("image exists");
+                    } else {
+                        console.log("url not exists");
+                        setLoading(false);
+                        setError("URL doesn't exists");
+                    }
                 } else {
-                    console.log("url not exists");
+                    console.log("invalid url");
                     setLoading(false);
-                    setError("URL doesn't exists");
+                    setError("Enter valid URL");
                 }
             } else {
-                console.log("invalid url");
                 setLoading(false);
-                setError("Enter valid URL");
+                setError("Empty url not accepted.");
             }
         } else {
-            setLoading(false);
-            setError("Empty url not accepted.");
+            history.push("/login");
         }
     };
 
@@ -212,35 +208,48 @@ export const Home = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col self-center bg-white text-white p-3">
-                <div className="flex flex-col border-2 p-2 rounded-xl mb-3" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
-                    <div className="flex flex-1 md:flex-row flex-col">
-                        <Stats title="ALL URLS" value={meta?.allLinks} icon={Logo} color="bg-green-200" />
-                        <Stats title="TOTAL CLICKS" value={meta?.allClicks} icon={Cursor} color="bg-blue-200" />
-                    </div>
-                    <div className="flex flex-1 md:flex-row flex-col">
-                        <Stats
-                            title="LINKS ADDED THIS MONTH"
-                            value={meta?.clicks?.[currDate.getFullYear()]?.[currDate.toLocaleString("default", { month: "long" })]?.count}
-                            icon={NewLink}
-                            color="bg-blue-200"
-                        />
-                        <Stats
-                            title="LINKS ADDED THIS YEAR"
-                            value={meta?.clicks?.[currDate.getFullYear()]?.count}
-                            icon={NewLink}
-                            color="bg-blue-200"
-                        />
-                    </div>
-                </div>
-                <div className="flex flex-col border-2 p-2 rounded-xl mb-3" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
-                    <div className="flex items-center">
-                        <div className="my-2">
-                            <img src={Cursor} height="35px" width="35px" className="bg-blue-300 rounded-full p-2 mr-2 inline" />
+            <div className="text-center mx-3 mb-4">
+                <h1 class="text-xl mb-4 text-gray-500">
+                    Shorty URLs allows you to measure the click-through rates of your links, so you can find out what is happening with your links.
+                    Thanks to this, you can learn about the habits and preferences of your users and customers. This allows you to improve and
+                    increase the click-through rate of your links to get the highest possible click-through and visit rates for your website or store,
+                    and this will increase your sales. In addition, thanks to the ability to independently set uniqueness in the link click-through
+                    analysis, you have one of the most advanced link management platforms at your disposal. See features and pricing
+                </h1>
+                <h1 className="text-3xl font-bold text-center text-blue-500">{state.token ? "Your Statistics" : "Our Statistics"}</h1>
+            </div>
+
+            <div className="flex flex-col self-center bg-white text-white m-3 relative">
+                <div>
+                    <div className="flex flex-col border-2 p-2 rounded-xl mb-3" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
+                        <div className="flex flex-1 md:flex-row flex-col">
+                            <Stats title="ALL URLS" value={meta?.allLinks} icon={Logo} color="bg-green-200" />
+                            <Stats title="TOTAL CLICKS" value={meta?.allClicks} icon={Cursor} color="bg-blue-200" />
                         </div>
-                        <h1 className="text-xl text-gray-500 font-bold mb-2 inline">Clicks</h1>
+                        <div className="flex flex-1 md:flex-row flex-col">
+                            <Stats
+                                title="LINKS ADDED THIS MONTH"
+                                value={meta?.linksAdded?.[currDate.getFullYear()]?.[currDate.toLocaleString("default", { month: "long" })]?.count}
+                                icon={NewLink}
+                                color="bg-red-200"
+                            />
+                            <Stats
+                                title="LINKS ADDED THIS YEAR"
+                                value={meta?.linksAdded?.[currDate.getFullYear()]?.count}
+                                icon={NewLink}
+                                color="bg-yellow-200"
+                            />
+                        </div>
                     </div>
-                    <ClicksGraph data={meta?.clicks} type="daily" params={{ year: 2021, month: "November" }} />
+                    <div className="flex flex-col border-2 p-3 rounded-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
+                        <div className="flex items-center">
+                            <div className="my-2">
+                                <img src={Cursor} height="35px" width="35px" className="bg-blue-400 rounded-full p-2 mr-2 inline" />
+                            </div>
+                            <h1 className="text-xl text-blue-500 font-bold mb-2 inline">Clicks</h1>
+                        </div>
+                        <ClicksGraph data={meta?.clicks} />
+                    </div>
                 </div>
             </div>
             <Footer />

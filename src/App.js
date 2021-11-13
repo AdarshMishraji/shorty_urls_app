@@ -23,9 +23,8 @@ const SwitchScreens = () => {
         <Switch>
             <Route exact path="/login" component={Auth} />
             <Route exact path="/history" component={History} />
-            <Route exact path="/home" component={Home} />
             <Route exact path="/account" component={Account} />
-            <Route path="/" component={Splash} />
+            <Route path="/" component={Home} />
         </Switch>
     );
 };

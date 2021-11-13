@@ -26,6 +26,7 @@ const Header = () => {
         setHamburgerOpen(!hamburgerOpen);
     };
 
+    console.log("state,", state);
     return (
         <header className="absolute top-0  w-full text-white">
             <div className="flex justify-between py-2 px-2 bg-transparent">
@@ -35,18 +36,26 @@ const Header = () => {
                 </div>
                 <div className="flex-row items-center justify-center md:flex hidden">
                     <Link text="History" onPress={() => history?.push("/history")} />
-                    <img
-                        src={state.photo_img || account}
-                        style={{ display: state.name ? "block" : "none" }}
-                        className="bg-white rounded-3xl p-1"
-                        height="50"
-                        width="50"
-                        onClick={() => setAccountMenu(!accountMenu)}
-                    />
+                    {state.token ? (
+                        <img
+                            src={state.photo_img || account}
+                            style={{ display: state.name ? "block" : "none" }}
+                            className="bg-white rounded-3xl p-1"
+                            height="50"
+                            width="50"
+                            onClick={() => setAccountMenu(!accountMenu)}
+                        />
+                    ) : (
+                        <Link text="Login / Signup" onPress={() => history?.push("/login")} />
+                    )}
                 </div>
                 <div className="md:hidden flex items-center text-gray-600 md:mr-10 mr-2" onClick={toggleMenu}>
                     <button className="rounded-3xl focus:outline-none border-0" style={{ height: 40, width: 40 }}>
-                        <img src={hamburgerOpen ? HamburgerClose : Hamburger} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} />
+                        {hamburgerOpen ? (
+                            <img src={HamburgerClose} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} />
+                        ) : (
+                            <img src={Hamburger} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} />
+                        )}
                     </button>
                 </div>
             </div>
