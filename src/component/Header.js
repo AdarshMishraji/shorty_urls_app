@@ -32,10 +32,10 @@ const Header = () => {
             <div className="flex justify-between py-2 px-2 bg-transparent">
                 <div className="flex justify-start items-center md:ml-5 ml-2 cursor-pointer" onClick={() => history?.push("/home")}>
                     <img src={Logo} height="50" width="50" className="bg-white rounded-full p-2 mr-3" />
-                    <h3 className="font-bold md:text-2xl text-sm"> Shorty URLs </h3>
+                    <h3 className="font-bold sm:text-2xl text-lg"> Shorty URLs </h3>
                 </div>
                 <div className="flex-row items-center justify-center md:flex hidden">
-                    <Link text="History" onPress={() => history?.push("/history")} />
+                    <Link text="URLs" onPress={() => history?.push("/urls")} />
                     {state.token ? (
                         <img
                             src={state.photo_img || account}
@@ -96,13 +96,13 @@ const Header = () => {
                         hover:bg-gray-300 transition duration-300 ease-in-out text-lg font-bold cursor-pointer"
                     onClick={() => {
                         setHamburgerOpen(false);
-                        history?.push("/history");
+                        history?.push("/urls");
                     }}
                 >
-                    History
+                    URLs
                 </h1>
                 <h1
-                    style={{ display: state.name ? "block" : "none" }}
+                    style={{ display: state.token ? "block" : "none" }}
                     className=" my-2 w-full py-1 px-4 rounded-xl mr-10 text-black
                         hover:bg-gray-300 transition duration-300 ease-in-out text-lg font-bold cursor-pointer"
                     onClick={() => {
@@ -113,16 +113,16 @@ const Header = () => {
                     Edit Profile
                 </h1>
                 <h1
-                    style={{ display: state.name ? "block" : "none" }}
+                    // style={{ display: state.token ? "block" : "none" }}
                     className="bg-blue-500 w-full py-1 px-4 rounded-xl mr-10 text-white z-50
                         hover:bg-blue-600 transition duration-300 ease-in-out text-lg font-bold"
                     onClick={() => {
                         clearUserData();
-                        setAccountMenu(false);
+                        setHamburgerOpen(false);
                         history?.push("/login");
                     }}
                 >
-                    Logout
+                    {state.token ? "Logout" : "Login / Signup"}
                 </h1>
             </div>
         </header>

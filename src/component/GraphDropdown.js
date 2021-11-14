@@ -1,61 +1,42 @@
-import { useReducer, useState } from "react";
-import ExpandMore from "../assets/svgs/expand_less.svg";
-import ExpandLess from "../assets/svgs/expand_more.svg";
+import React, { useReducer, useState } from "react";
+import { Dropdown, Option } from "./Dropdown";
 import { months, noMonths } from "../constants";
+import { useOutsideAlerter } from "../hooks";
 
 const currDate = new Date();
 
-const reducer = (state, { type, payload }) => {
-    switch (type) {
-        case "set_isMonth": {
-            return { ...state, isMonth: payload };
-        }
-        case "set_isYear": {
-            return { ...state, isYear: payload };
-        }
-        case "set_isOpen": {
-            return { ...state, isOpen: payload };
-        }
-        case "set_isMonthOpen": {
-            return { ...state, isMonthOpen: payload };
-        }
-        case "set_isYearOpen": {
-            return { ...state, isYearOpen: payload };
-        }
-        case "on_daily_select": {
-            return { ...state, isMonth: true, isYear: true, isOpen: false };
-        }
-        case "on_monthly_select": {
-            return { ...state, isMonth: false, isYear: true, isOpen: false };
-        }
-        case "on_yearly_select": {
-            return { ...state, isMonth: false, isYear: false, isOpen: false };
-        }
-        default:
-            return state;
-    }
-};
-
 export const GraphDropdown = ({ type, month, year, setType, setMonth, setYear, smallestYear }) => {
-    const [state, dispatch] = useReducer(reducer, {
-        isMonth: false,
-        isYear: true,
-        isOpen: false,
-        isMonthOpen: false,
-        isYearOpen: false,
+    const [isMonth, setIsMonth] = useState(false);
+    const [isYear, setIsYear] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
+    const [isMonthOpen, setIsMonthOpen] = useState(false);
+    const [isYearOpen, setIsYearOpen] = useState(false);
+
+    let typesRef = React.createRef();
+    let monthsRef = React.createRef();
+    let yearsRef = React.createRef();
+
+    useOutsideAlerter(typesRef, () => {
+        setIsOpen(false);
+    });
+    useOutsideAlerter(monthsRef, () => {
+        setIsMonthOpen(false);
+    });
+    useOutsideAlerter(yearsRef, () => {
+        setIsYearOpen(false);
     });
 
-    const { isMonth, isYear, isOpen, isMonthOpen, isYearOpen } = state;
-
-    console.log(state);
-
     return (
-        <div className="flex flex-row flex-wrap root_graph_dropdow">
+        <div className="flex flex-row flex-wrap">
             <Dropdown
+                ref={typesRef}
                 isOpen={isOpen}
                 isVisible={true}
-                // onSelect={() => setOpen(!isOpen)}
-                onSelect={() => dispatch({ type: "set_isOpen", payload: !isOpen })}
+                onSelect={() => {
+                    setIsOpen(!isOpen);
+                    setIsMonthOpen(false);
+                    setIsYearOpen(false);
+                }}
                 value={type.charAt(0).toUpperCase() + type.slice(1)}
                 title="Select"
             >
@@ -64,7 +45,9 @@ export const GraphDropdown = ({ type, month, year, setType, setMonth, setYear, s
                     hint="(Past 5 Years)"
                     onClick={() => {
                         setType("yearly");
-                        dispatch({ type: "on_yearly_select" });
+                        setIsMonth(false);
+                        setIsYear(false);
+                        setIsOpen(false);
                     }}
                 />
                 <Option
@@ -72,7 +55,9 @@ export const GraphDropdown = ({ type, month, year, setType, setMonth, setYear, s
                     onClick={() => {
                         setType("monthly");
                         setYear(currDate.getFullYear());
-                        dispatch({ type: "on_monthly_select" });
+                        setIsMonth(false);
+                        setIsYear(true);
+                        setIsOpen(false);
                     }}
                 />
                 <Option
@@ -81,16 +66,22 @@ export const GraphDropdown = ({ type, month, year, setType, setMonth, setYear, s
                         setType("daily");
                         setMonth(noMonths[currDate.getMonth() + 1]);
                         setYear(currDate.getFullYear());
-                        dispatch({ type: "on_daily_select" });
+                        setIsMonth(true);
+                        setIsYear(true);
+                        setIsOpen(false);
                     }}
                     last
                 />
             </Dropdown>
-
             <Dropdown
+                ref={monthsRef}
                 isOpen={isMonthOpen}
                 isVisible={isMonth}
-                onSelect={() => dispatch({ type: "set_isMonthOpen", payload: !isMonthOpen })}
+                onSelect={() => {
+                    setIsOpen(false);
+                    setIsMonthOpen(!isMonthOpen);
+                    setIsYearOpen(false);
+                }}
                 value={month}
                 title="Month"
             >
@@ -100,7 +91,9 @@ export const GraphDropdown = ({ type, month, year, setType, setMonth, setYear, s
                             text={ele}
                             onClick={() => {
                                 setMonth(ele);
-                                dispatch({ type: "set_isMonthOpen", payload: false });
+                                setIsOpen(false);
+                                setIsMonthOpen(!false);
+                                setIsYearOpen(false);
                             }}
                             last={index === 11}
                         />
@@ -109,9 +102,14 @@ export const GraphDropdown = ({ type, month, year, setType, setMonth, setYear, s
             </Dropdown>
 
             <Dropdown
+                ref={yearsRef}
                 isOpen={isYearOpen}
                 isVisible={isYear}
-                onSelect={() => dispatch({ type: "set_isYearOpen", payload: !isYearOpen })}
+                onSelect={() => {
+                    setIsOpen(false);
+                    setIsMonthOpen(false);
+                    setIsYearOpen(!isYearOpen);
+                }}
                 value={year}
                 title="Year"
             >
@@ -123,7 +121,9 @@ export const GraphDropdown = ({ type, month, year, setType, setMonth, setYear, s
                                 text={parseInt(smallestYear) + index}
                                 onClick={() => {
                                     setYear(parseInt(smallestYear) + index);
-                                    dispatch({ type: "set_isYearOpen", payload: false });
+                                    setIsOpen(false);
+                                    setIsMonthOpen(false);
+                                    setIsYearOpen(true);
                                 }}
                                 last={parseInt(smallestYear) + index === currDate.getFullYear()}
                             />
@@ -131,41 +131,5 @@ export const GraphDropdown = ({ type, month, year, setType, setMonth, setYear, s
                     })}
             </Dropdown>
         </div>
-    );
-};
-
-const Dropdown = ({ isOpen, isVisible, children, onSelect, value, title }) => {
-    return (
-        <div className="relative w-40 p-2 mt-1" onClick={onSelect} style={{ display: isVisible ? "block" : "none", marginLeft: 20 }}>
-            <h1 className="text-lg text-black font-bold mb-2 inline">{title}</h1>
-            <div className="flex border-2 border-blue-400 justify-between rounded-xl px-2 py-1">
-                <h1 className="text-xl text-blue-500 font-bold inline">{value}</h1>
-                <img src={isOpen ? ExpandLess : ExpandMore} />
-            </div>
-            <div
-                className="absolute right-0 bottom-16 z-20 rounded-2xl flex-col text-blue-500 p-2 bg-white overflow-auto"
-                style={{ boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.5)", display: isOpen ? "flex" : "none", maxHeight: "25vh" }}
-            >
-                {children}
-            </div>
-        </div>
-    );
-};
-
-const Option = ({ text, hint, onClick, last }) => {
-    return (
-        <h1
-            className="cursor-pointer text-lg font-bold"
-            style={{
-                paddingBottom: last ? "0rem" : "0.25rem",
-                borderBottomWidth: last ? "0px" : "2px",
-            }}
-            onClick={onClick}
-        >
-            {text}{" "}
-            <h1 className="text-sm font-normal" style={{ display: hint ? "block" : "none" }}>
-                {hint}
-            </h1>
-        </h1>
     );
 };

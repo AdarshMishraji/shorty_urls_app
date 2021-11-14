@@ -13,7 +13,7 @@ import Logo from "../assets/images/logo.png";
 import Footer from "../component/Footer";
 import { ClicksGraph } from "../component/ClicksGraph";
 import { Stats } from "../component/Stats";
-import { TypingText } from "../component/TypingText";
+import { TopLinks } from "../component/TopLinks";
 
 const makeURLValid = (url) => {
     let temp = url;
@@ -47,26 +47,24 @@ export const Home = () => {
 
     useEffect(() => {
         tryLocalLogin(
-            () => {},
+            () => {
+                axios
+                    .get(`${BASE_URL}meta${state.token ? "" : "?withoutAuth=true"}`, {
+                        headers: {
+                            Authorization,
+                            accessToken: state.token,
+                        },
+                    })
+                    .then((res) => {
+                        setMeta(res.data);
+                        console.log(res.data);
+                    })
+                    .catch((e) => console.log(e));
+            },
             () => {}
         );
         textRef.current.focus();
     }, []);
-
-    useEffect(() => {
-        axios
-            .get(`${BASE_URL}meta${state.token ? "" : "?withoutAuth=true"}`, {
-                headers: {
-                    Authorization,
-                    accessToken: state.token,
-                },
-            })
-            .then((res) => {
-                setMeta(res.data);
-                console.log(res.data);
-            })
-            .catch((e) => console.log(e));
-    }, [state]);
 
     const onSubmit = async () => {
         if (state.token) {
@@ -192,11 +190,9 @@ export const Home = () => {
                         <p className="text-red-600 text-xl text-center">{error}</p>
                         {short_url ? (
                             <div className="flex flex-col w-full">
-                                <input
-                                    className="text-xl text-white bg-gray-600 py-2 rounded-xl px-3 my-2 w-full"
-                                    value={short_url}
-                                    contentEditable={false}
-                                />
+                                <p className="text-xl text-white bg-gray-600 py-2 px-3 my-2 rounded-xl pl-3 flex-1 mr-2 md:w-100 w-full whitespace-nowrap overflow-scroll">
+                                    {short_url}
+                                </p>
                                 <p className="text-blue-600 text-xl text-center mb-2">{success}</p>
                                 <div className="flex justify-around items-center">
                                     <ThemedButton title="Copy" onClickHandler={onCopy} />
@@ -209,13 +205,6 @@ export const Home = () => {
             </div>
 
             <div className="text-center mx-3 mb-4">
-                <h1 class="text-xl mb-4 text-gray-500">
-                    Shorty URLs allows you to measure the click-through rates of your links, so you can find out what is happening with your links.
-                    Thanks to this, you can learn about the habits and preferences of your users and customers. This allows you to improve and
-                    increase the click-through rate of your links to get the highest possible click-through and visit rates for your website or store,
-                    and this will increase your sales. In addition, thanks to the ability to independently set uniqueness in the link click-through
-                    analysis, you have one of the most advanced link management platforms at your disposal. See features and pricing
-                </h1>
                 <h1 className="text-3xl font-bold text-center text-blue-500">{state.token ? "Your Statistics" : "Our Statistics"}</h1>
             </div>
 
@@ -223,23 +212,42 @@ export const Home = () => {
                 <div>
                     <div className="flex flex-col border-2 p-2 rounded-xl mb-3" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
                         <div className="flex flex-1 md:flex-row flex-col">
-                            <Stats title="ALL URLS" value={meta?.allLinks} icon={Logo} color="bg-green-200" />
-                            <Stats title="TOTAL CLICKS" value={meta?.allClicks} icon={Cursor} color="bg-blue-200" />
+                            <Stats title="ALL URLS" value={meta?.all_links} icon={Logo} color="bg-green-200" />
+                            <Stats title="TOTAL CLICKS" value={meta?.all_clicks} icon={Cursor} color="bg-blue-200" />
                         </div>
                         <div className="flex flex-1 md:flex-row flex-col">
                             <Stats
                                 title="LINKS ADDED THIS MONTH"
-                                value={meta?.linksAdded?.[currDate.getFullYear()]?.[currDate.toLocaleString("default", { month: "long" })]?.count}
+                                value={meta?.links_added?.[currDate.getFullYear()]?.[currDate.toLocaleString("default", { month: "long" })]?.count}
                                 icon={NewLink}
                                 color="bg-red-200"
                             />
                             <Stats
                                 title="LINKS ADDED THIS YEAR"
-                                value={meta?.linksAdded?.[currDate.getFullYear()]?.count}
+                                value={meta?.links_added?.[currDate.getFullYear()]?.count}
                                 icon={NewLink}
                                 color="bg-yellow-200"
                             />
                         </div>
+                        <h1 className="text-blue-500 text-2xl my-2 text-center border-t-2 pt-3">Most Clicked URLs</h1>
+                        <TopLinks
+                            title={meta?.top_three?.[0]?.title}
+                            url={meta?.top_three?.[0]?.url}
+                            short_url={meta?.top_three?.[0]?.short_url}
+                            color="#FFD700"
+                        />
+                        <TopLinks
+                            title={meta?.top_three?.[1]?.title}
+                            url={meta?.top_three?.[1]?.url}
+                            short_url={meta?.top_three?.[1]?.short_url}
+                            color="#C0C0C0"
+                        />
+                        <TopLinks
+                            title={meta?.top_three?.[2]?.title}
+                            url={meta?.top_three?.[2]?.url}
+                            short_url={meta?.top_three?.[2]?.short_url}
+                            color="#CD7F32"
+                        />
                     </div>
                     <div className="flex flex-col border-2 p-3 rounded-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
                         <div className="flex items-center">
@@ -249,6 +257,18 @@ export const Home = () => {
                             <h1 className="text-xl text-blue-500 font-bold mb-2 inline">Clicks</h1>
                         </div>
                         <ClicksGraph data={meta?.clicks} />
+                    </div>
+                </div>
+                <div>
+                    <div className="text-center mx-3 mt-5">
+                        <h1 class="text-xl my-3 text-gray-500">
+                            Shorty URLs allows you to measure the click-through rates of your links, so you can find out what is happening with your
+                            links. Thanks to this, you can learn about the habits and preferences of your users and customers. This allows you to
+                            improve and increase the click-through rate of your links to get the highest possible click-through and visit rates for
+                            your website or store, and this will increase your sales. In addition, thanks to the ability to independently set
+                            uniqueness in the link click-through analysis, you have one of the most advanced link management platforms at your
+                            disposal. See features and pricing
+                        </h1>
                     </div>
                 </div>
             </div>

@@ -49,7 +49,6 @@ export const Auth = () => {
 
     return (
         <div className="bg-white pb-10">
-            <Header />
             <div
                 className="flex flex-col items-center justify-center mb-5 h-screen"
                 style={{

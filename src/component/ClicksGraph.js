@@ -201,7 +201,7 @@ export const ClicksGraph = ({ data }) => {
     return (
         <div className="relative">
             <div style={{ filter: data ? "none" : "blur(8px)" }}>
-                <TypeSelector isBar={barType === "bar"} setType={(type) => setBarType(type)} className="flex items-center justify-center" />
+                <TypeSelector isBar={barType === "bar"} setType={(type) => setBarType(type)} className="flex items-center justify-center top-5" />
                 <Bar style={{ maxHeight: "40vh", marginTop: ".5rem" }} data={content} options={options} />
                 <div>
                     <GraphDropdown
