@@ -1,22 +1,15 @@
-import { useContext, useEffect, useState } from "react";
+import * as React from "react";
 import { Context as AuthContext } from "../context";
-import Footer from "../component/Footer";
-import Header from "../component/Header";
-import GoogleIcon from "../google_icon.svg";
-// import "../../styles/Auth.css";
 import "../configs/firebaseConfig";
-import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { useHistory } from "react-router";
-import axios from "axios";
-import { Authorization, BASE_URL } from "../configs/constants";
+import { ToastContainer } from "react-toastify";
 
-export const Account = () => {
-    const { state, tryLocalLogin } = useContext(AuthContext);
-    const [loading, setLoading] = useState(false);
+const Account = () => {
+    const { state, tryLocalLogin } = React.useContext(AuthContext);
 
     const history = useHistory();
 
-    useEffect(() => {
+    React.useEffect(() => {
         tryLocalLogin(
             () => {
                 // history.replace("/home");
@@ -28,63 +21,31 @@ export const Account = () => {
     }, []);
 
     return (
-        <div class="body mainRoot">
-            <Header>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <div class="nav" style={{ marginRight: "50px" }}>
-                        <p onClick={() => history.push("/home")}>Home</p>
-                    </div>
-                    <div class="nav">
-                        <p onClick={() => history.push("/history")}>History</p>
-                    </div>
+        <div className="bg-white z-10">
+            <ToastContainer />
+            <div
+                className="flex flex-col items-center justify-center mb-5 rounded-b-2xl"
+                style={{ background: "linear-gradient(-45deg,#2225ff 10%,#2254ff 90%)", boxShadow: "0px 5px 40px 2px blue", paddingBottom: 70 }}
+            ></div>
+            <div className="flex flex-col border-2 p-5 rounded-xl m-3 text-xl items-center" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
+                <div className="flex p-1 mr-2 mb-3 rounded-full" style={{ boxShadow: "0px 0px 15px 1px blue" }}>
+                    <img src={state.photo_img} height={100} width={100} style={{ borderRadius: 50 }} />
                 </div>
-            </Header>
-            <div class="mainbox" style={{ display: "flex", justifyContent: "space-around", flexDirection: "row" }}>
-                <div style={{ width: 125, display: "flex", justifyContent: "center" }}>
-                    <img src={state.photo_img} height={100} width={100} style={{ borderRadius: 50, boxShadow: "0px 5px 20px 5px black" }} />
-                </div>
-                <div style={{ alignItems: "center" }}>
-                    <p style={{ flexDirection: "row", display: "flex" }}>
-                        <label style={{ fontWeight: "bold", width: "150px", fontSize: "25px", color: "white" }}>Name :</label>
-                        <input
-                            value={state.name}
-                            title="Name"
-                            contentEditable={false}
-                            disabled
-                            style={{
-                                borderRadius: "25px",
-                                outline: "none",
-                                border: "none",
-                                padding: "5px 15px",
-                                width: "60%",
-                                marginRight: "20px",
-                                boxShadow: "0px 5px 20px 5px black",
-                                backgroundColor: "#e3f2fd",
-                            }}
-                        />
-                    </p>
-                    <p style={{ flexDirection: "row", display: "flex" }}>
-                        <label style={{ fontWeight: "bold", width: "150px", fontSize: "25px", color: "white" }}>Email :</label>
-                        <input
-                            value={state.email}
-                            title="Email"
-                            contentEditable={false}
-                            disabled
-                            style={{
-                                borderRadius: "25px",
-                                outline: "none",
-                                border: "none",
-                                padding: "5px 15px",
-                                width: "60%",
-                                marginRight: "20px",
-                                boxShadow: "0px 5px 20px 5px black",
-                                backgroundColor: "#e3f2fd",
-                            }}
-                        />
-                    </p>
+                <div className="flex flex-col items-center justify-center">
+                    <div className="flex flex-col md:w-full items-center" style={{ maxWidth: "80vw" }}>
+                        <p className="text-xl text-white bg-gray-600 py-2 px-3 my-2 rounded-xl pl-3 flex-1 md:w-100 w-full whitespace-nowrap overflow-scroll">
+                            {state.name}
+                        </p>
+                    </div>
+                    <div className="flex flex-col md:w-full items-center" style={{ maxWidth: "80vw" }}>
+                        <p className="text-xl text-white bg-gray-600 py-2 px-3 my-2 rounded-xl pl-3 flex-1 md:w-100 w-full whitespace-nowrap overflow-scroll">
+                            {state.email}
+                        </p>
+                    </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };
+
+export default Account;

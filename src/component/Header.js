@@ -1,10 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import * as React from "react";
 import { useHistory } from "react-router";
 import { Context as AuthContext } from "../context";
 import Logo from "../assets/images/logo.png";
 import account from "../assets/svgs/account.svg";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import HamburgerClose from "../assets/svgs/close.svg";
+import { useOutsideAlerter } from "../hooks";
 
 const Link = ({ text, onPress, last }) => {
     return (
@@ -17,14 +18,25 @@ const Link = ({ text, onPress, last }) => {
 };
 
 const Header = () => {
-    const [hamburgerOpen, setHamburgerOpen] = useState(false);
-    const [accountMenu, setAccountMenu] = useState(false);
+    const [hamburgerOpen, setHamburgerOpen] = React.useState(false);
+    const [accountMenu, setAccountMenu] = React.useState(false);
     const history = useHistory();
-    const { state, clearUserData } = useContext(AuthContext);
+    const { state, clearUserData } = React.useContext(AuthContext);
 
     const toggleMenu = () => {
         setHamburgerOpen(!hamburgerOpen);
     };
+
+    const hamburgerRef = React.createRef();
+    const accountMenuRef = React.createRef();
+
+    useOutsideAlerter(accountMenuRef, () => {
+        setAccountMenu(false);
+    });
+
+    useOutsideAlerter(hamburgerRef, () => {
+        setHamburgerOpen(false);
+    });
 
     console.log("state,", state);
     return (
@@ -49,31 +61,32 @@ const Header = () => {
                         <Link text="Login / Signup" onPress={() => history?.push("/login")} />
                     )}
                 </div>
-                <div className="md:hidden flex items-center text-gray-600 md:mr-10 mr-2" onClick={toggleMenu}>
-                    <button className="rounded-3xl focus:outline-none border-0" style={{ height: 40, width: 40 }}>
+                <div className="md:hidden flex items-center text-gray-600 md:mr-10 mr-2 z-" onClick={toggleMenu}>
+                    <div className="rounded-3xl focus:outline-none border-0" style={{ height: 40, width: 40 }}>
                         {hamburgerOpen ? (
                             <img src={HamburgerClose} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} />
                         ) : (
                             <img src={Hamburger} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} />
                         )}
-                    </button>
+                    </div>
                 </div>
             </div>
 
             <div
+                ref={accountMenuRef}
                 className="menu opacity-95 md:hidden p-3 self-center mt-2 absolute right-5 bg-white rounded-2xl z-10"
                 style={{ display: accountMenu ? "block" : "none", boxShadow: "0px 0px 25px 5px black" }}
             >
-                <button
-                    className=" my-2 w-full pb-1 px-4 rounded-xl mr-10 text-black
+                <h1
+                    className=" my-2 w-full py-1 px-4 rounded-xl mr-10 text-black
                         hover:bg-gray-300 transition duration-300 ease-in-out text-lg font-bold cursor-pointer"
                     onClick={() => {
                         setAccountMenu(false);
                         history?.push("/account");
                     }}
                 >
-                    Edit Profile
-                </button>
+                    View Profile
+                </h1>
                 <button
                     className="bg-blue-500 w-full py-1 rounded-xl mr-10 text-white 
                     hover:bg-blue-600 transition duration-300 ease-in-out text-lg font-bold"
@@ -88,6 +101,7 @@ const Header = () => {
             </div>
 
             <div
+                ref={hamburgerRef}
                 className="menu p-3 mt-2 absolute right-5 flex-col bg-gray-200 rounded-2xl z-10 opacity-95"
                 style={{ display: hamburgerOpen ? "flex" : "none", boxShadow: "0px 0px 25px 5px black" }}
             >
@@ -110,9 +124,9 @@ const Header = () => {
                         history?.push("/account");
                     }}
                 >
-                    Edit Profile
+                    View Profile
                 </h1>
-                <h1
+                <button
                     // style={{ display: state.token ? "block" : "none" }}
                     className="bg-blue-500 w-full py-1 px-4 rounded-xl mr-10 text-white z-50
                         hover:bg-blue-600 transition duration-300 ease-in-out text-lg font-bold"
@@ -123,7 +137,7 @@ const Header = () => {
                     }}
                 >
                     {state.token ? "Logout" : "Login / Signup"}
-                </h1>
+                </button>
             </div>
         </header>
     );

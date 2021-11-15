@@ -1,26 +1,22 @@
-import { useContext, useEffect, useState } from "react";
+import * as React from "react";
 import { Context as AuthContext } from "../context";
-import Footer from "../component/Footer";
-import Header from "../component/Header";
 import GoogleIcon from "../google_icon.svg";
-// import "../../styles/Auth.css";
 import "../configs/firebaseConfig";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { useHistory } from "react-router";
 import axios from "axios";
 import { Authorization, BASE_URL } from "../configs/constants";
 
-export const Auth = () => {
-    const { state, setUserDetails, tryLocalLogin } = useContext(AuthContext);
-    const [loading, setLoading] = useState(false);
+const Auth = () => {
+    const { state, setUserDetails, tryLocalLogin } = React.useContext(AuthContext);
+    const [loading, setLoading] = React.useState(false);
 
     const history = useHistory();
 
-    useEffect(() => {
+    React.useEffect(() => {
         tryLocalLogin(
             () => {
                 history.replace("/home");
-                //  history.replace("/login");
             },
             () => {}
         );
@@ -48,19 +44,22 @@ export const Auth = () => {
     };
 
     return (
-        <div className="bg-white pb-10">
+        <div className="bg-white">
             <div
-                className="flex flex-col items-center justify-center mb-5 h-screen"
+                className="flex flex-col items-center justify-center h-screen"
                 style={{
                     background: "linear-gradient(-45deg,#2225ff 10%,#2254ff 90%)",
                     boxShadow: "0px 5px 40px 2px black",
                 }}
             >
-                <div className="flex flex-col justify-center items-center px-5 py-4 bg-white rounded-3xl mx-2">
-                    <h1 className="text-3xl font-bold mb-3">Sign Up / Log In</h1>
+                <div
+                    className="flex flex-col justify-center items-center px-5 py-4 bg-white rounded-3xl mx-2"
+                    style={{ boxShadow: "0px 0px 15px 0.5px blue" }}
+                >
+                    <h1 className="text-3xl font-bold mb-3 text-gray-800">Sign Up / Log In</h1>
                     <button
                         className="flex items-center bg-white p-3 rounded-3xl font-bold text-xl focus:outline-none focus:shadow-2xl"
-                        style={{ boxShadow: "0px 2px 25px 5px black" }}
+                        style={{ boxShadow: "0px 0px 15px 0.5px blue", maxWidth: "75vw", minWidth: "50vw" }}
                         onClick={() => {
                             if (!loading) {
                                 onLogin();
@@ -70,9 +69,21 @@ export const Auth = () => {
                         <img src={GoogleIcon} height="50px" width="50px" className="mr-3" />
 
                         {loading ? (
-                            <div className="spinner-border text-dark ml-5"></div>
+                            <svg
+                                class="animate-spin h-8 w-8 mx-auto text-blue-500"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
                         ) : (
-                            <h1>
+                            <h1 className="w-full md:mr-5 mr-0 text-gray-700 text-2xl">
                                 Log in <h1 className="md:inline-block hidden">using Google</h1>
                             </h1>
                         )}
@@ -82,3 +93,5 @@ export const Auth = () => {
         </div>
     );
 };
+
+export default Auth;

@@ -1,7 +1,11 @@
-import { useState } from "react";
-import { Bar } from "react-chartjs-2";
+import * as React from "react";
+import { Bar, Chart } from "react-chartjs-2";
 import { GraphDropdown } from "./GraphDropdown";
 import { noMonths, monthNo } from "../constants";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import { TypeSelector } from "./TypesSelector";
+
+Chart.register(ChartDataLabels);
 
 const options = {
     plugins: {
@@ -15,6 +19,20 @@ const options = {
                     return " " + item.raw;
                 },
             },
+        },
+        datalabels: {
+            backgroundColor: "white",
+            color: "black",
+            font: {
+                weight: "bold",
+            },
+            borderRadius: 20,
+            formatter: Math.round,
+        },
+    },
+    elements: {
+        line: {
+            tension: 0.5,
         },
     },
     scales: {
@@ -37,55 +55,20 @@ const commonStyle = {
     },
     line: {
         type: "line",
-        cubicInterpolationMode: "monotone",
         borderColor: "rgba(54,162,235,1)",
         borderWidth: 1,
-        borderJoinStyle: "miter",
         pointStyle: "circle",
         fill: true,
     },
 };
 
-const TypeSelector = ({ isBar, setType, className }) => {
-    return (
-        <div className={className}>
-            <div className="flex justify-around w-52 h-12 relative items-center">
-                <h1
-                    onClick={() => setType("bar")}
-                    className="text-white left-0 w-28  rounded-l-2xl  text-center bg-blue-400 py-2 cursor-pointer"
-                    style={{ backgroundColor: "#2254ff55" }}
-                >
-                    Bar
-                </h1>
-                <h1
-                    onClick={() => setType("line")}
-                    className="text-white right-0 w-28  rounded-r-2xl text-center  py-2 cursor-pointer"
-                    style={{ backgroundColor: "#2254ff55" }}
-                >
-                    Line
-                </h1>
-                <div
-                    className="absolute w-28 bg-blue-600 rounded-2xl text-center py-2 left-0 font-semibold"
-                    style={{
-                        transform: isBar ? "translateX(-5px)" : "translateX(100px)",
-                        transition: "0.5s linear",
-                        boxShadow: "0px 0px 20px 0.5px black",
-                    }}
-                >
-                    {isBar ? "Bar" : "Line"}
-                </div>
-            </div>
-        </div>
-    );
-};
-
 const currDate = new Date();
 
 export const ClicksGraph = ({ data }) => {
-    const [barType, setBarType] = useState("line");
-    const [type, setType] = useState("monthly");
-    const [month, setMonth] = useState(noMonths[currDate.getMonth() + 1]);
-    const [year, setYear] = useState(currDate.getFullYear());
+    const [barType, setBarType] = React.useState("line");
+    const [type, setType] = React.useState("monthly");
+    const [month, setMonth] = React.useState(noMonths[currDate.getMonth() + 1]);
+    const [year, setYear] = React.useState(currDate.getFullYear());
 
     const commonData =
         type === "monthly"
@@ -201,7 +184,14 @@ export const ClicksGraph = ({ data }) => {
     return (
         <div className="relative">
             <div style={{ filter: data ? "none" : "blur(8px)" }}>
-                <TypeSelector isBar={barType === "bar"} setType={(type) => setBarType(type)} className="flex items-center justify-center top-5" />
+                <TypeSelector
+                    isBar={barType === "bar"}
+                    setType={(type) => setBarType(type)}
+                    className="flex items-center justify-center pt-3"
+                    text1="Bars"
+                    text2="Lines"
+                />
+                <h1 className="text-blue-500 text-2xl mb-2 mt-3 text-center">{type[0].toUpperCase() + type.slice(1)} Clicks</h1>
                 <Bar style={{ maxHeight: "40vh", marginTop: ".5rem" }} data={content} options={options} />
                 <div>
                     <GraphDropdown

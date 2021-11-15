@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import * as React from "react";
 import validator from "validator";
 import ThemedButton from "../component/ThemedButton";
 import axios from "axios";
@@ -14,6 +14,9 @@ import Footer from "../component/Footer";
 import { ClicksGraph } from "../component/ClicksGraph";
 import { Stats } from "../component/Stats";
 import { TopLinks } from "../component/TopLinks";
+import { useCallback } from "react/cjs/react.development";
+import { toast, ToastContainer } from "react-toastify";
+import { toastConfig } from "../component/URLItems";
 
 const makeURLValid = (url) => {
     let temp = url;
@@ -27,29 +30,24 @@ const makeURLValid = (url) => {
     return;
 };
 
-const isURLExists = async (url) => {
-    // return await urlExists(url);
-    return true;
-};
-
-export const Home = () => {
+const Home = () => {
     const currDate = new Date();
-    const [url, setUrl] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [short_url, set_short_url] = useState();
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
-    const [meta, setMeta] = useState({});
-    let textRef = useRef();
+    const [url, setUrl] = React.useState("");
+    const [loading, setLoading] = React.useState(false);
+    const [short_url, set_short_url] = React.useState();
+    const [error, setError] = React.useState("");
+    const [success, setSuccess] = React.useState("");
+    const [meta, setMeta] = React.useState({});
+    let textRef = React.useRef();
 
-    const { state, tryLocalLogin } = useContext(AuthContext);
+    const { state, tryLocalLogin } = React.useContext(AuthContext);
     const history = useHistory();
 
-    useEffect(() => {
-        tryLocalLogin(
-            () => {
+    const fetchMetaData = React.useCallback(
+        (withoutAuth) => {
+            if (withoutAuth || state.token)
                 axios
-                    .get(`${BASE_URL}meta${state.token ? "" : "?withoutAuth=true"}`, {
+                    .get(`${BASE_URL}meta?withoutAuth=${withoutAuth}}`, {
                         headers: {
                             Authorization,
                             accessToken: state.token,
@@ -60,8 +58,18 @@ export const Home = () => {
                         console.log(res.data);
                     })
                     .catch((e) => console.log(e));
+        },
+        [state]
+    );
+
+    React.useEffect(() => {
+        tryLocalLogin(
+            () => {
+                fetchMetaData(false);
             },
-            () => {}
+            () => {
+                fetchMetaData(true);
+            }
         );
         textRef.current.focus();
     }, []);
@@ -73,50 +81,55 @@ export const Home = () => {
             if (url) {
                 if (validator.isURL(url)) {
                     const newURL = makeURLValid(url);
-                    if (await isURLExists(newURL)) {
-                        axios
-                            .post(
-                                `${BASE_URL}generate_short_url`,
-                                {
-                                    url: newURL,
+                    axios
+                        .post(
+                            `${BASE_URL}generate_short_url`,
+                            {
+                                url: newURL,
+                            },
+                            {
+                                headers: {
+                                    Authorization,
+                                    accessToken: state.token,
                                 },
-                                {
-                                    headers: {
-                                        Authorization,
-                                        accessToken: state.token,
-                                    },
-                                }
-                            )
-                            .then((value) => {
-                                set_short_url(value.data.short_url);
-                            })
-                            .catch((e) => {
-                                console.log("error", e.response);
-                                if (e.response) {
-                                    if (e.response.status === 409) {
-                                        set_short_url(e.response.data.short_url);
-                                    } else {
-                                        setError("Unable to short this url. Try again.");
-                                    }
-                                } else {
-                                    setError("Unable to short this url. Try again.");
-                                }
-                            })
-                            .finally(() => setLoading(false));
-                        console.log("image exists");
-                    } else {
-                        console.log("url not exists");
-                        setLoading(false);
-                        setError("URL doesn't exists");
-                    }
+                            }
+                        )
+                        .then((value) => {
+                            set_short_url(value.data.short_url);
+                            toast("👍 Success", {
+                                type: "success",
+                                ...toastConfig,
+                            });
+                        })
+                        .catch((e) => {
+                            console.log("error", e?.response);
+                            if (e?.response?.status === 409) {
+                                set_short_url(e.response.data.short_url);
+                            }
+
+                            toast("😵 " + e?.response?.data?.error, {
+                                type: "error",
+                                ...toastConfig,
+                            });
+                        })
+                        .finally(() => setLoading(false));
                 } else {
-                    console.log("invalid url");
+                    console.log("url not exists");
                     setLoading(false);
-                    setError("Enter valid URL");
+                    setError("URL doesn't exists");
+                    toast("😵 URL doesn't exists", {
+                        type: "error",
+                        ...toastConfig,
+                    });
                 }
             } else {
+                console.log("invalid url");
                 setLoading(false);
-                setError("Empty url not accepted.");
+                setError("Enter valid URL");
+                toast("😵 Enter valid URL", {
+                    type: "error",
+                    ...toastConfig,
+                });
             }
         } else {
             history.push("/login");
@@ -137,6 +150,7 @@ export const Home = () => {
 
     return (
         <div className="bg-white z-10">
+            <ToastContainer />
             <div
                 className="flex flex-col items-center justify-center py-5 mb-5 rounded-b-2xl"
                 style={{ background: "linear-gradient(-45deg,#2225ff 10%,#2254ff 90%)", boxShadow: "0px 5px 40px 2px blue" }}
@@ -180,7 +194,7 @@ export const Home = () => {
                                 </div>
                             </div>
                         ) : (
-                            <ThemedButton title="Shorten" onClickHandler={onSubmit} />
+                            <ThemedButton title="Shorten" onClickHandler={onSubmit} color="bg-blue-600" />
                         )}
                     </div>
                     <div
@@ -189,14 +203,14 @@ export const Home = () => {
                     >
                         <p className="text-red-600 text-xl text-center">{error}</p>
                         {short_url ? (
-                            <div className="flex flex-col w-full">
+                            <div className="flex flex-col md:w-full" style={{ maxWidth: "80vw" }}>
                                 <p className="text-xl text-white bg-gray-600 py-2 px-3 my-2 rounded-xl pl-3 flex-1 mr-2 md:w-100 w-full whitespace-nowrap overflow-scroll">
                                     {short_url}
                                 </p>
                                 <p className="text-blue-600 text-xl text-center mb-2">{success}</p>
                                 <div className="flex justify-around items-center">
-                                    <ThemedButton title="Copy" onClickHandler={onCopy} />
-                                    <ThemedButton title="Open" onClickHandler={onOpenURL} />
+                                    <ThemedButton title="Copy" onClickHandler={onCopy} color="bg-blue-500" />
+                                    <ThemedButton title="Open" onClickHandler={onOpenURL} color="bg-green-500" />
                                 </div>
                             </div>
                         ) : null}
@@ -258,11 +272,9 @@ export const Home = () => {
                         ) : null}
                     </div>
                     <div className="flex flex-col border-2 p-3 rounded-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
-                        <div className="flex items-center">
-                            <div className="my-2">
-                                <img src={Cursor} height="35px" width="35px" className="bg-blue-400 rounded-full p-2 mr-2 inline" />
-                            </div>
-                            <h1 className="text-xl text-blue-500 font-bold mb-2 inline">Clicks</h1>
+                        <div className="flex items-center my-2">
+                            <img src={Cursor} height="35px" width="35px" className="bg-blue-400 rounded-full p-2 mr-2 inline" />
+                            <h1 className="text-2xl text-blue-500 font-bold inline">Clicks</h1>
                         </div>
                         <ClicksGraph data={meta?.clicks} />
                     </div>
@@ -284,3 +296,5 @@ export const Home = () => {
         </div>
     );
 };
+
+export default Home;

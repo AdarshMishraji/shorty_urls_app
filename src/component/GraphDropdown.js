@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from "react";
+import * as React from "react";
 import { Dropdown, Option } from "./Dropdown";
 import { months, noMonths } from "../constants";
 import { useOutsideAlerter } from "../hooks";
@@ -6,11 +6,11 @@ import { useOutsideAlerter } from "../hooks";
 const currDate = new Date();
 
 export const GraphDropdown = ({ type, month, year, setType, setMonth, setYear, smallestYear }) => {
-    const [isMonth, setIsMonth] = useState(false);
-    const [isYear, setIsYear] = useState(true);
-    const [isOpen, setIsOpen] = useState(false);
-    const [isMonthOpen, setIsMonthOpen] = useState(false);
-    const [isYearOpen, setIsYearOpen] = useState(false);
+    const [isMonth, setIsMonth] = React.useState(false);
+    const [isYear, setIsYear] = React.useState(true);
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [isMonthOpen, setIsMonthOpen] = React.useState(false);
+    const [isYearOpen, setIsYearOpen] = React.useState(false);
 
     let typesRef = React.createRef();
     let monthsRef = React.createRef();

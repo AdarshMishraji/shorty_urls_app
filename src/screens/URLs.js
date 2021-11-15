@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
-import validator from "validator";
+import * as React from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,23 +6,22 @@ import { Context as AuthContext } from "../context";
 import { useHistory } from "react-router";
 import { Authorization, BASE_URL } from "../configs/constants";
 import { URLItem, ModalContainer, toastConfig } from "../component/URLItems";
-import { useCallback } from "react/cjs/react.development";
 
-export const URLs = () => {
-    const [loading, setLoading] = useState();
-    const [limit, setLimit] = useState("10");
-    const [skipCount, setSkipCount] = useState(0);
-    const [error, setError] = useState("");
-    const [urls, setURLs] = useState([]);
-    const [modalContent, setModalContent] = useState();
+const URLs = () => {
+    const [loading, setLoading] = React.useState();
+    const [urls, setURLs] = React.useState([]);
+    const [isAtEnd, setIsAtEnd] = React.useState(false);
+    const [modalContent, setModalContent] = React.useState();
+    const [hasMore, setMore] = React.useState(true);
 
-    const { state, tryLocalLogin } = useContext(AuthContext);
+    const { state, tryLocalLogin } = React.useContext(AuthContext);
     const nav = useHistory();
 
-    const fetchHistory = useCallback(() => {
-        if ((validator.isInt(limit) && parseInt(limit) >= 0) || limit === "") {
-            setLoading(true);
-            const url = `${BASE_URL}urls${limit === "" ? "?limit=" : "?limit=" + limit}`;
+    const observer = React.useRef();
+
+    const fetchHistory = React.useCallback(
+        (skipCount) => {
+            const url = `${BASE_URL}urls?limit=10&skip=${skipCount}`;
             console.log(url);
             if (state.token) {
                 axios
@@ -34,7 +32,12 @@ export const URLs = () => {
                         },
                     })
                     .then((value) => {
-                        setURLs(value.data.urls);
+                        console.log(value.data);
+                        if (value.data?.urls.length === 0) {
+                            setMore(false);
+                        } else {
+                            setURLs([...urls, ...value.data.urls]);
+                        }
                     })
                     .catch((e) => {
                         console.log(e);
@@ -43,23 +46,44 @@ export const URLs = () => {
                             ...toastConfig,
                         });
                     })
-                    .finally(() => setLoading(false));
-            } else {
-                setError("Limit must be positive integer.");
+                    .finally(() => {
+                        setLoading(false);
+                        setIsAtEnd(false);
+                    });
             }
-        }
-    }, [state]);
+        },
+        [urls, state]
+    );
 
-    useEffect(() => {
+    React.useEffect(() => {
         tryLocalLogin(
             () => {
-                if (state.token) fetchHistory();
+                if (state.token) {
+                    setLoading(true);
+                    fetchHistory();
+                }
             },
             () => {
                 nav.replace("/login");
             }
         );
     }, [state.token]);
+
+    const lastElementRef = React.useCallback(
+        (node) => {
+            if (loading) return;
+            if (observer.current) observer.current.disconnect();
+            observer.current = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && hasMore) {
+                    setIsAtEnd(true);
+                    console.log("at end");
+                    if (state.token) fetchHistory(urls.length);
+                }
+            });
+            if (node) observer.current.observe(node);
+        },
+        [loading, urls.length, hasMore]
+    );
 
     return (
         <div className="bg-white z-10">
@@ -76,19 +100,67 @@ export const URLs = () => {
                     <h1>Fetching Your URLs</h1>
                 </div>
             ) : (
-                <div className="flex flex-col list">
+                <div className="flex flex-col list" onScroll={(e) => {}}>
                     {urls.length == 0 && (
                         <div>
                             <h1 className="text-blue-500 text-2xl overflow-scroll text-center mb-3">No URLs found</h1>
                             <h1 className="text-9xl text-center">😵</h1>
                         </div>
                     )}
-                    {urls?.map((ele, index) => (
-                        <URLItem index={index} item={ele} key={ele._id} setModalContent={setModalContent} reFetch={() => fetchHistory()} />
-                    ))}
+                    {urls?.map((ele, index) => {
+                        if (index === urls.length - 1) {
+                            return (
+                                <URLItem
+                                    item={ele}
+                                    key={index}
+                                    setModalContent={setModalContent}
+                                    reFetch={() => fetchHistory()}
+                                    index={index}
+                                    ref={lastElementRef}
+                                    showBtn
+                                />
+                            );
+                        } else {
+                            return (
+                                <URLItem
+                                    item={ele}
+                                    key={index}
+                                    setModalContent={setModalContent}
+                                    reFetch={() => fetchHistory()}
+                                    index={index}
+                                    showBtn
+                                />
+                            );
+                        }
+                    })}
+                    {isAtEnd ? (
+                        <div className="w-full md:w-3/5 mx-auto p-4 text-center mb-4">
+                            <h1 className="text-blue-500 text-2xl overflow-scroll text-center mb-3">Loading...</h1>
+                            <svg
+                                class="animate-spin h-8 w-8 mx-auto text-blue-500"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                        </div>
+                    ) : (
+                        <div className="mb-2">
+                            <h1 className="text-blue-500 text-2xl overflow-scroll text-center mb-3">No More is Here</h1>
+                            <h1 className="text-5xl text-center">😵</h1>
+                        </div>
+                    )}
+                    <ModalContainer onClose={() => setModalContent()} children={modalContent} />
                 </div>
             )}
-            <ModalContainer onClose={() => setModalContent()} children={modalContent} />
         </div>
     );
 };
+
+export default URLs;

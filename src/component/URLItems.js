@@ -1,4 +1,4 @@
-import React, { useRef, useState, useContext, useCallback } from "react";
+import * as React from "react";
 import { ToggleSwitch } from "../component/ToggleSwitch";
 import qr from "qrcode";
 import ReactTooltip from "react-tooltip";
@@ -20,6 +20,9 @@ import { useOutsideAlerter } from "../hooks";
 import ThemedButton from "../component/ThemedButton";
 import { BASE_URL, Authorization } from "../configs/constants";
 import axios from "axios";
+import { useHistory } from "react-router";
+
+let x = 0;
 
 export const toastConfig = {
     position: "bottom-center",
@@ -59,22 +62,22 @@ export const ModalContainer = ({ onClose, children }) => {
 };
 
 export const ExpirationModalContent = ({ onSelect, onClose }) => {
-    const [type, setType] = useState(0);
-    const [afterIndex, setAfterIndex] = useState(0);
+    const [type, setType] = React.useState(0);
+    const [afterIndex, setAfterIndex] = React.useState(0);
 
-    const [days, setDays] = useState(1);
-    const [months, setMonths] = useState(1);
-    const [years, setYears] = useState(1);
+    const [days, setDays] = React.useState(1);
+    const [months, setMonths] = React.useState(1);
+    const [years, setYears] = React.useState(1);
 
     let daysRef = React.createRef();
     let monthsRef = React.createRef();
     let yearsRef = React.createRef();
 
-    const [daysOpen, setDaysOpen] = useState(false);
-    const [monthsOpen, setMonthsOpen] = useState(false);
-    const [yearsOpen, setYearsOpen] = useState(false);
+    const [daysOpen, setDaysOpen] = React.useState(false);
+    const [monthsOpen, setMonthsOpen] = React.useState(false);
+    const [yearsOpen, setYearsOpen] = React.useState(false);
 
-    const [timestamp, setTimestamp] = useState();
+    const [timestamp, setTimestamp] = React.useState();
 
     useOutsideAlerter(daysRef, () => {
         setDaysOpen(false);
@@ -251,8 +254,8 @@ export const ExpirationModalContent = ({ onSelect, onClose }) => {
 };
 
 export const PasswordModalContent = ({ onClose, onSubmit }) => {
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+    const [password, setPassword] = React.useState("");
+    const [confirmPassword, setConfirmPassword] = React.useState("");
     return (
         <div className="flex flex-col items-center">
             <h1 className="text-white text-2xl mb-2 text-center"></h1>Enter Password
@@ -306,7 +309,7 @@ export const PasswordModalContent = ({ onClose, onSubmit }) => {
 };
 
 export const ChangeAliasModalContent = ({ prevAlias, onClose, onSubmit }) => {
-    const [alias, setAlias] = useState(prevAlias);
+    const [alias, setAlias] = React.useState(prevAlias);
     return (
         <div className="flex flex-col items-center justify-center">
             <h1 className="text-gray-500 text-2xl mb-2 text-center">Change the Alias</h1>
@@ -329,24 +332,29 @@ export const ChangeAliasModalContent = ({ prevAlias, onClose, onSubmit }) => {
     );
 };
 
-export const URLItem = ({ item, index, setModalContent, reFetch }) => {
-    const [active, setActive] = useState(item.is_active);
-    const [isPasswordProtected, setPasswordProtected] = useState(Boolean(item?.protection?.password));
-    const [expirationTime, setExpirationTime] = useState(item?.expired_at);
-    const [disabled, setDisabled] = useState(false);
-    const [shortURL, setShortURL] = useState(item.short_url);
-    const { state } = useContext(AuthContext);
+const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, showBtn }, ref) => {
+    const [active, setActive] = React.useState(item.is_active);
+    const [isPasswordProtected, setPasswordProtected] = React.useState(Boolean(item?.protection?.password));
+    const [expirationTime, setExpirationTime] = React.useState(item?.expired_at);
+    const [disabled, setDisabled] = React.useState(false);
+    const [shortURL, setShortURL] = React.useState(item.short_url);
+    const { state } = React.useContext(AuthContext);
+    const nav = useHistory();
 
-    let copyRef = useRef();
-    let keyoffRef = useRef();
-    let keyeditRef = useRef();
-    let keyRef = useRef();
-    let editRef = useRef();
-    let timerRef = useRef();
-    let qrcodeRef = useRef();
-    let deletRef = useRef();
+    let copyRef = React.useRef();
+    let keyoffRef = React.useRef();
+    let keyeditRef = React.useRef();
+    let keyRef = React.useRef();
+    let editRef = React.useRef();
+    let timerRef = React.useRef();
+    let qrcodeRef = React.useRef();
+    let deletRef = React.useRef();
 
-    const onChangeStatus = useCallback(
+    React.useEffect(() => {
+        console.log(++x);
+    }, []);
+
+    const onChangeStatus = React.useCallback(
         (status) => {
             setDisabled(true);
             axios
@@ -363,6 +371,10 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
                 .then((val) => {
                     setActive(status);
                     setDisabled(false);
+                    toast("👍 Success", {
+                        type: "success",
+                        ...toastConfig,
+                    });
                 })
                 .catch((e) => {
                     console.log(e);
@@ -376,7 +388,7 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
         [item, state]
     );
 
-    const onDelete = useCallback(() => {
+    const onDelete = React.useCallback(() => {
         setDisabled(true);
         axios
             .delete(`${BASE_URL}delete_url`, {
@@ -391,6 +403,10 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
             .then((val) => {
                 setDisabled(false);
                 reFetch();
+                toast("👍 Success", {
+                    type: "success",
+                    ...toastConfig,
+                });
             })
             .catch((e) => {
                 console.log(e);
@@ -405,7 +421,7 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
             });
     }, [state, item]);
 
-    const setPassword = useCallback(
+    const setPassword = React.useCallback(
         (password) => {
             setDisabled(true);
             axios
@@ -422,6 +438,10 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
                 .then((val) => {
                     setDisabled(false);
                     setPasswordProtected(true);
+                    toast("👍 Success", {
+                        type: "success",
+                        ...toastConfig,
+                    });
                 })
                 .catch((e) => {
                     console.log(e);
@@ -438,7 +458,7 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
         [state, item]
     );
 
-    const onRemovePassword = useCallback(() => {
+    const onRemovePassword = React.useCallback(() => {
         setDisabled(true);
         axios
             .delete(`${BASE_URL}remove_password`, {
@@ -453,6 +473,10 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
             .then((val) => {
                 setDisabled(false);
                 setPasswordProtected(false);
+                toast("👍 Success", {
+                    type: "success",
+                    ...toastConfig,
+                });
             })
             .catch((e) => {
                 console.log(e);
@@ -467,7 +491,7 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
             });
     }, [state, item]);
 
-    const setExpireDuration = useCallback(
+    const setExpireDuration = React.useCallback(
         (expired_at) => {
             setDisabled(true);
             axios
@@ -487,6 +511,10 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
                 .then((val) => {
                     setExpirationTime(expired_at);
                     setDisabled(false);
+                    toast("👍 Success", {
+                        type: "success",
+                        ...toastConfig,
+                    });
                 })
                 .catch((e) => {
                     console.log(e);
@@ -503,7 +531,7 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
         [state, item]
     );
 
-    const changeAliasName = useCallback(
+    const changeAliasName = React.useCallback(
         (alias) => {
             setDisabled(true);
             axios
@@ -523,11 +551,15 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
                 .then((val) => {
                     setShortURL(BASE_URL + alias);
                     setDisabled(false);
+                    toast("👍 Success", {
+                        type: "success",
+                        ...toastConfig,
+                    });
                 })
                 .catch((e) => {
                     console.log(e);
                     setDisabled(false);
-                    toast("😵 Internal Error", {
+                    toast("😵" + e?.response?.data?.message || e?.response?.data?.error || "Internal Error", {
                         type: "error",
                         ...toastConfig,
                     });
@@ -540,7 +572,7 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
     );
 
     return (
-        <div className="flex flex-col border-2 p-3 rounded-xl m-3 text-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
+        <div className="flex flex-col border-2 p-3 rounded-xl m-3 text-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }} ref={ref}>
             <ReactTooltip />
             <div className="relative">
                 <div className="flex justify-between items-center">
@@ -554,8 +586,15 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
                     ) : null}
                 </div>
                 <div className="border-b-2 pb-3">
-                    <h1 className="text-gray-800 font-bold overflow-scroll whitespace-nowrap py-1">{item.title}</h1>
-                    <h1 className="text-gray-500 font-bold overflow-scroll whitespace-nowrap pt-1 pb-3">{item.description}</h1>
+                    <h1 className="text-gray-800 font-bold overflow-scroll whitespace-nowrap py-1" style={{ display: item.title ? "block" : "none" }}>
+                        {item.title}
+                    </h1>
+                    <h1
+                        className="text-gray-500 font-bold overflow-scroll whitespace-nowrap pt-1 pb-3"
+                        style={{ display: item.title ? "block" : "none" }}
+                    >
+                        {item.description}
+                    </h1>
                     <h1 className="text-gray-500 overflow-scroll whitespace-nowrap">{item.url}</h1>
                     <h1
                         className="text-blue-500 overflow-scroll whitespace-nowrap cursor-pointer"
@@ -567,8 +606,7 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
                     </h1>
                     {expirationTime ? (
                         <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">
-                            <span className="text-gray-600 font-bold">Expired At: </span>{" "}
-                            {moment(item?.expired_at).format("YYYY - MMM - DD, hh:mm A")}
+                            <span className="text-gray-600 font-bold">Expired At: </span> {moment(expirationTime).format("YYYY - MMM - DD, hh:mm A")}
                         </h1>
                     ) : null}
                 </div>
@@ -590,63 +628,64 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
                             }}
                         />
                         {isPasswordProtected ? (
-                            <div className="flex">
-                                <img
-                                    data-tip="Remove Password Protection"
-                                    ref={keyoffRef}
-                                    src={KeyOff}
-                                    height="30"
-                                    width="30"
-                                    className="mr-3 cursor-pointer"
-                                    onClick={() => {
-                                        if (!disabled)
-                                            setModalContent(
-                                                <div className="flex flex-col items-center justify-center">
-                                                    <img src={Warning} height={75} width={75} />
-                                                    <h1 className="text-red-500 overflow-scroll text-center">
-                                                        Are you sure to remove password protection for this url?
-                                                    </h1>
-                                                    <div className="flex items-center mt-2">
-                                                        <ThemedButton
-                                                            title="No"
-                                                            onClickHandler={() => setModalContent()}
-                                                            color="bg-green-500"
-                                                            className="mx-2"
-                                                        />
-                                                        <ThemedButton
-                                                            title="Yes"
-                                                            onClickHandler={() => {
-                                                                if (!disabled) onRemovePassword();
-                                                            }}
-                                                            className="mx-2"
-                                                            color="bg-red-500"
-                                                        />
-                                                    </div>
+                            <img
+                                data-tip="Remove Password Protection"
+                                ref={keyoffRef}
+                                src={KeyOff}
+                                height="30"
+                                width="30"
+                                className="mr-3 cursor-pointer"
+                                onClick={() => {
+                                    if (!disabled)
+                                        setModalContent(
+                                            <div className="flex flex-col items-center justify-center">
+                                                <img src={Warning} height={75} width={75} />
+                                                <h1 className="text-red-500 overflow-scroll text-center">
+                                                    Are you sure to remove password protection for this url?
+                                                </h1>
+                                                <div className="flex items-center mt-2">
+                                                    <ThemedButton
+                                                        title="No"
+                                                        onClickHandler={() => setModalContent()}
+                                                        color="bg-green-500"
+                                                        className="mx-2"
+                                                    />
+                                                    <ThemedButton
+                                                        title="Yes"
+                                                        onClickHandler={() => {
+                                                            if (!disabled) onRemovePassword();
+                                                        }}
+                                                        className="mx-2"
+                                                        color="bg-red-500"
+                                                    />
                                                 </div>
-                                            );
-                                    }}
-                                />
-                                <img
-                                    data-tip="Update Password"
-                                    ref={keyeditRef}
-                                    src={ChangePassword}
-                                    height="30"
-                                    width="30"
-                                    className="mr-3 cursor-pointer"
-                                    onClick={() => {
-                                        if (!disabled)
-                                            setModalContent(
-                                                <PasswordModalContent
-                                                    onClose={() => setModalContent()}
-                                                    onSubmit={(password) => {
-                                                        if (!disabled) setPassword(password);
-                                                    }}
-                                                />
-                                            );
-                                    }}
-                                />
-                            </div>
-                        ) : (
+                                            </div>
+                                        );
+                                }}
+                            />
+                        ) : null}
+                        {isPasswordProtected ? (
+                            <img
+                                data-tip="Update Password"
+                                ref={keyeditRef}
+                                src={ChangePassword}
+                                height="30"
+                                width="30"
+                                className="mr-3 cursor-pointer"
+                                onClick={() => {
+                                    if (!disabled)
+                                        setModalContent(
+                                            <PasswordModalContent
+                                                onClose={() => setModalContent()}
+                                                onSubmit={(password) => {
+                                                    if (!disabled) setPassword(password);
+                                                }}
+                                            />
+                                        );
+                                }}
+                            />
+                        ) : null}
+                        {!isPasswordProtected ? (
                             <img
                                 data-tip="Add Password Protection"
                                 src={Key}
@@ -666,7 +705,7 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
                                         );
                                 }}
                             />
-                        )}
+                        ) : null}
                         <img
                             data-tip="Edit Alias Name"
                             ref={editRef}
@@ -743,20 +782,20 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
                                             <img src={Warning} height={75} width={75} />
                                             <h1 className="text-red-500 overflow-scroll whitespace-nowrap">Are you sure to delete?</h1>
                                             <div className="flex items-center mt-2">
-                                                <div
-                                                    className="flex justify-between items-center text-xl py-2 px-3 mx-2 rounded-xl bg-green-500 text-white cursor-pointer"
-                                                    onClick={() => setModalContent()}
-                                                >
-                                                    <h1>No</h1>
-                                                </div>
-                                                <div
-                                                    className="flex justify-between items-center text-xl py-2 px-3 mx-2 rounded-xl bg-red-500 text-white cursor-pointer"
-                                                    onClick={() => {
+                                                <ThemedButton
+                                                    title="No"
+                                                    onClickHandler={() => setModalContent()}
+                                                    color="bg-green-500"
+                                                    className="mx-2"
+                                                />
+                                                <ThemedButton
+                                                    title="Yes"
+                                                    onClickHandler={() => {
                                                         if (!disabled) onDelete();
                                                     }}
-                                                >
-                                                    <h1>Yes</h1>
-                                                </div>
+                                                    className="mx-2"
+                                                    color="bg-red-500"
+                                                />
                                             </div>
                                         </div>
                                     );
@@ -764,8 +803,8 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
                             }}
                         />
                     </div>
-                    <div className="bg-blue-500 text-white rounded-xl p-2 cursor-pointer" style={{ boxShadow: "0px 0px 10px 0.25px blue" }}>
-                        Statistics
+                    <div>
+                        {showBtn ? <ThemedButton onClickHandler={() => nav.push(`/url/${item._id}`)} title="Statistics" color="bg-blue-500" /> : null}
                     </div>
                 </div>
                 {expirationTime && expirationTime < Date.now() ? (
@@ -791,4 +830,7 @@ export const URLItem = ({ item, index, setModalContent, reFetch }) => {
             </div>
         </div>
     );
-};
+});
+
+export const URLItem = React.memo(RenderItem);
+// export const URLItem = RenderItem;
