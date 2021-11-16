@@ -7,6 +7,7 @@ import { useHistory } from "react-router";
 import axios from "axios";
 import { Authorization, BASE_URL } from "../configs/constants";
 import Link from "../assets/svgs/link.svg";
+import Header from "../component/Header";
 
 const Auth = () => {
     const { state, setUserDetails, tryLocalLogin } = React.useContext(AuthContext);
@@ -46,6 +47,7 @@ const Auth = () => {
 
     return (
         <div className="bg-white">
+            <Header />
             <div
                 className="flex flex-col items-center justify-center h-screen"
                 style={{

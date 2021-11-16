@@ -7,6 +7,7 @@ import { BASE_URL, Authorization } from "../configs/constants";
 import { Context as AuthContext } from "../context";
 import { ClicksGraph } from "../component/ClicksGraph";
 import { PieChart } from "../component/PieChart";
+import Header from "../component/Header";
 
 const URLStats = () => {
     const nav = useHistory();
@@ -63,33 +64,36 @@ const URLStats = () => {
     return (
         <div className="bg-white z-10">
             <ToastContainer className="z-50 text-center" />
-            <div
-                className="flex flex-col items-center justify-center mb-5 rounded-b-2xl"
-                style={{ background: "linear-gradient(-45deg,#2225ff 10%,#2254ff 90%)", boxShadow: "0px 5px 40px 2px blue", paddingBottom: 70 }}
-            ></div>
-            {loading ? (
-                <div className="flex items-center justify-center" style={{ opacity: 0.7 }}>
-                    <div className="spinner-grow mr-3" role="status" style={{ color: "black", height: 75, width: 75 }}>
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                    <h1>Fetching URL stats</h1>
-                </div>
-            ) : (
-                <div className="flex flex-col list">
-                    <URLItem item={URLData?.info} setModalContent={setModalContent} reFetch={() => fetchURL()} />
-                    <h1 className="text-blue-500 text-3xl my-2 text-center font-bold">Statistics</h1>
-                    <div className="flex flex-col border-2 p-3 rounded-xl m-3 text-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
-                        <ClicksGraph data={URLData?.meta?.year_month_day_click} />
-                        <div className="flex justify-center md:my-5 flex-wrap items-center">
-                            <PieChart data={URLData?.meta?.browser_clicks} title="Browsers Clicks" />
-                            <PieChart data={URLData?.meta?.os_clicks} title="System (OS) Clicks" />
-                            <PieChart data={URLData?.meta?.device_clicks} title="Devices Clicks" />
-                            <PieChart data={URLData?.meta?.country_clicks} title="Geo Locations Clicks" />
+            <Header requireBackground />
+            <div className="mt-20">
+                {loading ? (
+                    <div className="flex items-center justify-center" style={{ opacity: 0.7 }}>
+                        <div className="spinner-grow mr-3" role="status" style={{ color: "black", height: 75, width: 75 }}>
+                            <span class="sr-only">Loading...</span>
                         </div>
+                        <h1>Fetching URL stats</h1>
                     </div>
-                    <ModalContainer onClose={() => setModalContent()} children={modalContent} />
-                </div>
-            )}
+                ) : (
+                    <div className="flex flex-col list">
+                        <URLItem item={URLData?.info} setModalContent={setModalContent} reFetch={() => nav.goBack()} />
+                        <h1 className="text-blue-500 text-3xl my-2 text-center font-bold">
+                            {Object.keys(URLData.meta).length ? "Statistics" : "No Stats Available 🥲"}
+                        </h1>
+                        {Object.keys(URLData.meta).length ? (
+                            <div className="flex flex-col border-2 p-3 rounded-xl m-3 text-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
+                                <ClicksGraph data={URLData?.meta?.year_month_day_click} />
+                                <div className="flex justify-around md:my-5 flex-wrap items-center">
+                                    <PieChart data={URLData?.meta?.browser_clicks} title="Browsers Clicks" />
+                                    <PieChart data={URLData?.meta?.os_clicks} title="System (OS) Clicks" />
+                                    <PieChart data={URLData?.meta?.device_clicks} title="Devices Clicks" />
+                                    <PieChart data={URLData?.meta?.country_clicks} title="Geo Locations Clicks" />
+                                </div>
+                            </div>
+                        ) : null}
+                        <ModalContainer onClose={() => setModalContent()} children={modalContent} />
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

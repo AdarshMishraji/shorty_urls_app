@@ -38,12 +38,12 @@ export const PieChart = ({ data, title }) => {
                     return data[key].count;
                 }),
                 backgroundColor: [
-                    "rgba(255, 99, 132, 0.25)",
-                    "rgba(54, 162, 235, 0.25)",
-                    "rgba(255, 206, 86, 0.25)",
-                    "rgba(75, 192, 192, 0.25)",
-                    "rgba(153, 102, 255, 0.25)",
-                    "rgba(255, 159, 64, 0.25)",
+                    "rgba(255, 99, 132, 0.5)",
+                    "rgba(54, 162, 235, 0.5)",
+                    "rgba(255, 206, 86, 0.5)",
+                    "rgba(75, 192, 192, 0.5)",
+                    "rgba(153, 102, 255, 0.5)",
+                    "rgba(255, 159, 64, 0.5)",
                 ],
                 borderColor: [
                     "rgba(255, 99, 132, 1)",
@@ -60,7 +60,7 @@ export const PieChart = ({ data, title }) => {
 
     return (
         <div
-            className="flex flex-col border-2 p-3 rounded-xl my-3 md: mx-3 text-xl w-10/12 md:w-3/12"
+            className="flex flex-col border-2 p-3 rounded-xl my-3 md: mx-3 text-xl w-10/12 md:w-4/12"
             style={{ boxShadow: "0px 0px 15px 0.5px blue" }}
         >
             <h1 className="text-blue-500 text-2xl my-2 text-center">{title}</h1>

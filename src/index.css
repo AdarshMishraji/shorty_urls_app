@@ -31,7 +31,7 @@ button {
     margin: 0 auto;
     width: fit-content;
     border-radius: 20px;
-    box-shadow: 0px 0px 10px 5px #554ff2aa;
+    box-shadow: 0px 0px 15px 0.5px blue;
     cursor: pointer;
     font-size: 20px;
     outline: none;
@@ -40,7 +40,7 @@ button {
 button:active {
     outline: none;
     border: none;
-    box-shadow: 0px 0px 10px 0.5px #554ff2aa;
+    box-shadow: 0px 0px 10px 0.5px blue;
 }
 
 button:focus {
@@ -49,6 +49,6 @@ button:focus {
 
 button:disabled {
     outline: none;
-    box-shadow: 0px 0px 5px 0.5px #554ff2aa;
+    box-shadow: 0px 0px 15px 0.5px blue;
     opacity: 0.75;
 }

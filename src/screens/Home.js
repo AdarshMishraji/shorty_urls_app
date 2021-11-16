@@ -16,6 +16,7 @@ import { Stats } from "../component/Stats";
 import { TopLinks } from "../component/TopLinks";
 import { toast, ToastContainer } from "react-toastify";
 import { toastConfig } from "../component/URLItems";
+import Header from "../component/Header";
 
 const makeURLValid = (url) => {
     let temp = url;
@@ -151,6 +152,7 @@ const Home = () => {
     return (
         <div className="bg-white z-10">
             <ToastContainer />
+            <Header requireBackground />
             <div
                 className="flex flex-col items-center justify-center py-5 mb-5 rounded-b-2xl"
                 style={{ background: "linear-gradient(-45deg,#2225ff 10%,#2254ff 90%)", boxShadow: "0px 5px 40px 2px blue" }}
@@ -194,7 +196,7 @@ const Home = () => {
                                 </div>
                             </div>
                         ) : (
-                            <ThemedButton title="Shorten" onClickHandler={onSubmit} color="bg-blue-600" />
+                            <ThemedButton title="Shorten" onClickHandler={onSubmit} color="bg-blue-600 ml-2" />
                         )}
                     </div>
                     <div

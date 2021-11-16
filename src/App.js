@@ -4,7 +4,6 @@ import Auth from "./screens/Auth";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import URLs from "./screens/URLs";
 import Account from "./screens/Account";
-import Header from "./component/Header";
 import URLStats from "./screens/URLStats";
 
 const App = () => {
@@ -12,7 +11,6 @@ const App = () => {
         <div>
             <AuthProvider>
                 <BrowserRouter>
-                    <Header />
                     <Switch>
                         <Route exact path="/login" component={Auth} />
                         <Route exact path="/url/:urlID" component={URLStats} />

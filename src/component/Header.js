@@ -17,7 +17,7 @@ const Link = ({ text, onPress, last }) => {
     );
 };
 
-const Header = () => {
+const Header = ({ requireBackground }) => {
     const [hamburgerOpen, setHamburgerOpen] = React.useState(false);
     const [accountMenu, setAccountMenu] = React.useState(false);
     const history = useHistory();
@@ -40,7 +40,13 @@ const Header = () => {
 
     console.log("state,", state);
     return (
-        <header className="absolute top-0  w-full text-white">
+        <header
+            className="fixed top-0  w-full text-white rounded-b-2xl z-50"
+            style={{
+                background: requireBackground ? "linear-gradient(-45deg,#2225ff 10%,#2254ff 90%)" : "transparent",
+                boxShadow: requireBackground ? "0px 5px 40px 2px blue" : "none",
+            }}
+        >
             <div className="flex justify-between py-2 px-2 bg-transparent">
                 <div className="flex justify-start items-center md:ml-5 ml-2 cursor-pointer" onClick={() => history?.push("/home")}>
                     <img src={Logo} height="50" width="50" className="bg-white rounded-full p-2 mr-3" />
