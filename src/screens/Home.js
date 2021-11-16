@@ -225,7 +225,7 @@ const Home = () => {
             </div>
 
             <div className="flex flex-col self-center bg-white text-white m-3 relative">
-                <div>
+                <div className="lg:mx-40">
                     <div className="flex flex-col border-2 p-2 rounded-xl mb-3" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
                         <div className="flex flex-1 md:flex-row flex-col">
                             <Stats title="ALL URLS" value={meta?.all_links} icon={Logo} color="bg-green-200" />
@@ -285,8 +285,8 @@ const Home = () => {
                         <ClicksGraph data={meta?.clicks} />
                     </div>
                 </div>
-                <div>
-                    <div className="text-center mx-3 mt-5">
+                <div className="lg:mx-40">
+                    <div className="text-center mx-3 mt-5 ">
                         <h1 class="text-xl my-3 text-gray-500">
                             Shorty URLs allows you to measure the click-through rates of your links, so you can find out what is happening with your
                             links. Thanks to this, you can learn about the habits and preferences of your users and customers. This allows you to

@@ -74,7 +74,7 @@ const URLStats = () => {
                         <h1>Fetching URL stats</h1>
                     </div>
                 ) : (
-                    <div className="flex flex-col list">
+                    <div className="flex flex-col list lg:mx-40">
                         <URLItem item={URLData?.info} setModalContent={setModalContent} reFetch={() => nav.goBack()} />
                         <h1 className="text-blue-500 text-3xl my-2 text-center font-bold">
                             {Object.keys(URLData.meta).length ? "Statistics" : "No Stats Available 🥲"}

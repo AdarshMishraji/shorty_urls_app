@@ -102,7 +102,7 @@ const URLs = () => {
                         <h1>Fetching Your URLs</h1>
                     </div>
                 ) : (
-                    <div className="flex flex-col list" onScroll={(e) => {}}>
+                    <div className="flex flex-col list lg:mx-40" onScroll={(e) => {}}>
                         {urls.length == 0 && (
                             <div>
                                 <h1 className="text-blue-500 text-2xl overflow-scroll text-center mb-3">No URLs found</h1>
