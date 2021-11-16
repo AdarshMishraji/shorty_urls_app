@@ -62,12 +62,12 @@ const Auth = () => {
                     <img src={Link} height={200} width={200} />
                 </div>
                 <div
-                    className="flex flex-col justify-center items-center px-5 py-4 bg-white rounded-3xl mx-2 z-20"
-                    style={{ boxShadow: "0px 0px 15px 0.5px blue" }}
+                    className="flex flex-col justify-center items-center px-5 py-4 bg-white rounded-3xl mx-2 z-20 w"
+                    style={{ boxShadow: "0px 0px 15px 0.5px blue", maxWidth: "90vw" }}
                 >
                     <h1 className="text-3xl font-bold mb-3 text-gray-800 text-center">Sign Up / Log In</h1>
                     <button
-                        style={{ boxShadow: "0px 0px 15px 0.5px blue", width: "20rem" }}
+                        style={{ boxShadow: "0px 0px 15px 0.5px blue", maxWidth: "80vw" }}
                         className="flex items-center bg-white p-3 rounded-3xl font-bold text-xl"
                         onClick={() => {
                             if (!loading) {

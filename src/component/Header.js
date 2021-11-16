@@ -38,7 +38,6 @@ const Header = ({ requireBackground }) => {
         setHamburgerOpen(false);
     });
 
-    console.log("state,", state);
     return (
         <header
             className="fixed top-0  w-full text-white rounded-b-2xl z-50"

@@ -47,7 +47,7 @@ const Home = () => {
         (withoutAuth) => {
             if (withoutAuth || state.token)
                 axios
-                    .get(`${BASE_URL}meta?withoutAuth=${withoutAuth}}`, {
+                    .get(`${BASE_URL}meta?withoutAuth=${withoutAuth}`, {
                         headers: {
                             Authorization,
                             accessToken: state.token,
@@ -139,10 +139,10 @@ const Home = () => {
 
     const onCopy = () => {
         copy(short_url);
-        setSuccess("URL Copied!");
-        setTimeout(() => {
-            setSuccess("");
-        }, 2000);
+        toast("👍 Copied", {
+            type: "success",
+            ...toastConfig,
+        });
     };
 
     const onOpenURL = () => {
@@ -245,32 +245,36 @@ const Home = () => {
                                 color="bg-yellow-200"
                             />
                         </div>
-                        {meta?.top_three?.length > 0 ? (
-                            <h1 className="text-blue-500 text-2xl my-2 text-center border-t-2 pt-3 m-2">Most Clicked URLs</h1>
-                        ) : null}
-                        {meta?.top_three?.[0] ? (
-                            <TopLinks
-                                title={meta?.top_three?.[0]?.title}
-                                url={meta?.top_three?.[0]?.url}
-                                short_url={meta?.top_three?.[0]?.short_url}
-                                color="#FFD700"
-                            />
-                        ) : null}
-                        {meta?.top_three?.[0] ? (
-                            <TopLinks
-                                title={meta?.top_three?.[1]?.title}
-                                url={meta?.top_three?.[1]?.url}
-                                short_url={meta?.top_three?.[1]?.short_url}
-                                color="#C0C0C0"
-                            />
-                        ) : null}
-                        {meta?.top_three?.[0] ? (
-                            <TopLinks
-                                title={meta?.top_three?.[2]?.title}
-                                url={meta?.top_three?.[2]?.url}
-                                short_url={meta?.top_three?.[2]?.short_url}
-                                color="#CD7F32"
-                            />
+                        {state.token ? (
+                            <div>
+                                {meta?.top_three?.length > 0 ? (
+                                    <h1 className="text-blue-500 text-2xl my-2 text-center border-t-2 pt-3 m-2">Most Clicked URLs</h1>
+                                ) : null}
+                                {meta?.top_three?.[0] ? (
+                                    <TopLinks
+                                        title={meta?.top_three?.[0]?.title}
+                                        url={meta?.top_three?.[0]?.url}
+                                        short_url={meta?.top_three?.[0]?.short_url}
+                                        color="#FFD700"
+                                    />
+                                ) : null}
+                                {meta?.top_three?.[0] ? (
+                                    <TopLinks
+                                        title={meta?.top_three?.[1]?.title}
+                                        url={meta?.top_three?.[1]?.url}
+                                        short_url={meta?.top_three?.[1]?.short_url}
+                                        color="#C0C0C0"
+                                    />
+                                ) : null}
+                                {meta?.top_three?.[0] ? (
+                                    <TopLinks
+                                        title={meta?.top_three?.[2]?.title}
+                                        url={meta?.top_three?.[2]?.url}
+                                        short_url={meta?.top_three?.[2]?.short_url}
+                                        color="#CD7F32"
+                                    />
+                                ) : null}
+                            </div>
                         ) : null}
                     </div>
                     <div className="flex flex-col border-2 p-3 rounded-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>

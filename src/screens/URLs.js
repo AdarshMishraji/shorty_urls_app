@@ -154,8 +154,12 @@ const URLs = () => {
                             </div>
                         ) : (
                             <div className="mb-2">
-                                <h1 className="text-blue-500 text-2xl overflow-scroll text-center mb-3">No More is Here</h1>
-                                <h1 className="text-5xl text-center">😵</h1>
+                                {urls.length ? (
+                                    <div>
+                                        <h1 className="text-blue-500 text-2xl overflow-scroll text-center mb-3">No More is Here</h1>
+                                        <h1 className="text-5xl text-center">😵</h1>
+                                    </div>
+                                ) : null}
                             </div>
                         )}
                         <ModalContainer onClose={() => setModalContent()} children={modalContent} />
