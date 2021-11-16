@@ -27,7 +27,7 @@ const makeURLValid = (url) => {
         }
         return "https://" + temp;
     }
-    return;
+    return url;
 };
 
 const Home = () => {
