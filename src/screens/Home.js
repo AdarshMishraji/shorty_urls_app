@@ -14,7 +14,6 @@ import Footer from "../component/Footer";
 import { ClicksGraph } from "../component/ClicksGraph";
 import { Stats } from "../component/Stats";
 import { TopLinks } from "../component/TopLinks";
-import { useCallback } from "react/cjs/react.development";
 import { toast, ToastContainer } from "react-toastify";
 import { toastConfig } from "../component/URLItems";
 
@@ -65,14 +64,15 @@ const Home = () => {
     React.useEffect(() => {
         tryLocalLogin(
             () => {
-                fetchMetaData(false);
+                console.log("called");
+                if (state.token) fetchMetaData(false);
             },
             () => {
                 fetchMetaData(true);
             }
         );
         textRef.current.focus();
-    }, []);
+    }, [state.token]);
 
     const onSubmit = async () => {
         if (state.token) {

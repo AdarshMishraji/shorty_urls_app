@@ -6,6 +6,7 @@ import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { useHistory } from "react-router";
 import axios from "axios";
 import { Authorization, BASE_URL } from "../configs/constants";
+import Link from "../assets/svgs/link.svg";
 
 const Auth = () => {
     const { state, setUserDetails, tryLocalLogin } = React.useContext(AuthContext);
@@ -52,14 +53,20 @@ const Auth = () => {
                     boxShadow: "0px 5px 40px 2px black",
                 }}
             >
+                <div className="absolute top-20 left-0" style={{ transform: "rotate(90deg)" }}>
+                    <img src={Link} height={150} width={150} />
+                </div>
+                <div className="absolute bottom-20 right-0" style={{ transform: "rotate(180deg)" }}>
+                    <img src={Link} height={200} width={200} />
+                </div>
                 <div
-                    className="flex flex-col justify-center items-center px-5 py-4 bg-white rounded-3xl mx-2"
+                    className="flex flex-col justify-center items-center px-5 py-4 bg-white rounded-3xl mx-2 z-20"
                     style={{ boxShadow: "0px 0px 15px 0.5px blue" }}
                 >
-                    <h1 className="text-3xl font-bold mb-3 text-gray-800">Sign Up / Log In</h1>
+                    <h1 className="text-3xl font-bold mb-3 text-gray-800 text-center">Sign Up / Log In</h1>
                     <button
-                        className="flex items-center bg-white p-3 rounded-3xl font-bold text-xl focus:outline-none focus:shadow-2xl"
-                        style={{ boxShadow: "0px 0px 15px 0.5px blue", maxWidth: "75vw", minWidth: "50vw" }}
+                        style={{ boxShadow: "0px 0px 15px 0.5px blue", width: "20rem" }}
+                        className="flex items-center bg-white p-3 rounded-3xl font-bold text-xl"
                         onClick={() => {
                             if (!loading) {
                                 onLogin();
