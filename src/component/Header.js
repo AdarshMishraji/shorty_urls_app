@@ -77,7 +77,7 @@ const Header = ({ requireBackground }) => {
                         src={HamburgerClose}
                         height={40}
                         width={40}
-                        className="bg-gray-600 self-end rounded-full p-1"
+                        className="bg-gray-600 self-end rounded-full p-1 cursor-pointer"
                         onClick={() => setAccountMenu(false)}
                     />
                     <h1
@@ -111,7 +111,7 @@ const Header = ({ requireBackground }) => {
                         src={HamburgerClose}
                         height={40}
                         width={40}
-                        className="bg-gray-600 self-end rounded-full p-1"
+                        className="bg-gray-600 self-end rounded-full p-1 cursor-pointer"
                         onClick={() => setHamburgerOpen(false)}
                     />
                     <h1

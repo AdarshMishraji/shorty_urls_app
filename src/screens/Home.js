@@ -250,7 +250,7 @@ const Home = () => {
                                 {meta?.top_three?.length > 0 ? (
                                     <h1 className="text-blue-500 text-2xl my-2 text-center border-t-2 pt-3 m-2">Most Clicked URLs</h1>
                                 ) : null}
-                                {meta?.top_three?.[0] ? (
+                                {meta?.top_three?.[0]?.url ? (
                                     <TopLinks
                                         title={meta?.top_three?.[0]?.title}
                                         url={meta?.top_three?.[0]?.url}
@@ -258,7 +258,7 @@ const Home = () => {
                                         color="#FFD700"
                                     />
                                 ) : null}
-                                {meta?.top_three?.[0] ? (
+                                {meta?.top_three?.[1]?.url ? (
                                     <TopLinks
                                         title={meta?.top_three?.[1]?.title}
                                         url={meta?.top_three?.[1]?.url}
@@ -266,7 +266,7 @@ const Home = () => {
                                         color="#C0C0C0"
                                     />
                                 ) : null}
-                                {meta?.top_three?.[0] ? (
+                                {meta?.top_three?.[2]?.url ? (
                                     <TopLinks
                                         title={meta?.top_three?.[2]?.title}
                                         url={meta?.top_three?.[2]?.url}

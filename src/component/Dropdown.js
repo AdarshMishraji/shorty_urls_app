@@ -15,7 +15,7 @@ export const Dropdown = React.forwardRef(({ isOpen, isVisible, children, onSelec
             <img src={isOpen ? ExpandMore : ExpandLess} />
         </div>
         <div
-            className={`absolute right-0 top-16 z-20 rounded-2xl flex-col text-blue-500 p-2 bg-white overflow-auto`}
+            className={`absolute right-0 top-16 z-20 rounded-2xl flex-col text-blue-500 p-2 bg-white overflow-auto cursor-pointer`}
             style={{ boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.5)", display: isOpen ? "flex" : "none", maxHeight: "25vh" }}
         >
             {children}

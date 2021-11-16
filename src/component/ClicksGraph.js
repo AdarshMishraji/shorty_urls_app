@@ -206,7 +206,7 @@ export const ClicksGraph = ({ data }) => {
                 </div>
             </div>
             <div
-                className="flex w-full h-full z-50 absolute top-0 rounded-2xl items-center justify-center"
+                className="flex w-full h-full z-40 absolute top-0 rounded-2xl items-center justify-center"
                 style={{ backgroundColor: "rgba(0,0,0,0.2)", filter: "blur(0.5px)", display: data ? "none" : "flex" }}
             >
                 <div className="spinner-grow text-white" role="status" style={{ height: 100, width: 100 }}>

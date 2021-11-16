@@ -1,18 +1,31 @@
 import Done from "../assets/svgs/done.svg";
 import Close from "../assets/svgs/close.svg";
 
-export const ToggleSwitch = ({ isActive, setStatus, className }) => {
+export const ToggleSwitch = ({ isActive, setStatus, className, disabled }) => {
     return (
         <div className={className}>
             <div
                 className="flex justify-around w-20 h-10 relative items-center rounded-full"
                 style={{ backgroundColor: isActive ? "#22ff55aa" : "#ff2255aa" }}
             >
-                <div onClick={() => setStatus(true)} className="flex items-center text-white left-0 w-20  text-center py-2 cursor-pointer">
+                <div
+                    onClick={() => {
+                        if (!disabled) {
+                            console.log("clicked");
+                            setStatus(true);
+                        }
+                    }}
+                    className="flex items-center text-white left-0 w-20  text-center py-2 cursor-pointer"
+                >
                     <img src={Close} className="ml-2" />
                 </div>
                 <div
-                    onClick={() => setStatus(false)}
+                    onClick={() => {
+                        if (!disabled) {
+                            console.log("clicked");
+                            setStatus(false);
+                        }
+                    }}
                     className="flex items-center justify-center text-white right-0 w-20  text-center  py-2 cursor-pointer"
                 >
                     <img src={Done} className="mr-2" />

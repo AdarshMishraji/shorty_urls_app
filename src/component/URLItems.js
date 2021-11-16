@@ -187,7 +187,7 @@ export const ExpirationModalContent = ({ onSelect, onClose }) => {
                                         <Option
                                             text={index === 4 ? "Infinite" : 1 + index}
                                             onClick={() => {
-                                                if (index <= 4) setYears(1 + index);
+                                                if (index < 4) setYears(1 + index);
                                                 else setYears("Infinite");
                                             }}
                                             last={index === 4}
@@ -313,9 +313,10 @@ export const ChangeAliasModalContent = ({ prevAlias, onClose, onSubmit }) => {
     return (
         <div className="flex flex-col items-center justify-center">
             <h1 className="text-gray-500 text-2xl mb-2 text-center">Change the Alias</h1>
-            <div className="flex items-center justify-center rounded-2xl border-2 mx-2 w-9/12">
-                <span className="border-r-2 p-2 overflow-scroll whitespace-nowrap rounded-l-2xl">{BASE_URL}</span>
-                <input value={alias} onChange={(e) => setAlias(e.target.value)} className="p-2 rounded-r-2xl" />
+            <div className="flex flex-col items-center justify-center rounded-2xl mx-2">
+                <span className="border-2 p-2 overflow-scroll whitespace-nowrap rounded-2xl w-11/12">{BASE_URL}</span>
+                <label className="mt-2 mb-1 text-gray-500 text-lg w-11/12 text-left pl-2">Alias</label>
+                <input value={alias} onChange={(e) => setAlias(e.target.value)} className="p-2 rounded-2xl border-2 w-11/12" />
             </div>
             <div className="flex mt-3">
                 <ThemedButton title="Cancel" onClickHandler={onClose} color="bg-gray-500" className="mx-2" />
@@ -335,7 +336,7 @@ export const ChangeAliasModalContent = ({ prevAlias, onClose, onSubmit }) => {
 const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, showBtn }, ref) => {
     const [active, setActive] = React.useState(item.is_active);
     const [isPasswordProtected, setPasswordProtected] = React.useState(Boolean(item?.protection?.password));
-    const [expirationTime, setExpirationTime] = React.useState(item?.expired_at);
+    const [expirationTime, setExpirationTime] = React.useState(item.expired_at);
     const [disabled, setDisabled] = React.useState(false);
     const [shortURL, setShortURL] = React.useState(item.short_url);
     const { state } = React.useContext(AuthContext);
@@ -379,7 +380,7 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                 .catch((e) => {
                     console.log(e);
                     setDisabled(false);
-                    toast("😵 Internal Error", {
+                    toast("😵 " + e?.response?.data?.error, {
                         type: "error",
                         ...toastConfig,
                     });
@@ -411,13 +412,10 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
             .catch((e) => {
                 console.log(e);
                 setDisabled(false);
-                toast("😵 Internal Error", {
+                toast("😵 " + e?.response?.data?.error, {
                     type: "error",
                     ...toastConfig,
                 });
-            })
-            .finally(() => {
-                setModalContent();
             });
     }, [state, item]);
 
@@ -446,13 +444,10 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                 .catch((e) => {
                     console.log(e);
                     setDisabled(false);
-                    toast("😵 Internal Error", {
+                    toast("😵 " + e?.response?.data?.error, {
                         type: "error",
                         ...toastConfig,
                     });
-                })
-                .finally(() => {
-                    setModalContent();
                 });
         },
         [state, item]
@@ -481,13 +476,10 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
             .catch((e) => {
                 console.log(e);
                 setDisabled(false);
-                toast("😵 Internal Error", {
+                toast("😵 " + e?.response?.data?.error, {
                     type: "error",
                     ...toastConfig,
                 });
-            })
-            .finally(() => {
-                setModalContent();
             });
     }, [state, item]);
 
@@ -499,7 +491,7 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                     `${BASE_URL}set_expiration_time`,
                     {
                         urlID: item._id,
-                        expired_at,
+                        expired_at: expired_at === "Infinite" ? false : expired_at,
                     },
                     {
                         headers: {
@@ -509,7 +501,7 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                     }
                 )
                 .then((val) => {
-                    setExpirationTime(expired_at);
+                    setExpirationTime(expired_at === "Infinite" ? false : expired_at);
                     setDisabled(false);
                     toast("👍 Success", {
                         type: "success",
@@ -519,13 +511,10 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                 .catch((e) => {
                     console.log(e);
                     setDisabled(false);
-                    toast("😵 Internal Error", {
+                    toast("😵 " + e?.response?.data?.error, {
                         type: "error",
                         ...toastConfig,
                     });
-                })
-                .finally(() => {
-                    setModalContent();
                 });
         },
         [state, item]
@@ -563,9 +552,6 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                         type: "error",
                         ...toastConfig,
                     });
-                })
-                .finally(() => {
-                    setModalContent();
                 });
         },
         [state, item]
@@ -653,7 +639,8 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                                                     <ThemedButton
                                                         title="Yes"
                                                         onClickHandler={() => {
-                                                            if (!disabled) onRemovePassword();
+                                                            onRemovePassword();
+                                                            setModalContent();
                                                         }}
                                                         className="mx-2"
                                                         color="bg-red-500"
@@ -678,7 +665,8 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                                             <PasswordModalContent
                                                 onClose={() => setModalContent()}
                                                 onSubmit={(password) => {
-                                                    if (!disabled) setPassword(password);
+                                                    setPassword(password);
+                                                    setModalContent();
                                                 }}
                                             />
                                         );
@@ -699,7 +687,8 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                                             <PasswordModalContent
                                                 onClose={() => setModalContent()}
                                                 onSubmit={(password) => {
-                                                    if (!disabled) setPassword(password);
+                                                    setPassword(password);
+                                                    setModalContent();
                                                 }}
                                             />
                                         );
@@ -720,7 +709,8 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                                         <ChangeAliasModalContent
                                             onClose={() => setModalContent()}
                                             onSubmit={(alias) => {
-                                                if (!disabled) changeAliasName(alias);
+                                                changeAliasName(alias);
+                                                setModalContent();
                                             }}
                                             prevAlias={prevAlias}
                                         />
@@ -741,7 +731,8 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                                         <ExpirationModalContent
                                             onClose={() => setModalContent()}
                                             onSelect={(res) => {
-                                                if (!disabled) setExpireDuration(res);
+                                                setExpireDuration(res);
+                                                setModalContent();
                                             }}
                                         />
                                     );
@@ -791,7 +782,8 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                                                 <ThemedButton
                                                     title="Yes"
                                                     onClickHandler={() => {
-                                                        if (!disabled) onDelete();
+                                                        onDelete();
+                                                        setModalContent();
                                                     }}
                                                     className="mx-2"
                                                     color="bg-red-500"
@@ -804,27 +796,35 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                         />
                     </div>
                     <div>
-                        {showBtn ? <ThemedButton onClickHandler={() => nav.push(`/url/${item._id}`)} title="Statistics" color="bg-blue-500" /> : null}
+                        {showBtn ? (
+                            <ThemedButton
+                                onClickHandler={() => nav.push(`/url/${item._id}`)}
+                                title="Statistics"
+                                color="bg-blue-500"
+                                disabled={disabled}
+                            />
+                        ) : null}
                     </div>
                 </div>
                 {expirationTime && expirationTime < Date.now() ? (
                     <div className="flex flex-col items-center justify-center flex-1">
                         <h1>Link has Expired</h1>
-                        <div
-                            className="flex justify-between items-center text-xl py-2 px-3 mx-2 rounded-xl bg-green-500 text-white cursor-pointer my-2"
-                            onClick={() =>
-                                setModalContent(
-                                    <ExpirationModalContent
-                                        onClose={() => setModalContent()}
-                                        onSelect={(res) => {
-                                            setExpireDuration(res);
-                                        }}
-                                    />
-                                )
-                            }
-                        >
-                            <h1>Make Me Alive!</h1>
-                        </div>
+                        <ThemedButton
+                            title="Make Me Alive!"
+                            onClickHandler={() => {
+                                if (!disabled)
+                                    setModalContent(
+                                        <ExpirationModalContent
+                                            onClose={() => setModalContent()}
+                                            onSelect={(res) => {
+                                                setExpireDuration(res);
+                                            }}
+                                        />
+                                    );
+                            }}
+                            disabled={disabled}
+                            color="bg-green-500"
+                        />
                     </div>
                 ) : null}
             </div>
