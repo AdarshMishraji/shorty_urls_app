@@ -23,10 +23,6 @@ const Header = ({ requireBackground }) => {
     const history = useHistory();
     const { state, clearUserData } = React.useContext(AuthContext);
 
-    const toggleMenu = () => {
-        setHamburgerOpen(!hamburgerOpen);
-    };
-
     const hamburgerRef = React.createRef();
     const accountMenuRef = React.createRef();
 
@@ -57,7 +53,7 @@ const Header = ({ requireBackground }) => {
                         <img
                             src={state.photo_img || account}
                             style={{ display: state.name ? "block" : "none" }}
-                            className="bg-white rounded-3xl p-1"
+                            className="bg-white rounded-3xl p-1 mr-3"
                             height="50"
                             width="50"
                             onClick={() => setAccountMenu(!accountMenu)}
@@ -66,83 +62,91 @@ const Header = ({ requireBackground }) => {
                         <Link text="Login / Signup" onPress={() => history?.push("/login")} />
                     )}
                 </div>
-                <div className="md:hidden flex items-center text-gray-600 md:mr-10 mr-2 z-" onClick={toggleMenu}>
-                    <div className="rounded-3xl focus:outline-none border-0" style={{ height: 40, width: 40 }}>
-                        {hamburgerOpen ? (
-                            <img src={HamburgerClose} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} />
-                        ) : (
-                            <img src={Hamburger} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} />
-                        )}
+                <div className="md:hidden flex items-center text-gray-600 md:mr-10 mr-2 z-50 relative">
+                    <div className="rounded-3xl focus:outline-none border-0" style={{ height: 40, width: 40 }} onClick={() => setHamburgerOpen(true)}>
+                        <img src={Hamburger} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} />
                     </div>
                 </div>
-            </div>
 
-            <div
-                ref={accountMenuRef}
-                className="menu opacity-95 md:hidden p-3 self-center mt-2 absolute right-5 bg-white rounded-2xl z-10"
-                style={{ display: accountMenu ? "block" : "none", boxShadow: "0px 0px 25px 5px black" }}
-            >
-                <h1
-                    className=" my-2 w-full py-1 px-4 rounded-xl mr-10 text-black
-                        hover:bg-gray-300 transition duration-300 ease-in-out text-lg font-bold cursor-pointer"
-                    onClick={() => {
-                        setAccountMenu(false);
-                        history?.push("/account");
-                    }}
+                <div
+                    ref={accountMenuRef}
+                    className="menu p-3 mt-2 absolute top-2 right-5 flex-col bg-gray-200 rounded-2xl z-50"
+                    style={{ display: accountMenu ? "flex" : "none", boxShadow: "0px 0px 25px 5px black" }}
                 >
-                    View Profile
-                </h1>
-                <button
-                    className="bg-blue-500 w-full py-1 rounded-xl mr-10 text-white 
+                    <img
+                        src={HamburgerClose}
+                        height={40}
+                        width={40}
+                        className="bg-gray-600 self-end rounded-full p-1"
+                        onClick={() => setAccountMenu(false)}
+                    />
+                    <h1
+                        className={`z-20 rounded-2xl flex-col text-blue-500 p-2 my-2 overflow-auto cursor-pointer `}
+                        onClick={() => {
+                            setAccountMenu(false);
+                            history?.push("/account");
+                        }}
+                    >
+                        View Profile
+                    </h1>
+                    <button
+                        className="bg-blue-500 w-full py-1 rounded-xl mr-10 text-white 
                     hover:bg-blue-600 transition duration-300 ease-in-out text-lg font-bold"
-                    onClick={() => {
-                        clearUserData();
-                        setAccountMenu(false);
-                        history?.push("/login");
-                    }}
-                >
-                    Logout
-                </button>
-            </div>
+                        onClick={() => {
+                            clearUserData();
+                            setAccountMenu(false);
+                            history?.push("/login");
+                        }}
+                    >
+                        Logout
+                    </button>
+                </div>
 
-            <div
-                ref={hamburgerRef}
-                className="menu p-3 mt-2 absolute right-5 flex-col bg-gray-200 rounded-2xl z-10 opacity-95"
-                style={{ display: hamburgerOpen ? "flex" : "none", boxShadow: "0px 0px 25px 5px black" }}
-            >
-                <h1
-                    className=" my-2 w-full py-1 px-4 rounded-xl mr-10 text-black
-                        hover:bg-gray-300 transition duration-300 ease-in-out text-lg font-bold cursor-pointer"
-                    onClick={() => {
-                        setHamburgerOpen(false);
-                        history?.push("/urls");
-                    }}
+                <div
+                    ref={hamburgerRef}
+                    className="menu p-3 mt-2 absolute top-2 right-5 flex-col bg-gray-200 rounded-2xl z-50"
+                    style={{ display: hamburgerOpen ? "flex" : "none", boxShadow: "0px 0px 25px 5px black" }}
                 >
-                    URLs
-                </h1>
-                <h1
-                    style={{ display: state.token ? "block" : "none" }}
-                    className=" my-2 w-full py-1 px-4 rounded-xl mr-10 text-black
-                        hover:bg-gray-300 transition duration-300 ease-in-out text-lg font-bold cursor-pointer"
-                    onClick={() => {
-                        setHamburgerOpen(false);
-                        history?.push("/account");
-                    }}
-                >
-                    View Profile
-                </h1>
-                <button
-                    // style={{ display: state.token ? "block" : "none" }}
-                    className="bg-blue-500 w-full py-1 px-4 rounded-xl mr-10 text-white z-50
+                    <img
+                        src={HamburgerClose}
+                        height={40}
+                        width={40}
+                        className="bg-gray-600 self-end rounded-full p-1"
+                        onClick={() => setHamburgerOpen(false)}
+                    />
+                    <h1
+                        className={`z-20 rounded-2xl flex-col text-blue-500 p-2  mb-2  overflow-auto cursor-pointer`}
+                        onClick={() => {
+                            setHamburgerOpen(false);
+                            history?.push("/urls");
+                        }}
+                    >
+                        URLs
+                    </h1>
+                    <h1
+                        style={{ display: state.token ? "block" : "none" }}
+                        className={`z-20 rounded-2xl flex-col text-blue-500 p-2 mb-2 overflow-auto cursor-pointer`}
+                        onClick={() => {
+                            setHamburgerOpen(false);
+                            history?.push("/account");
+                        }}
+                    >
+                        View Profile
+                    </h1>
+                    <button
+                        // style={{ display: state.token ? "block" : "none" }}
+                        className="bg-blue-500 w-full py-1 px-4 rounded-xl mr-10 text-white z-50
                         hover:bg-blue-600 transition duration-300 ease-in-out text-lg font-bold"
-                    onClick={() => {
-                        clearUserData();
-                        setHamburgerOpen(false);
-                        history?.push("/login");
-                    }}
-                >
-                    {state.token ? "Logout" : "Login / Signup"}
-                </button>
+                        onClick={() => {
+                            clearUserData();
+                            setHamburgerOpen(false);
+                            history?.push("/login");
+                        }}
+                    >
+                        {state.token ? "Logout" : "Login / Signup"}
+                    </button>
+                </div>
+                {/* </div> */}
             </div>
         </header>
     );
