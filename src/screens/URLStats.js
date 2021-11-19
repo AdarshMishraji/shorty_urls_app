@@ -11,6 +11,8 @@ import Header from "../component/Header";
 import { Loader } from "../component/Loader";
 import ContentLoader from "react-content-loader";
 import { TypeSelector } from "../component/TypesSelector";
+import ThemedButton from "../component/ThemedButton";
+import moment from "moment";
 
 const ScreenLoader = React.memo(({ display }) => {
     return (
@@ -30,7 +32,7 @@ const ScreenLoader = React.memo(({ display }) => {
                             height="50vh"
                             backgroundColor="#f3f3f3"
                             foregroundColor="#cccccc"
-                            className="flex flex-col my-3 text-xl md:mx-3 md:w-4/12"
+                            className="flex flex-col my-3 text-xl w-full md:w-5/12"
                         >
                             <rect height="50vh" width="100%" rx="12" ry="12" />
                         </ContentLoader>
@@ -39,7 +41,7 @@ const ScreenLoader = React.memo(({ display }) => {
                             height="50vh"
                             backgroundColor="#f3f3f3"
                             foregroundColor="#cccccc"
-                            className="flex flex-col my-3 text-xl md:mx-3 md:w-4/12"
+                            className="flex flex-col my-3 text-xl w-full md:w-5/12"
                         >
                             <rect height="50vh" width="100%" rx="12" ry="12" />
                         </ContentLoader>
@@ -48,7 +50,7 @@ const ScreenLoader = React.memo(({ display }) => {
                             height="50vh"
                             backgroundColor="#f3f3f3"
                             foregroundColor="#cccccc"
-                            className="flex flex-col my-3 text-xl md:mx-3 md:w-4/12"
+                            className="flex flex-col my-3 text-xl w-full md:w-5/12"
                         >
                             <rect height="50vh" width="100%" rx="12" ry="12" />
                         </ContentLoader>
@@ -57,7 +59,7 @@ const ScreenLoader = React.memo(({ display }) => {
                             height="50vh"
                             backgroundColor="#f3f3f3"
                             foregroundColor="#cccccc"
-                            className="flex flex-col my-3 text-xl md:mx-3 md:w-4/12"
+                            className="flex flex-col my-3 text-xl w-full md:w-5/12"
                         >
                             <rect height="50vh" width="100%" rx="12" ry="12" />
                         </ContentLoader>
@@ -68,9 +70,12 @@ const ScreenLoader = React.memo(({ display }) => {
     );
 });
 
-const Statistics = React.memo(({ year_month_day_click, browser_clicks, os_clicks, device_clicks, country_clicks }) => {
+const Statistics = React.memo(({ year_month_day_click, browser_clicks, os_clicks, device_clicks, country_clicks, display }) => {
     return (
-        <div className="flex flex-col border-2 p-3 rounded-xl m-3 text-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
+        <div
+            className="flex flex-col p-3 rounded-xl m-3 text-xl"
+            style={{ boxShadow: "0px 0px 15px 0.5px blue", display: display ? "flex" : "none" }}
+        >
             <ClicksGraph data={year_month_day_click} />
             <div className="flex justify-around md:my-5 flex-wrap items-center">
                 <PieChart data={browser_clicks} title="Browsers Clicks" />
@@ -82,16 +87,69 @@ const Statistics = React.memo(({ year_month_day_click, browser_clicks, os_clicks
     );
 });
 
-const History = React.memo(({ year_month_day_click, browser_clicks, os_clicks, device_clicks, country_clicks }) => {
-    return (
-        <div className="flex flex-col border-2 p-3 rounded-xl m-3 text-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
-            <ClicksGraph data={year_month_day_click} />
-            <div className="flex justify-around md:my-5 flex-wrap items-center">
-                <PieChart data={browser_clicks} title="Browsers Clicks" />
-                <PieChart data={os_clicks} title="System (OS) Clicks" />
-                <PieChart data={device_clicks} title="Devices Clicks" />
-                <PieChart data={country_clicks} title="Geo Locations Clicks" />
+const History = React.memo(({ display, data }) => {
+    const Row = React.memo(({ sno, ip, clicked_at, browser, device, OS, location }) => {
+        return (
+            <div className={`w-max border-b-2 rounded-2xl ${sno === 1 ? "border-t-2" : null}`}>
+                <span className=" text-center w-24 inline-block font-bold my-2">{sno}</span>
+                <span className="font-bold inline-block"> | </span>
+                <span className=" text-center w-64 inline-block font-bold my-2">{ip || "NA"}</span>
+                <span className="font-bold inline-block"> | </span>
+                <span className=" text-center w-64 inline-block font-bold my-2">{clicked_at}</span>
+                <span className=" font-bold inline-block"> | </span>
+                <span className=" text-center w-64 inline-block font-bold my-2">{browser}</span>
+                <span className=" font-bold inline-block"> | </span>
+                <span className=" text-center w-64 inline-block font-bold my-2">{device}</span>
+                <span className=" font-bold inline-block"> | </span>
+                <span className=" text-center w-64 inline-block font-bold my-2">{OS}</span>
+                <span className=" font-bold inline-block"> | </span>
+                <span className=" text-center w-64 inline-block font-bold my-2">{location}</span>
             </div>
+        );
+    });
+
+    return (
+        <div
+            className="flex flex-col p-3 rounded-xl m-3 text-xl"
+            style={{ boxShadow: "0px 0px 15px 0.5px blue", display: display ? "flex" : "none" }}
+        >
+            {data?.length > 0 ? (
+                <div>
+                    <div className="flex flex-col rounded-xl text-xl py-3 whitespace-nowrap overflow-scroll text-gray-700">
+                        <div className="mb-3 w-max border-2 rounded-xl bg-blue-500 text-white">
+                            <Row
+                                sno="S No."
+                                ip="IP"
+                                clicked_at="Clicked At"
+                                browser="Browser"
+                                device="Device"
+                                OS="System (OS)"
+                                location="Geo Location"
+                            />
+                        </div>
+                        {data?.map((value, index) => {
+                            console.log(value);
+                            const location = value?.location
+                                ? `${value.location.city}, ${value?.location?.country}. ${value?.location?.zipCode}`
+                                : "Not Available";
+                            const date = moment(value?.requested_at).format("YYYY - MMM - DD, hh:mm A");
+
+                            return (
+                                <Row
+                                    key={index}
+                                    sno={index + 1}
+                                    ip={value?.ip || "NA"}
+                                    clicked_at={date}
+                                    browser={value?.client_info?.client_name}
+                                    device={value?.client_info?.device_type[0].toUpperCase() + value?.client_info?.device_type.slice(1)}
+                                    OS={value?.client_info?.OS}
+                                    location={location}
+                                />
+                            );
+                        })}
+                    </div>
+                </div>
+            ) : null}
         </div>
     );
 });
@@ -136,9 +194,8 @@ const URLStats = () => {
         tryLocalLogin(
             () => {
                 if (state.token) {
-                    // setLoading(true);
                     if (urlID) {
-                        // fetchURL();
+                        fetchURL();
                     } else {
                         nav.replace("/urls");
                     }
@@ -158,28 +215,32 @@ const URLStats = () => {
                 {loading ? null : (
                     <div className="flex flex-col list">
                         <URLItem item={URLData?.info} setModalContent={setModalContent} reFetch={() => nav.goBack()} />
-                        <h1 className="text-blue-500 text-3xl my-2 text-center font-bold md:mx-5 mx-2">
+                        <h1 className="text-blue-500 text-xl my-2 text-center font-bold mx-5">
                             {Object.keys(URLData?.meta)?.length ? (
                                 <TypeSelector
                                     isFirst={!tableDisplay}
                                     setType={(type) => setTableDisplay(type === 1 ? false : true)}
                                     text1="Statistics"
-                                    text2="History"
+                                    text2="Histories"
                                     className=""
                                     buttonClassName="w-50"
                                 />
                             ) : (
-                                "No Stats Available 🥲"
+                                "No One Visited 🥲"
                             )}
                         </h1>
                         {Object.keys(URLData.meta).length ? (
-                            <Statistics
-                                year_month_day_click={URLData?.meta?.year_month_day_click}
-                                browser_clicks={URLData?.meta?.browser_clicks}
-                                os_clicks={URLData?.meta?.os_clicks}
-                                device_clicks={URLData?.meta?.device_clicks}
-                                country_clicks={URLData?.meta?.country_clicks}
-                            />
+                            <div>
+                                <Statistics
+                                    display={!tableDisplay}
+                                    year_month_day_click={URLData?.meta?.year_month_day_click}
+                                    browser_clicks={URLData?.meta?.browser_clicks}
+                                    os_clicks={URLData?.meta?.os_clicks}
+                                    device_clicks={URLData?.meta?.device_clicks}
+                                    country_clicks={URLData?.meta?.country_clicks}
+                                />
+                                <History display={tableDisplay} data={URLData?.info?.from_visited} />
+                            </div>
                         ) : null}
                         <ModalContainer onClose={() => setModalContent()} children={modalContent} />
                     </div>
