@@ -92,7 +92,7 @@ const URLs = () => {
         <div className="bg-white z-10">
             <ToastContainer className="z-50 text-center" />
             <Header requireBackground />
-            <div className="mt-20 md:mx-5 lg:mx-40">
+            <div className="flex flex-col mt-20 md:mx-5 lg:mx-40">
                 <Loader display={loading} />
                 <div className="flex flex-col list" style={{ display: loading ? "none" : "flex" }} onScroll={(e) => {}}>
                     {urls.length == 0 && (

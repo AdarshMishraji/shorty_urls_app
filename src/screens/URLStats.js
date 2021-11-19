@@ -11,7 +11,6 @@ import Header from "../component/Header";
 import { Loader } from "../component/Loader";
 import ContentLoader from "react-content-loader";
 import { TypeSelector } from "../component/TypesSelector";
-import ThemedButton from "../component/ThemedButton";
 import moment from "moment";
 
 const ScreenLoader = React.memo(({ display }) => {
@@ -207,7 +206,7 @@ const URLStats = () => {
         <div className="bg-white z-10">
             <ToastContainer className="z-50 text-center" />
             <Header requireBackground />
-            <div className="mt-20 md:mx-5 lg:mx-40">
+            <div className="flex flex-col mt-20 md:mx-5 lg:mx-40">
                 <ScreenLoader display={loading} />
                 {loading ? null : (
                     <div className="flex flex-col list">
