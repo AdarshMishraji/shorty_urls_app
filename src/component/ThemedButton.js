@@ -1,11 +1,14 @@
-import "../styles/ThemedButton.css";
-
-const ThemedButton = ({ title, onClickHandler }) => {
-  return (
-    <div class="themed-btn" onClick={onClickHandler}>
-      {title}
-    </div>
-  );
-};
+import * as React from "react";
+const ThemedButton = React.memo(({ title, onClickHandler, color, className, disabled }) => {
+    return (
+        <button
+            className={`flex justify-between items-center text-xl py-2 px-3 rounded-xl ${color} text-white cursor-pointer ${className}`}
+            disabled={disabled}
+            onClick={onClickHandler}
+        >
+            <h1>{title}</h1>
+        </button>
+    );
+});
 
 export default ThemedButton;
