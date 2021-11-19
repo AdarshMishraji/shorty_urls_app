@@ -128,7 +128,6 @@ const History = React.memo(({ display, data }) => {
                             />
                         </div>
                         {data?.map((value, index) => {
-                            console.log(value);
                             const location = value?.location
                                 ? `${value.location.city}, ${value?.location?.country}. ${value?.location?.zipCode}`
                                 : "Not Available";
@@ -165,7 +164,6 @@ const URLStats = () => {
 
     const fetchURL = React.useCallback(() => {
         const url = `${BASE_URL}url/${urlID}`;
-        console.log(url);
         if (state.token) {
             axios
                 .get(url, {
@@ -175,7 +173,6 @@ const URLStats = () => {
                     },
                 })
                 .then((value) => {
-                    console.log(value.data);
                     setURLData(value.data);
                     setLoading(false);
                 })

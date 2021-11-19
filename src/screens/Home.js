@@ -55,7 +55,6 @@ const Home = () => {
                     })
                     .then((res) => {
                         setMeta(res.data);
-                        console.log(res.data);
                     })
                     .catch((e) => console.log(e));
         },
@@ -65,7 +64,6 @@ const Home = () => {
     React.useEffect(() => {
         tryLocalLogin(
             () => {
-                console.log("called");
                 if (state.token) fetchMetaData(false);
             },
             () => {
@@ -115,7 +113,6 @@ const Home = () => {
                         })
                         .finally(() => setLoading(false));
                 } else {
-                    console.log("url not exists");
                     setLoading(false);
                     setError("URL doesn't exists");
                     toast("😵 URL doesn't exists", {
@@ -124,7 +121,6 @@ const Home = () => {
                     });
                 }
             } else {
-                console.log("invalid url");
                 setLoading(false);
                 setError("Enter valid URL");
                 toast("😵 Enter valid URL", {

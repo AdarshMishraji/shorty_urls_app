@@ -24,7 +24,6 @@ const URLs = () => {
     const fetchHistory = React.useCallback(
         (skipCount) => {
             const url = `${BASE_URL}urls?limit=10&skip=${skipCount}`;
-            console.log(url);
             if (state.token) {
                 axios
                     .get(url, {
@@ -34,7 +33,6 @@ const URLs = () => {
                         },
                     })
                     .then((value) => {
-                        console.log(value.data);
                         if (value.data?.urls.length === 0) {
                             setMore(false);
                         } else {

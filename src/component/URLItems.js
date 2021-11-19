@@ -352,10 +352,6 @@ export const URLItem = React.memo(
         let qrcodeRef = React.useRef();
         let deletRef = React.useRef();
 
-        React.useEffect(() => {
-            console.log(++x);
-        }, []);
-
         const onChangeStatus = React.useCallback(
             (status) => {
                 setDisabled(true);
