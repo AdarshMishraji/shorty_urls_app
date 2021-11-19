@@ -12,9 +12,7 @@ const Account = () => {
 
     React.useEffect(() => {
         tryLocalLogin(
-            () => {
-                // history.replace("/home");
-            },
+            () => {},
             () => {
                 history.replace("/login");
             }

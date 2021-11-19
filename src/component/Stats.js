@@ -8,7 +8,7 @@ export const Stats = React.memo(({ title, value, icon, color }) => {
                 <h1 className="text-sm text-blue-600 font-bold" style={{ minWidth: 100 }}>
                     {title}
                 </h1>
-                {value ? (
+                {typeof value === "number" ? (
                     <h1 className="text-sm text-gray-700">{value || 0}</h1>
                 ) : (
                     <ContentLoader width="100%" height="16" className="rounded-xl" backgroundColor="#f3f3f3" foregroundColor="#cccccc">

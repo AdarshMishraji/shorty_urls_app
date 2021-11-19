@@ -32,7 +32,6 @@ const Auth = () => {
             .then((res) => {
                 res.user.getIdToken().then((token) => {
                     axios.post(`${BASE_URL}authenticate`, { token }, { headers: { Authorization } }).then((res1) => {
-                        console.log(res1.data.token);
                         setUserDetails({ ...res.user, token: res1.data.token });
                         history.replace("/home");
                         setLoading(false);

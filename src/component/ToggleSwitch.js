@@ -12,7 +12,6 @@ export const ToggleSwitch = React.memo(({ isActive, setStatus, className, disabl
                 <div
                     onClick={() => {
                         if (!disabled) {
-                            console.log("clicked");
                             setStatus(true);
                         }
                     }}
@@ -23,7 +22,6 @@ export const ToggleSwitch = React.memo(({ isActive, setStatus, className, disabl
                 <div
                     onClick={() => {
                         if (!disabled) {
-                            console.log("clicked");
                             setStatus(false);
                         }
                     }}
