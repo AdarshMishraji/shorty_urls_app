@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Doughnut, Chart } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
@@ -27,7 +28,7 @@ const options = {
     },
 };
 
-export const PieChart = ({ data, title }) => {
+export const PieChart = React.memo(({ data, title }) => {
     const dataSet = {
         labels: Object.keys(data).map((key) => {
             return key[0].toUpperCase() + key.slice(1);
@@ -67,4 +68,4 @@ export const PieChart = ({ data, title }) => {
             <Doughnut data={dataSet} options={options} style={{ maxHeight: "40vh", marginTop: ".5rem" }} />
         </div>
     );
-};
+});

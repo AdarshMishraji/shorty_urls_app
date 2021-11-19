@@ -1,7 +1,8 @@
+import * as React from "react";
 import Done from "../assets/svgs/done.svg";
 import Close from "../assets/svgs/close.svg";
 
-export const ToggleSwitch = ({ isActive, setStatus, className, disabled }) => {
+export const ToggleSwitch = React.memo(({ isActive, setStatus, className, disabled }) => {
     return (
         <div className={className}>
             <div
@@ -41,4 +42,4 @@ export const ToggleSwitch = ({ isActive, setStatus, className, disabled }) => {
             </div>
         </div>
     );
-};
+});

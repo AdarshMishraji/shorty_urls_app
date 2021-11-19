@@ -1,6 +1,7 @@
+import * as React from "react";
 import { Trophy } from "./Trophy";
 
-export const TopLinks = ({ title, url, short_url, color }) => {
+export const TopLinks = React.memo(({ title, url, short_url, color }) => {
     return (
         <div
             className={`px-4 py-2 rounded-xl mx-2 flex flex-1 justify-between items-center my-2`}
@@ -22,4 +23,4 @@ export const TopLinks = ({ title, url, short_url, color }) => {
             </div>
         </div>
     );
-};
+});

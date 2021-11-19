@@ -35,7 +35,7 @@ export const toastConfig = {
     progress: undefined,
 };
 
-export const ModalContainer = ({ onClose, children }) => {
+export const ModalContainer = React.memo(({ onClose, children }) => {
     return (
         <div
             className="justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50"
@@ -59,9 +59,9 @@ export const ModalContainer = ({ onClose, children }) => {
             ></div>
         </div>
     );
-};
+});
 
-export const ExpirationModalContent = ({ onSelect, onClose }) => {
+export const ExpirationModalContent = React.memo(({ onSelect, onClose }) => {
     const [type, setType] = React.useState(0);
     const [afterIndex, setAfterIndex] = React.useState(0);
 
@@ -251,9 +251,9 @@ export const ExpirationModalContent = ({ onSelect, onClose }) => {
             </div>
         </div>
     );
-};
+});
 
-export const PasswordModalContent = ({ onClose, onSubmit }) => {
+export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
     const [password, setPassword] = React.useState("");
     const [confirmPassword, setConfirmPassword] = React.useState("");
     return (
@@ -306,9 +306,9 @@ export const PasswordModalContent = ({ onClose, onSubmit }) => {
             </div>
         </div>
     );
-};
+});
 
-export const ChangeAliasModalContent = ({ prevAlias, onClose, onSubmit }) => {
+export const ChangeAliasModalContent = React.memo(({ prevAlias, onClose, onSubmit }) => {
     const [alias, setAlias] = React.useState(prevAlias);
     return (
         <div className="flex flex-col items-center justify-center">
@@ -331,178 +331,80 @@ export const ChangeAliasModalContent = ({ prevAlias, onClose, onSubmit }) => {
             </div>
         </div>
     );
-};
+});
 
-const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, showBtn }, ref) => {
-    const [active, setActive] = React.useState(item.is_active);
-    const [isPasswordProtected, setPasswordProtected] = React.useState(Boolean(item?.protection?.password));
-    const [expirationTime, setExpirationTime] = React.useState(item.expired_at);
-    const [disabled, setDisabled] = React.useState(false);
-    const [shortURL, setShortURL] = React.useState(item.short_url);
-    const { state } = React.useContext(AuthContext);
-    const nav = useHistory();
+export const URLItem = React.memo(
+    React.forwardRef(({ item, index, setModalContent, reFetch, showBtn }, ref) => {
+        const [active, setActive] = React.useState(item.is_active);
+        const [isPasswordProtected, setPasswordProtected] = React.useState(Boolean(item?.protection?.password));
+        const [expirationTime, setExpirationTime] = React.useState(item.expired_at);
+        const [disabled, setDisabled] = React.useState(false);
+        const [shortURL, setShortURL] = React.useState(item.short_url);
+        const { state } = React.useContext(AuthContext);
+        const nav = useHistory();
 
-    let copyRef = React.useRef();
-    let keyoffRef = React.useRef();
-    let keyeditRef = React.useRef();
-    let keyRef = React.useRef();
-    let editRef = React.useRef();
-    let timerRef = React.useRef();
-    let qrcodeRef = React.useRef();
-    let deletRef = React.useRef();
+        let copyRef = React.useRef();
+        let keyoffRef = React.useRef();
+        let keyeditRef = React.useRef();
+        let keyRef = React.useRef();
+        let editRef = React.useRef();
+        let timerRef = React.useRef();
+        let qrcodeRef = React.useRef();
+        let deletRef = React.useRef();
 
-    React.useEffect(() => {
-        console.log(++x);
-    }, []);
+        React.useEffect(() => {
+            console.log(++x);
+        }, []);
 
-    const onChangeStatus = React.useCallback(
-        (status) => {
+        const onChangeStatus = React.useCallback(
+            (status) => {
+                setDisabled(true);
+                axios
+                    .patch(
+                        `${BASE_URL}update_url_status`,
+                        { urlID: item._id, status },
+                        {
+                            headers: {
+                                Authorization,
+                                accessToken: state.token,
+                            },
+                        }
+                    )
+                    .then((val) => {
+                        setActive(status);
+                        setDisabled(false);
+                        toast("👍 Success", {
+                            type: "success",
+                            ...toastConfig,
+                        });
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                        setDisabled(false);
+                        toast("😵 " + e?.response?.data?.error, {
+                            type: "error",
+                            ...toastConfig,
+                        });
+                    });
+            },
+            [item, state]
+        );
+
+        const onDelete = React.useCallback(() => {
             setDisabled(true);
             axios
-                .patch(
-                    `${BASE_URL}update_url_status`,
-                    { urlID: item._id, status },
-                    {
-                        headers: {
-                            Authorization,
-                            accessToken: state.token,
-                        },
-                    }
-                )
-                .then((val) => {
-                    setActive(status);
-                    setDisabled(false);
-                    toast("👍 Success", {
-                        type: "success",
-                        ...toastConfig,
-                    });
-                })
-                .catch((e) => {
-                    console.log(e);
-                    setDisabled(false);
-                    toast("😵 " + e?.response?.data?.error, {
-                        type: "error",
-                        ...toastConfig,
-                    });
-                });
-        },
-        [item, state]
-    );
-
-    const onDelete = React.useCallback(() => {
-        setDisabled(true);
-        axios
-            .delete(`${BASE_URL}delete_url`, {
-                data: {
-                    urlID: item._id,
-                },
-                headers: {
-                    Authorization,
-                    accessToken: state.token,
-                },
-            })
-            .then((val) => {
-                setDisabled(false);
-                reFetch();
-                toast("👍 Success", {
-                    type: "success",
-                    ...toastConfig,
-                });
-            })
-            .catch((e) => {
-                console.log(e);
-                setDisabled(false);
-                toast("😵 " + e?.response?.data?.error, {
-                    type: "error",
-                    ...toastConfig,
-                });
-            });
-    }, [state, item]);
-
-    const setPassword = React.useCallback(
-        (password) => {
-            setDisabled(true);
-            axios
-                .patch(
-                    `${BASE_URL}update_password`,
-                    { urlID: item._id, password },
-                    {
-                        headers: {
-                            Authorization,
-                            accessToken: state.token,
-                        },
-                    }
-                )
-                .then((val) => {
-                    setDisabled(false);
-                    setPasswordProtected(true);
-                    toast("👍 Success", {
-                        type: "success",
-                        ...toastConfig,
-                    });
-                })
-                .catch((e) => {
-                    console.log(e);
-                    setDisabled(false);
-                    toast("😵 " + e?.response?.data?.error, {
-                        type: "error",
-                        ...toastConfig,
-                    });
-                });
-        },
-        [state, item]
-    );
-
-    const onRemovePassword = React.useCallback(() => {
-        setDisabled(true);
-        axios
-            .delete(`${BASE_URL}remove_password`, {
-                headers: {
-                    Authorization,
-                    accessToken: state.token,
-                },
-                data: {
-                    urlID: item._id,
-                },
-            })
-            .then((val) => {
-                setDisabled(false);
-                setPasswordProtected(false);
-                toast("👍 Success", {
-                    type: "success",
-                    ...toastConfig,
-                });
-            })
-            .catch((e) => {
-                console.log(e);
-                setDisabled(false);
-                toast("😵 " + e?.response?.data?.error, {
-                    type: "error",
-                    ...toastConfig,
-                });
-            });
-    }, [state, item]);
-
-    const setExpireDuration = React.useCallback(
-        (expired_at) => {
-            setDisabled(true);
-            axios
-                .patch(
-                    `${BASE_URL}set_expiration_time`,
-                    {
+                .delete(`${BASE_URL}delete_url`, {
+                    data: {
                         urlID: item._id,
-                        expired_at: expired_at === "Infinite" ? false : expired_at,
                     },
-                    {
-                        headers: {
-                            Authorization,
-                            accessToken: state.token,
-                        },
-                    }
-                )
+                    headers: {
+                        Authorization,
+                        accessToken: state.token,
+                    },
+                })
                 .then((val) => {
-                    setExpirationTime(expired_at === "Infinite" ? false : expired_at);
                     setDisabled(false);
+                    reFetch();
                     toast("👍 Success", {
                         type: "success",
                         ...toastConfig,
@@ -516,30 +418,57 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                         ...toastConfig,
                     });
                 });
-        },
-        [state, item]
-    );
+        }, [state, item]);
 
-    const changeAliasName = React.useCallback(
-        (alias) => {
+        const setPassword = React.useCallback(
+            (password) => {
+                setDisabled(true);
+                axios
+                    .patch(
+                        `${BASE_URL}update_password`,
+                        { urlID: item._id, password },
+                        {
+                            headers: {
+                                Authorization,
+                                accessToken: state.token,
+                            },
+                        }
+                    )
+                    .then((val) => {
+                        setDisabled(false);
+                        setPasswordProtected(true);
+                        toast("👍 Success", {
+                            type: "success",
+                            ...toastConfig,
+                        });
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                        setDisabled(false);
+                        toast("😵 " + e?.response?.data?.error, {
+                            type: "error",
+                            ...toastConfig,
+                        });
+                    });
+            },
+            [state, item]
+        );
+
+        const onRemovePassword = React.useCallback(() => {
             setDisabled(true);
             axios
-                .patch(
-                    `${BASE_URL}change_alias`,
-                    {
-                        urlID: item._id,
-                        alias,
+                .delete(`${BASE_URL}remove_password`, {
+                    headers: {
+                        Authorization,
+                        accessToken: state.token,
                     },
-                    {
-                        headers: {
-                            Authorization,
-                            accessToken: state.token,
-                        },
-                    }
-                )
+                    data: {
+                        urlID: item._id,
+                    },
+                })
                 .then((val) => {
-                    setShortURL(BASE_URL + alias);
                     setDisabled(false);
+                    setPasswordProtected(false);
                     toast("👍 Success", {
                         type: "success",
                         ...toastConfig,
@@ -548,87 +477,306 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                 .catch((e) => {
                     console.log(e);
                     setDisabled(false);
-                    toast("😵" + e?.response?.data?.message || e?.response?.data?.error || "Internal Error", {
+                    toast("😵 " + e?.response?.data?.error, {
                         type: "error",
                         ...toastConfig,
                     });
                 });
-        },
-        [state, item]
-    );
+        }, [state, item]);
 
-    return (
-        <div className="flex flex-col border-2 p-3 rounded-xl m-3 text-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }} ref={ref}>
-            <ReactTooltip />
-            <div className="relative">
-                <div className="flex justify-between items-center">
-                    <ToggleSwitch isActive={active} setStatus={onChangeStatus} className="mb-3" disbled={disabled} />
-                    {disabled ? (
-                        <div className="flex items-center justify-center" style={{ opacity: 0.7 }}>
-                            <div className="spinner-grow mr-3" role="status" style={{ color: "black", height: 35, width: 35 }}>
-                                <span class="sr-only">Loading...</span>
+        const setExpireDuration = React.useCallback(
+            (expired_at) => {
+                setDisabled(true);
+                axios
+                    .patch(
+                        `${BASE_URL}set_expiration_time`,
+                        {
+                            urlID: item._id,
+                            expired_at: expired_at === "Infinite" ? false : expired_at,
+                        },
+                        {
+                            headers: {
+                                Authorization,
+                                accessToken: state.token,
+                            },
+                        }
+                    )
+                    .then((val) => {
+                        setExpirationTime(expired_at === "Infinite" ? false : expired_at);
+                        setDisabled(false);
+                        toast("👍 Success", {
+                            type: "success",
+                            ...toastConfig,
+                        });
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                        setDisabled(false);
+                        toast("😵 " + e?.response?.data?.error, {
+                            type: "error",
+                            ...toastConfig,
+                        });
+                    });
+            },
+            [state, item]
+        );
+
+        const changeAliasName = React.useCallback(
+            (alias) => {
+                setDisabled(true);
+                axios
+                    .patch(
+                        `${BASE_URL}change_alias`,
+                        {
+                            urlID: item._id,
+                            alias,
+                        },
+                        {
+                            headers: {
+                                Authorization,
+                                accessToken: state.token,
+                            },
+                        }
+                    )
+                    .then((val) => {
+                        setShortURL(BASE_URL + alias);
+                        setDisabled(false);
+                        toast("👍 Success", {
+                            type: "success",
+                            ...toastConfig,
+                        });
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                        setDisabled(false);
+                        toast("😵" + e?.response?.data?.message || e?.response?.data?.error || "Internal Error", {
+                            type: "error",
+                            ...toastConfig,
+                        });
+                    });
+            },
+            [state, item]
+        );
+
+        return (
+            <div className="flex flex-col border-2 p-3 rounded-xl m-3 text-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }} ref={ref}>
+                <ReactTooltip />
+                <div className="relative">
+                    <div className="flex justify-between items-center">
+                        <ToggleSwitch isActive={active} setStatus={onChangeStatus} className="mb-3" disbled={disabled} />
+                        {disabled ? (
+                            <div className="flex items-center justify-center" style={{ opacity: 0.7 }}>
+                                <div className="spinner-grow mr-3" role="status" style={{ color: "black", height: 35, width: 35 }}>
+                                    <span class="sr-only">Loading...</span>
+                                </div>
                             </div>
-                        </div>
-                    ) : null}
-                </div>
-                <div className="border-b-2 pb-3">
-                    <h1 className="text-gray-800 font-bold overflow-scroll whitespace-nowrap py-1" style={{ display: item.title ? "block" : "none" }}>
-                        {item.title}
-                    </h1>
-                    <h1
-                        className="text-gray-500 font-bold overflow-scroll whitespace-nowrap pt-1 pb-3"
-                        style={{ display: item.title ? "block" : "none" }}
-                    >
-                        {item.description}
-                    </h1>
-                    <h1 className="text-gray-500 overflow-scroll whitespace-nowrap">{item.url}</h1>
-                    <h1
-                        className="text-blue-500 overflow-scroll whitespace-nowrap cursor-pointer"
-                        onClick={() => {
-                            window.open(shortURL, "_blank");
-                        }}
-                    >
-                        {shortURL}
-                    </h1>
-                    {expirationTime ? (
-                        <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">
-                            <span className="text-gray-600 font-bold">Expired At: </span> {moment(expirationTime).format("YYYY - MMM - DD, hh:mm A")}
+                        ) : null}
+                    </div>
+                    <div className="border-b-2 pb-3">
+                        <h1
+                            className="text-gray-800 font-bold overflow-scroll whitespace-nowrap py-1"
+                            style={{ display: item.title ? "block" : "none" }}
+                        >
+                            {item.title}
                         </h1>
-                    ) : null}
-                </div>
-                <div className="flex items-center mt-2 justify-between">
-                    <div className="flex items-center overflow-scroll whitespace-nowrap">
-                        <img
-                            ref={copyRef}
-                            src={Copy}
-                            height="30"
-                            width="30"
-                            data-tip="Copy the URL"
-                            className="mr-3 cursor-pointer"
+                        <h1
+                            className="text-gray-500 font-bold overflow-scroll whitespace-nowrap pt-1 pb-3"
+                            style={{ display: item.title ? "block" : "none" }}
+                        >
+                            {item.description}
+                        </h1>
+                        <h1 className="text-gray-500 overflow-scroll whitespace-nowrap">{item.url}</h1>
+                        <h1
+                            className="text-blue-500 overflow-scroll whitespace-nowrap cursor-pointer"
                             onClick={() => {
-                                copy(shortURL);
-                                toast("👍 Copied", {
-                                    type: "success",
-                                    ...toastConfig,
-                                });
+                                window.open(shortURL, "_blank");
                             }}
-                        />
-                        {isPasswordProtected ? (
+                        >
+                            {shortURL}
+                        </h1>
+                        {expirationTime ? (
+                            <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">
+                                <span className="text-gray-600 font-bold">Expired At: </span>{" "}
+                                {moment(expirationTime).format("YYYY - MMM - DD, hh:mm A")}
+                            </h1>
+                        ) : null}
+                    </div>
+                    <div className="flex items-center mt-2 justify-between">
+                        <div className="flex items-center overflow-scroll whitespace-nowrap">
                             <img
-                                data-tip="Remove Password Protection"
-                                ref={keyoffRef}
-                                src={KeyOff}
+                                ref={copyRef}
+                                src={Copy}
+                                height="30"
+                                width="30"
+                                data-tip="Copy the URL"
+                                className="mr-3 cursor-pointer"
+                                onClick={() => {
+                                    copy(shortURL);
+                                    toast("👍 Copied", {
+                                        type: "success",
+                                        ...toastConfig,
+                                    });
+                                }}
+                            />
+                            {isPasswordProtected ? (
+                                <img
+                                    data-tip="Remove Password Protection"
+                                    ref={keyoffRef}
+                                    src={KeyOff}
+                                    height="30"
+                                    width="30"
+                                    className="mr-3 cursor-pointer"
+                                    onClick={() => {
+                                        if (!disabled)
+                                            setModalContent(
+                                                <div className="flex flex-col items-center justify-center">
+                                                    <img src={Warning} height={75} width={75} />
+                                                    <h1 className="text-red-500 overflow-scroll text-center">
+                                                        Are you sure to remove password protection for this url?
+                                                    </h1>
+                                                    <div className="flex items-center mt-2">
+                                                        <ThemedButton
+                                                            title="No"
+                                                            onClickHandler={() => setModalContent()}
+                                                            color="bg-green-500"
+                                                            className="mx-2"
+                                                        />
+                                                        <ThemedButton
+                                                            title="Yes"
+                                                            onClickHandler={() => {
+                                                                onRemovePassword();
+                                                                setModalContent();
+                                                            }}
+                                                            className="mx-2"
+                                                            color="bg-red-500"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            );
+                                    }}
+                                />
+                            ) : null}
+                            {isPasswordProtected ? (
+                                <img
+                                    data-tip="Update Password"
+                                    ref={keyeditRef}
+                                    src={ChangePassword}
+                                    height="30"
+                                    width="30"
+                                    className="mr-3 cursor-pointer"
+                                    onClick={() => {
+                                        if (!disabled)
+                                            setModalContent(
+                                                <PasswordModalContent
+                                                    onClose={() => setModalContent()}
+                                                    onSubmit={(password) => {
+                                                        setPassword(password);
+                                                        setModalContent();
+                                                    }}
+                                                />
+                                            );
+                                    }}
+                                />
+                            ) : null}
+                            {!isPasswordProtected ? (
+                                <img
+                                    data-tip="Add Password Protection"
+                                    src={Key}
+                                    ref={keyRef}
+                                    height="30"
+                                    width="30"
+                                    className="mr-3 cursor-pointer"
+                                    onClick={() => {
+                                        if (!disabled)
+                                            setModalContent(
+                                                <PasswordModalContent
+                                                    onClose={() => setModalContent()}
+                                                    onSubmit={(password) => {
+                                                        setPassword(password);
+                                                        setModalContent();
+                                                    }}
+                                                />
+                                            );
+                                    }}
+                                />
+                            ) : null}
+                            <img
+                                data-tip="Edit Alias Name"
+                                ref={editRef}
+                                src={Edit}
+                                height="30"
+                                width="30"
+                                className="mr-3 cursor-pointer"
+                                onClick={() => {
+                                    if (!disabled) {
+                                        const prevAlias = shortURL.split("/").splice(-1)[0];
+                                        setModalContent(
+                                            <ChangeAliasModalContent
+                                                onClose={() => setModalContent()}
+                                                onSubmit={(alias) => {
+                                                    changeAliasName(alias);
+                                                    setModalContent();
+                                                }}
+                                                prevAlias={prevAlias}
+                                            />
+                                        );
+                                    }
+                                }}
+                            />
+                            <img
+                                data-tip="Set Expiration Time"
+                                ref={timerRef}
+                                src={Clock}
                                 height="30"
                                 width="30"
                                 className="mr-3 cursor-pointer"
                                 onClick={() => {
                                     if (!disabled)
                                         setModalContent(
+                                            <ExpirationModalContent
+                                                onClose={() => setModalContent()}
+                                                onSelect={(res) => {
+                                                    setExpireDuration(res);
+                                                    setModalContent();
+                                                }}
+                                            />
+                                        );
+                                }}
+                            />
+                            <img
+                                data-tip="Show QR Code"
+                                ref={qrcodeRef}
+                                src={QrCode}
+                                height="30"
+                                width="30"
+                                className="mr-3 cursor-pointer"
+                                onClick={() => {
+                                    if (!disabled)
+                                        qr.toDataURL(shortURL, { type: "image/png" }).then((value) => {
+                                            setModalContent(
+                                                <div className="flex flex-col items-center justify-center">
+                                                    <img src={value} className="md:h-64 md:w-64 w-40 h-40" />
+                                                    <h1 className="text-blue-500 overflow-scroll text-center" aria-multiline>
+                                                        {shortURL}
+                                                    </h1>
+                                                </div>
+                                            );
+                                        });
+                                }}
+                            />
+                            <img
+                                data-tip="Delete the URL"
+                                ref={deletRef}
+                                src={Delete}
+                                height="30"
+                                width="30"
+                                className="mr-3 cursor-pointer"
+                                onClick={() => {
+                                    if (!disabled) {
+                                        setModalContent(
                                             <div className="flex flex-col items-center justify-center">
                                                 <img src={Warning} height={75} width={75} />
-                                                <h1 className="text-red-500 overflow-scroll text-center">
-                                                    Are you sure to remove password protection for this url?
-                                                </h1>
+                                                <h1 className="text-red-500 overflow-scroll whitespace-nowrap">Are you sure to delete?</h1>
                                                 <div className="flex items-center mt-2">
                                                     <ThemedButton
                                                         title="No"
@@ -639,7 +787,7 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                                                     <ThemedButton
                                                         title="Yes"
                                                         onClickHandler={() => {
-                                                            onRemovePassword();
+                                                            onDelete();
                                                             setModalContent();
                                                         }}
                                                         className="mx-2"
@@ -648,189 +796,45 @@ const RenderItem = React.forwardRef(({ item, index, setModalContent, reFetch, sh
                                                 </div>
                                             </div>
                                         );
+                                    }
                                 }}
                             />
-                        ) : null}
-                        {isPasswordProtected ? (
-                            <img
-                                data-tip="Update Password"
-                                ref={keyeditRef}
-                                src={ChangePassword}
-                                height="30"
-                                width="30"
-                                className="mr-3 cursor-pointer"
-                                onClick={() => {
-                                    if (!disabled)
-                                        setModalContent(
-                                            <PasswordModalContent
-                                                onClose={() => setModalContent()}
-                                                onSubmit={(password) => {
-                                                    setPassword(password);
-                                                    setModalContent();
-                                                }}
-                                            />
-                                        );
-                                }}
-                            />
-                        ) : null}
-                        {!isPasswordProtected ? (
-                            <img
-                                data-tip="Add Password Protection"
-                                src={Key}
-                                ref={keyRef}
-                                height="30"
-                                width="30"
-                                className="mr-3 cursor-pointer"
-                                onClick={() => {
-                                    if (!disabled)
-                                        setModalContent(
-                                            <PasswordModalContent
-                                                onClose={() => setModalContent()}
-                                                onSubmit={(password) => {
-                                                    setPassword(password);
-                                                    setModalContent();
-                                                }}
-                                            />
-                                        );
-                                }}
-                            />
-                        ) : null}
-                        <img
-                            data-tip="Edit Alias Name"
-                            ref={editRef}
-                            src={Edit}
-                            height="30"
-                            width="30"
-                            className="mr-3 cursor-pointer"
-                            onClick={() => {
-                                if (!disabled) {
-                                    const prevAlias = shortURL.split("/").splice(-1)[0];
-                                    setModalContent(
-                                        <ChangeAliasModalContent
-                                            onClose={() => setModalContent()}
-                                            onSubmit={(alias) => {
-                                                changeAliasName(alias);
-                                                setModalContent();
-                                            }}
-                                            prevAlias={prevAlias}
-                                        />
-                                    );
-                                }
-                            }}
-                        />
-                        <img
-                            data-tip="Set Expiration Time"
-                            ref={timerRef}
-                            src={Clock}
-                            height="30"
-                            width="30"
-                            className="mr-3 cursor-pointer"
-                            onClick={() => {
-                                if (!disabled)
-                                    setModalContent(
-                                        <ExpirationModalContent
-                                            onClose={() => setModalContent()}
-                                            onSelect={(res) => {
-                                                setExpireDuration(res);
-                                                setModalContent();
-                                            }}
-                                        />
-                                    );
-                            }}
-                        />
-                        <img
-                            data-tip="Show QR Code"
-                            ref={qrcodeRef}
-                            src={QrCode}
-                            height="30"
-                            width="30"
-                            className="mr-3 cursor-pointer"
-                            onClick={() => {
-                                if (!disabled)
-                                    qr.toDataURL(shortURL, { type: "image/png" }).then((value) => {
-                                        setModalContent(
-                                            <div className="flex flex-col items-center justify-center">
-                                                <img src={value} className="md:h-64 md:w-64 w-40 h-40" />
-                                                <h1 className="text-blue-500 overflow-scroll text-center" aria-multiline>
-                                                    {shortURL}
-                                                </h1>
-                                            </div>
-                                        );
-                                    });
-                            }}
-                        />
-                        <img
-                            data-tip="Delete the URL"
-                            ref={deletRef}
-                            src={Delete}
-                            height="30"
-                            width="30"
-                            className="mr-3 cursor-pointer"
-                            onClick={() => {
-                                if (!disabled) {
-                                    setModalContent(
-                                        <div className="flex flex-col items-center justify-center">
-                                            <img src={Warning} height={75} width={75} />
-                                            <h1 className="text-red-500 overflow-scroll whitespace-nowrap">Are you sure to delete?</h1>
-                                            <div className="flex items-center mt-2">
-                                                <ThemedButton
-                                                    title="No"
-                                                    onClickHandler={() => setModalContent()}
-                                                    color="bg-green-500"
-                                                    className="mx-2"
-                                                />
-                                                <ThemedButton
-                                                    title="Yes"
-                                                    onClickHandler={() => {
-                                                        onDelete();
-                                                        setModalContent();
-                                                    }}
-                                                    className="mx-2"
-                                                    color="bg-red-500"
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                }
-                            }}
-                        />
+                        </div>
+                        <div>
+                            {showBtn ? (
+                                <ThemedButton
+                                    onClickHandler={() => nav.push(`/url/${item._id}`)}
+                                    title="Statistics"
+                                    color="bg-blue-500"
+                                    disabled={disabled}
+                                />
+                            ) : null}
+                        </div>
                     </div>
-                    <div>
-                        {showBtn ? (
+                    {expirationTime && expirationTime < Date.now() ? (
+                        <div className="flex flex-col items-center justify-center flex-1">
+                            <h1>Link has Expired</h1>
                             <ThemedButton
-                                onClickHandler={() => nav.push(`/url/${item._id}`)}
-                                title="Statistics"
-                                color="bg-blue-500"
+                                title="Make Me Alive!"
+                                onClickHandler={() => {
+                                    if (!disabled)
+                                        setModalContent(
+                                            <ExpirationModalContent
+                                                onClose={() => setModalContent()}
+                                                onSelect={(res) => {
+                                                    setExpireDuration(res);
+                                                }}
+                                            />
+                                        );
+                                }}
                                 disabled={disabled}
+                                color="bg-green-500"
                             />
-                        ) : null}
-                    </div>
+                        </div>
+                    ) : null}
                 </div>
-                {expirationTime && expirationTime < Date.now() ? (
-                    <div className="flex flex-col items-center justify-center flex-1">
-                        <h1>Link has Expired</h1>
-                        <ThemedButton
-                            title="Make Me Alive!"
-                            onClickHandler={() => {
-                                if (!disabled)
-                                    setModalContent(
-                                        <ExpirationModalContent
-                                            onClose={() => setModalContent()}
-                                            onSelect={(res) => {
-                                                setExpireDuration(res);
-                                            }}
-                                        />
-                                    );
-                            }}
-                            disabled={disabled}
-                            color="bg-green-500"
-                        />
-                    </div>
-                ) : null}
             </div>
-        </div>
-    );
-});
-
-export const URLItem = React.memo(RenderItem);
+        );
+    })
+);
 // export const URLItem = RenderItem;

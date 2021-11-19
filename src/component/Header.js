@@ -17,7 +17,7 @@ const Link = ({ text, onPress, last }) => {
     );
 };
 
-const Header = ({ requireBackground }) => {
+const Header = React.memo(({ requireBackground }) => {
     const [hamburgerOpen, setHamburgerOpen] = React.useState(false);
     const [accountMenu, setAccountMenu] = React.useState(false);
     const history = useHistory();
@@ -150,6 +150,6 @@ const Header = ({ requireBackground }) => {
             </div>
         </header>
     );
-};
+});
 
 export default Header;

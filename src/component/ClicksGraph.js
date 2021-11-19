@@ -4,6 +4,7 @@ import { GraphDropdown } from "./GraphDropdown";
 import { noMonths, monthNo } from "../constants";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { TypeSelector } from "./TypesSelector";
+import ContentLoader from "react-content-loader";
 
 Chart.register(ChartDataLabels);
 
@@ -64,7 +65,7 @@ const commonStyle = {
 
 const currDate = new Date();
 
-export const ClicksGraph = ({ data }) => {
+export const ClicksGraph = React.memo(({ data }) => {
     const [barType, setBarType] = React.useState("line");
     const [type, setType] = React.useState("monthly");
     const [month, setMonth] = React.useState(noMonths[currDate.getMonth() + 1]);
@@ -183,37 +184,51 @@ export const ClicksGraph = ({ data }) => {
 
     return (
         <div className="relative">
-            <div style={{ filter: data ? "none" : "blur(8px)" }}>
-                <TypeSelector
-                    isBar={barType === "bar"}
-                    setType={(type) => setBarType(type)}
-                    className="flex items-center justify-center pt-3"
-                    text1="Bars"
-                    text2="Lines"
-                />
-                <h1 className="text-blue-500 text-2xl mb-2 mt-3 text-center">{type[0].toUpperCase() + type.slice(1)} Clicks</h1>
-                <Bar style={{ maxHeight: "40vh", marginTop: ".5rem" }} data={content} options={options} />
+            {data ? (
                 <div>
-                    <GraphDropdown
-                        type={type}
-                        month={month}
-                        year={year}
-                        setType={(x) => setType(x)}
-                        setMonth={(x) => setMonth(x)}
-                        setYear={(x) => setYear(x)}
-                        smallestYear={Object.keys(data || {})?.[0]}
-                    />
+                    <div>
+                        <TypeSelector
+                            isFirst={barType === "bar"}
+                            setType={(type) => setBarType(type === 1 ? "bar" : "line")}
+                            className="flex items-center justify-center pt-3"
+                            text1="Bars"
+                            text2="Lines"
+                        />
+                        <h1 className="text-blue-500 text-2xl mb-2 mt-3 text-center">{type[0].toUpperCase() + type.slice(1)} Clicks</h1>
+                        <Bar style={{ maxHeight: "40vh", marginTop: ".5rem" }} data={content} options={options} />
+                        <div>
+                            <GraphDropdown
+                                type={type}
+                                month={month}
+                                year={year}
+                                setType={(x) => setType(x)}
+                                setMonth={(x) => setMonth(x)}
+                                setYear={(x) => setYear(x)}
+                                smallestYear={Object.keys(data || {})?.[0]}
+                            />
+                        </div>
+                    </div>
+                    <div
+                        className="flex w-full h-full z-40 absolute top-0 rounded-2xl items-center justify-center"
+                        style={{ backgroundColor: "rgba(0,0,0,0.2)", filter: "blur(0.5px)", display: data ? "none" : "flex" }}
+                    >
+                        <div className="spinner-grow text-white" role="status" style={{ height: 100, width: 100 }}>
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <span className="text-2xl ml-2">Loading...</span>
+                    </div>
                 </div>
-            </div>
-            <div
-                className="flex w-full h-full z-40 absolute top-0 rounded-2xl items-center justify-center"
-                style={{ backgroundColor: "rgba(0,0,0,0.2)", filter: "blur(0.5px)", display: data ? "none" : "flex" }}
-            >
-                <div className="spinner-grow text-white" role="status" style={{ height: 100, width: 100 }}>
-                    <span class="sr-only">Loading...</span>
-                </div>
-                <span className="text-2xl ml-2">Loading...</span>
-            </div>
+            ) : (
+                <ContentLoader
+                    className="flex flex-col justify-center items-center"
+                    width="100%"
+                    height="50vh"
+                    backgroundColor="#f3f3f3"
+                    foregroundColor="#cccccc"
+                >
+                    <rect height="50vh" width="100%" rx="12" ry="12" />
+                </ContentLoader>
+            )}
         </div>
     );
-};
+});

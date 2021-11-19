@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Context as AuthContext } from "../context";
-import GoogleIcon from "../google_icon.svg";
+import GoogleIcon from "../assets/svgs/google_icon.svg";
 import "../configs/firebaseConfig";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { useHistory } from "react-router";

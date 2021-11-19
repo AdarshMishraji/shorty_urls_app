@@ -5,7 +5,7 @@ import { useOutsideAlerter } from "../hooks";
 
 const currDate = new Date();
 
-export const GraphDropdown = ({ type, month, year, setType, setMonth, setYear, smallestYear }) => {
+export const GraphDropdown = React.memo(({ type, month, year, setType, setMonth, setYear, smallestYear }) => {
     const [isMonth, setIsMonth] = React.useState(false);
     const [isYear, setIsYear] = React.useState(true);
     const [isOpen, setIsOpen] = React.useState(false);
@@ -132,4 +132,4 @@ export const GraphDropdown = ({ type, month, year, setType, setMonth, setYear, s
             </Dropdown>
         </div>
     );
-};
+});
