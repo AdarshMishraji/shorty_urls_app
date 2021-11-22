@@ -1,7 +1,8 @@
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+
 import { Provider as AuthProvider } from "./context";
 import Home from "./screens/Home";
 import Auth from "./screens/Auth";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
 import URLs from "./screens/URLs";
 import Account from "./screens/Account";
 import URLStats from "./screens/URLStats";

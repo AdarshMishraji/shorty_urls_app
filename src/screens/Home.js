@@ -1,22 +1,17 @@
 import * as React from "react";
 import validator from "validator";
-import ThemedButton from "../component/ThemedButton";
 import axios from "axios";
 import copy from "copy-to-clipboard";
-import { Context as AuthContext } from "../context";
 import { useHistory } from "react-router";
-import { Authorization, BASE_URL } from "../configs/constants";
+import { toast, ToastContainer } from "react-toastify";
+
+import { Context as AuthContext } from "../context";
+import { Authorization, BASE_URL, toastConfig } from "../configs";
 import Link from "../assets/svgs/link.svg";
 import Cursor from "../assets/svgs/cursor.svg";
 import NewLink from "../assets/svgs/newLink.svg";
 import Logo from "../assets/images/logo.png";
-import Footer from "../component/Footer";
-import { ClicksGraph } from "../component/ClicksGraph";
-import { Stats } from "../component/Stats";
-import { TopLinks } from "../component/TopLinks";
-import { toast, ToastContainer } from "react-toastify";
-import { toastConfig } from "../component/URLItems";
-import Header from "../component/Header";
+import { ClicksGraph, Footer, Header, Stats, ThemedButton, TopLinks } from "../component";
 
 const makeURLValid = (url) => {
     let temp = url;

@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Dropdown, Option } from "./Dropdown";
+
+import { Dropdown, Option } from ".";
 import { months, noMonths } from "../constants";
 import { useOutsideAlerter } from "../hooks";
 

@@ -2,12 +2,11 @@ import * as React from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Context as AuthContext } from "../context";
 import { useHistory } from "react-router";
-import { Authorization, BASE_URL } from "../configs/constants";
-import { URLItem, ModalContainer, toastConfig } from "../component/URLItems";
-import Header from "../component/Header";
-import { Loader } from "../component/Loader";
+
+import { Context as AuthContext } from "../context";
+import { Authorization, BASE_URL, toastConfig } from "../configs";
+import { Header, Loader, ModalContainer, URLItem } from "../component";
 
 const URLs = () => {
     const [loading, setLoading] = React.useState();
@@ -80,7 +79,7 @@ const URLs = () => {
                 if (entries[0].isIntersecting && hasMore) {
                     setIsAtEnd(true);
                     console.log("at end");
-                    if (state.token) fetchHistory(urls.length);
+                    if (state.token) fetchHistory(urls?.length);
                 }
             });
             if (node) observer.current.observe(node);
@@ -95,14 +94,14 @@ const URLs = () => {
             <div className="flex flex-col mt-20 md:mx-5 lg:mx-40">
                 <Loader display={loading} />
                 <div className="flex flex-col list" style={{ display: loading ? "none" : "flex" }} onScroll={(e) => {}}>
-                    {urls.length == 0 && (
+                    {urls?.length == 0 && (
                         <div>
                             <h1 className="text-blue-500 text-2xl overflow-scroll text-center mb-3">No URLs found</h1>
                             <h1 className="text-9xl text-center">😵</h1>
                         </div>
                     )}
                     {urls?.map((ele, index) => {
-                        if (index === urls.length - 1) {
+                        if (index === urls?.length - 1) {
                             return (
                                 <URLItem
                                     item={ele}
@@ -129,7 +128,7 @@ const URLs = () => {
                     })}
                     <Loader display={isAtEnd} />
                     <div className="mb-2 items-center justify-center" style={{ display: isAtEnd ? "none" : "flex" }}>
-                        <div style={{ display: urls.length ? "flex" : "none" }} className="flex flex-col items-center justify-center">
+                        <div style={{ display: urls?.length ? "flex" : "none" }} className="flex flex-col items-center justify-center">
                             <h1 className="text-blue-500 text-2xl overflow-scroll text-center mb-3">No More is Here</h1>
                             <h1 className="text-5xl text-center">😵</h1>
                         </div>
