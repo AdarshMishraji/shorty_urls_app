@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Bar, Chart } from "react-chartjs-2";
-import { GraphDropdown } from "./GraphDropdown";
-import { noMonths, monthNo } from "../constants";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { TypeSelector } from "./TypesSelector";
 import ContentLoader from "react-content-loader";
+
+import { GraphDropdown, TypeSelector } from ".";
+import { noMonths, monthNo } from "../constants";
 
 Chart.register(ChartDataLabels);
 

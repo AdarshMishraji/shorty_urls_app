@@ -1,9 +1,10 @@
 import * as React from "react";
-import { Context as AuthContext } from "../context";
-import "../configs/firebaseConfig";
 import { useHistory } from "react-router";
 import { ToastContainer } from "react-toastify";
-import Header from "../component/Header";
+
+import { Context as AuthContext } from "../context";
+import "../configs/firebaseConfig";
+import { Header } from "../component";
 
 const Account = () => {
     const { state, tryLocalLogin } = React.useContext(AuthContext);

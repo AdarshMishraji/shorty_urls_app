@@ -1,13 +1,14 @@
 import * as React from "react";
-import { Context as AuthContext } from "../context";
-import GoogleIcon from "../assets/svgs/google_icon.svg";
-import "../configs/firebaseConfig";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { useHistory } from "react-router";
 import axios from "axios";
-import { Authorization, BASE_URL } from "../configs/constants";
+
+import { Context as AuthContext } from "../context";
+import "../configs/firebaseConfig";
+import { Authorization, BASE_URL } from "../configs";
 import Link from "../assets/svgs/link.svg";
-import Header from "../component/Header";
+import GoogleIcon from "../assets/svgs/google_icon.svg";
+import { Header } from "../component";
 
 const Auth = () => {
     const { state, setUserDetails, tryLocalLogin } = React.useContext(AuthContext);

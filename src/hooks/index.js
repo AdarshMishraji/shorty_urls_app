@@ -1,4 +1,5 @@
 import * as React from "react";
+
 export function useOutsideAlerter(ref, callback) {
     React.useEffect(() => {
         function handleClickOutside(event) {

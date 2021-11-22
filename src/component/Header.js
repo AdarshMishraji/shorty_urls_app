@@ -1,11 +1,13 @@
 import * as React from "react";
 import { useHistory } from "react-router";
+
 import { Context as AuthContext } from "../context";
+import { useOutsideAlerter } from "../hooks";
+
 import Logo from "../assets/images/logo.png";
 import account from "../assets/svgs/account.svg";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import HamburgerClose from "../assets/svgs/close.svg";
-import { useOutsideAlerter } from "../hooks";
 
 const Link = ({ text, onPress, last }) => {
     return (
@@ -17,7 +19,7 @@ const Link = ({ text, onPress, last }) => {
     );
 };
 
-const Header = React.memo(({ requireBackground }) => {
+export const Header = React.memo(({ requireBackground }) => {
     const [hamburgerOpen, setHamburgerOpen] = React.useState(false);
     const [accountMenu, setAccountMenu] = React.useState(false);
     const history = useHistory();
@@ -134,7 +136,6 @@ const Header = React.memo(({ requireBackground }) => {
                         View Profile
                     </h1>
                     <button
-                        // style={{ display: state.token ? "block" : "none" }}
                         className="bg-blue-500 w-full py-1 px-4 rounded-xl mr-10 text-white z-50
                         hover:bg-blue-600 transition duration-300 ease-in-out text-lg font-bold"
                         onClick={() => {
@@ -146,10 +147,7 @@ const Header = React.memo(({ requireBackground }) => {
                         {state.token ? "Logout" : "Login / Signup"}
                     </button>
                 </div>
-                {/* </div> */}
             </div>
         </header>
     );
 });
-
-export default Header;

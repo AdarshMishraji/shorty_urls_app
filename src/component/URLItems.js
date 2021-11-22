@@ -1,11 +1,16 @@
 import * as React from "react";
-import { ToggleSwitch } from "../component/ToggleSwitch";
 import qr from "qrcode";
 import ReactTooltip from "react-tooltip";
 import copy from "copy-to-clipboard";
 import { toast } from "react-toastify";
+import axios from "axios";
+import { useHistory } from "react-router";
 import moment from "moment";
+
 import { Context as AuthContext } from "../context";
+import { Dropdown, ToggleSwitch, Option, ThemedButton } from ".";
+import { useOutsideAlerter } from "../hooks";
+
 import Copy from "../assets/svgs/copy.svg";
 import Delete from "../assets/svgs/delete.svg";
 import Clock from "../assets/svgs/clock.svg";
@@ -15,25 +20,9 @@ import QrCode from "../assets/svgs/qrcode.svg";
 import Edit from "../assets/svgs/edit.svg";
 import Warning from "../assets/svgs/warning.svg";
 import ChangePassword from "../assets/svgs/changePassword.svg";
-import { Dropdown, Option } from "../component/Dropdown";
-import { useOutsideAlerter } from "../hooks";
-import ThemedButton from "../component/ThemedButton";
-import { BASE_URL, Authorization } from "../configs/constants";
-import axios from "axios";
-import { useHistory } from "react-router";
+import { Authorization, BASE_URL, toastConfig } from "../configs";
 
 let x = 0;
-
-export const toastConfig = {
-    position: "bottom-center",
-    autoClose: 2000,
-    hideProgressBar: false,
-    newestOnTop: true,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-};
 
 export const ModalContainer = React.memo(({ onClose, children }) => {
     return (

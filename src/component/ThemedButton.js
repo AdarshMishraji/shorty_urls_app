@@ -1,5 +1,6 @@
 import * as React from "react";
-const ThemedButton = React.memo(({ title, onClickHandler, color, className, disabled }) => {
+
+export const ThemedButton = React.memo(({ title, onClickHandler, color, className, disabled }) => {
     return (
         <button
             className={`flex justify-between items-center text-xl py-2 px-3 rounded-xl ${color} text-white cursor-pointer ${className}`}
@@ -10,5 +11,3 @@ const ThemedButton = React.memo(({ title, onClickHandler, color, className, disa
         </button>
     );
 });
-
-export default ThemedButton;

@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import Done from "../assets/svgs/done.svg";
 import Close from "../assets/svgs/close.svg";
 

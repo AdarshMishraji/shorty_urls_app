@@ -1,7 +1,6 @@
 import * as React from "react";
 import ContentLoader from "react-content-loader";
-import ThemedButton from "./ThemedButton";
-import { ToggleSwitch } from "./ToggleSwitch";
+import { ThemedButton, ToggleSwitch } from ".";
 
 export const Loader = React.memo(
     React.forwardRef((props, ref) => {

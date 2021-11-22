@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import { Trophy } from "./Trophy";
 
 export const TopLinks = React.memo(({ title, url, short_url, color }) => {

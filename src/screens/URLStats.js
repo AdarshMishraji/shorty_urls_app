@@ -2,16 +2,12 @@ import axios from "axios";
 import * as React from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import { ModalContainer, toastConfig, URLItem } from "../component/URLItems";
-import { BASE_URL, Authorization } from "../configs/constants";
-import { Context as AuthContext } from "../context";
-import { ClicksGraph } from "../component/ClicksGraph";
-import { PieChart } from "../component/PieChart";
-import Header from "../component/Header";
-import { Loader } from "../component/Loader";
-import ContentLoader from "react-content-loader";
-import { TypeSelector } from "../component/TypesSelector";
 import moment from "moment";
+import ContentLoader from "react-content-loader";
+
+import { Context as AuthContext } from "../context";
+import { ClicksGraph, Header, Loader, ModalContainer, PieChart, TypeSelector, URLItem } from "../component";
+import { Authorization, BASE_URL, toastConfig } from "../configs";
 
 const ScreenLoader = React.memo(({ display }) => {
     return (
@@ -129,7 +125,7 @@ const History = React.memo(({ display, data }) => {
                         {data?.map((value, index) => {
                             const location = value?.location
                                 ? `${value.location.city}, ${value?.location?.country}. ${value?.location?.zipCode}`
-                                : "Not Available";
+                                : "NA";
                             const date = moment(value?.requested_at).format("YYYY - MMM - DD, hh:mm A");
 
                             return (
@@ -138,9 +134,9 @@ const History = React.memo(({ display, data }) => {
                                     sno={index + 1}
                                     ip={value?.ip || "NA"}
                                     clicked_at={date}
-                                    browser={value?.client_info?.client_name}
-                                    device={value?.client_info?.device_type[0].toUpperCase() + value?.client_info?.device_type.slice(1)}
-                                    OS={value?.client_info?.OS}
+                                    browser={value?.client_info?.client_name || "NA"}
+                                    device={value?.client_info?.device_type?.[0].toUpperCase() + value?.client_info?.device_type?.slice(1) || "NA"}
+                                    OS={value?.client_info?.OS || "NA"}
                                     location={location}
                                 />
                             );
@@ -225,7 +221,7 @@ const URLStats = () => {
                                 "No One Visited 🥲"
                             )}
                         </h1>
-                        {Object.keys(URLData.meta).length ? (
+                        {Object.keys(URLData?.meta).length ? (
                             <div>
                                 <Statistics
                                     display={!tableDisplay}
