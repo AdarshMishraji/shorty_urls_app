@@ -12,3 +12,4 @@ export * from "./TopLinks";
 export * from "./Trophy";
 export * from "./TypesSelector";
 export * from "./URLItems";
+export * from "./SearchBar";

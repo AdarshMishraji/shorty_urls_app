@@ -196,7 +196,7 @@ export const ExpirationModalContent = React.memo(({ onSelect, onClose }) => {
                             defaultValue={Date.now() + 10800}
                             disabled={type === 0}
                             type="datetime-local"
-                            className="border-2 p-2 rounded-xl border-blue-400"
+                            className="border-2 p-2 rounded-xl border-blue-400 outline-none"
                             onChange={(e) => {
                                 if (e.target.valueAsNumber - Date.now() > 10800) setTimestamp(e.target.valueAsNumber);
                                 else {
@@ -250,7 +250,7 @@ export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
             <h1 className="text-white text-2xl mb-2 text-center"></h1>Enter Password
             <div className="flex flex-col justify-between bg-white rounded-xl p-2 border-0 text-xl mb-2" style={{ zIndex: 2 }}>
                 <input
-                    className="focus:outline-none focus:shadow-2xl rounded-xl pl-3 flex-1 mr-2 md:w-96 w-full border-b-2 mb-2"
+                    className="outline-none focus:shadow-2xl rounded-xl pl-3 flex-1 mr-2 md:w-96 w-full border-b-2 mb-2"
                     placeholder="Password"
                     type="password"
                     onChange={(e) => {
@@ -258,7 +258,7 @@ export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
                     }}
                 />
                 <input
-                    className="focus:outline-none focus:shadow-2xl rounded-xl pl-3 flex-1 mr-2 md:w-96 w-full border-b-2"
+                    className="outline-none focus:shadow-2xl rounded-xl pl-3 flex-1 mr-2 md:w-96 w-full border-b-2"
                     placeholder="Confirm Password"
                     type="password"
                     onChange={(e) => {
@@ -305,7 +305,7 @@ export const ChangeAliasModalContent = React.memo(({ prevAlias, onClose, onSubmi
             <div className="flex flex-col items-center justify-center rounded-2xl mx-2">
                 <span className="border-2 p-2 overflow-scroll whitespace-nowrap rounded-2xl w-11/12">{BASE_URL}</span>
                 <label className="mt-2 mb-1 text-gray-500 text-lg w-11/12 text-left pl-2">Alias</label>
-                <input value={alias} onChange={(e) => setAlias(e.target.value)} className="p-2 rounded-2xl border-2 w-11/12" />
+                <input value={alias} onChange={(e) => setAlias(e.target.value)} className="outline-none p-2 rounded-2xl border-2 w-11/12" />
             </div>
             <div className="flex mt-3">
                 <ThemedButton title="Cancel" onClickHandler={onClose} color="bg-gray-500" className="mx-2" />
@@ -798,7 +798,7 @@ export const URLItem = React.memo(
                     </div>
                     {expirationTime && expirationTime < Date.now() ? (
                         <div className="flex flex-col items-center justify-center flex-1">
-                            <h1>Link has Expired</h1>
+                            <h1 className="mb-2">Link has been Expired</h1>
                             <ThemedButton
                                 title="Make Me Alive!"
                                 onClickHandler={() => {
@@ -808,6 +808,7 @@ export const URLItem = React.memo(
                                                 onClose={() => setModalContent()}
                                                 onSelect={(res) => {
                                                     setExpireDuration(res);
+                                                    setModalContent();
                                                 }}
                                             />
                                         );
