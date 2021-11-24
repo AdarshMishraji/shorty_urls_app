@@ -26,7 +26,6 @@ code {
 }
 
 button {
-    color: white;
     padding: 12px;
     margin: 0 auto;
     width: fit-content;
@@ -37,9 +36,9 @@ button {
     outline: none;
 }
 
-button:active {
+button:active,
+input:focus {
     outline: none;
-    border: none;
     box-shadow: 0px 0px 10px 0.5px blue;
 }
 
