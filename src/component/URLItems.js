@@ -22,8 +22,6 @@ import Warning from "../assets/svgs/warning.svg";
 import ChangePassword from "../assets/svgs/changePassword.svg";
 import { Authorization, BASE_URL, toastConfig } from "../configs";
 
-let x = 0;
-
 export const ModalContainer = React.memo(({ onClose, children }) => {
     return (
         <div
@@ -578,6 +576,9 @@ export const URLItem = React.memo(
                             }}
                         >
                             {shortURL}
+                        </h1>
+                        <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">
+                            <span className="text-gray-600 font-bold">Created At: </span> {moment(item.created_at).format("YYYY - MMM - DD, hh:mm A")}
                         </h1>
                         {expirationTime ? (
                             <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">

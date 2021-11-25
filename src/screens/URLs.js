@@ -37,9 +37,11 @@ const URLs = () => {
                         if (value.data?.urls.length === 0) {
                             setMore(false);
                         } else {
-                            if (skipCount) setURLs([...urls, ...value.data.urls]);
-                            else {
-                                setURLs(value.data.urls);
+                            if (skipCount) {
+                                const reversed = value.data?.urls?.reverse();
+                                setURLs([...urls, ...reversed]);
+                            } else {
+                                setURLs(value.data?.urls?.reverse());
                             }
                         }
                     })
