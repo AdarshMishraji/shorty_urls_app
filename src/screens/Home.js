@@ -1,7 +1,6 @@
 import * as React from "react";
 import validator from "validator";
 import axios from "axios";
-import copy from "copy-to-clipboard";
 import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -31,7 +30,6 @@ const Home = () => {
     const [loading, setLoading] = React.useState(false);
     const [short_url, set_short_url] = React.useState();
     const [error, setError] = React.useState("");
-    const [success, setSuccess] = React.useState("");
     const [meta, setMeta] = React.useState({});
     let textRef = React.useRef();
 
@@ -129,7 +127,7 @@ const Home = () => {
     };
 
     const onCopy = () => {
-        copy(short_url);
+        navigator.clipboard.writeText(short_url);
         toast("👍 Copied", {
             type: "success",
             ...toastConfig,
@@ -200,7 +198,6 @@ const Home = () => {
                                 <p className="text-xl text-white bg-gray-600 py-2 px-3 my-2 rounded-xl pl-3 flex-1 mr-2 md:w-100 w-full whitespace-nowrap overflow-scroll">
                                     {short_url}
                                 </p>
-                                <p className="text-blue-600 text-xl text-center mb-2">{success}</p>
                                 <div className="flex justify-around items-center">
                                     <ThemedButton title="Copy" onClickHandler={onCopy} color="bg-blue-500" />
                                     <ThemedButton title="Open" onClickHandler={onOpenURL} color="bg-green-500" />

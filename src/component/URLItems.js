@@ -1,7 +1,6 @@
 import * as React from "react";
 import qr from "qrcode";
 import ReactTooltip from "react-tooltip";
-import copy from "copy-to-clipboard";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useHistory } from "react-router";
@@ -597,7 +596,7 @@ export const URLItem = React.memo(
                                 data-tip="Copy the URL"
                                 className="mr-3 cursor-pointer"
                                 onClick={() => {
-                                    copy(shortURL);
+                                    navigator.clipboard.writeText(shortURL);
                                     toast("👍 Copied", {
                                         type: "success",
                                         ...toastConfig,
