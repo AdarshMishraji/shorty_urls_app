@@ -60,9 +60,16 @@ export const PieChart = React.memo(({ data, title }) => {
     };
 
     return (
-        <div className="flex flex-col border-2 p-3 rounded-xl my-3 text-xl w-full md:w-5/12" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
-            <h1 className="text-blue-500 text-2xl my-2 text-center">{title}</h1>
-            <Doughnut data={dataSet} options={options} style={{ maxHeight: "40vh", marginTop: ".5rem" }} />
+        <div
+            className="flex flex-col border-2 p-3 rounded-xl my-3 w-full md:w-5/12 text-blue-500 text-2xl text-center"
+            style={{ boxShadow: "0px 0px 15px 0.5px blue" }}
+        >
+            <h1 className="my-2">{title}</h1>
+            {Object.keys(data).length > 0 ? (
+                <Doughnut data={dataSet} options={options} style={{ maxHeight: "40vh", marginTop: ".5rem" }} />
+            ) : (
+                <h1 className="text-red-600">Not Available</h1>
+            )}
         </div>
     );
 });

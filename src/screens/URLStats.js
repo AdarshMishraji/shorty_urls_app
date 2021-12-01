@@ -1,4 +1,3 @@
-import axios from "axios";
 import * as React from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -7,7 +6,8 @@ import ContentLoader from "react-content-loader";
 
 import { Context as AuthContext } from "../context";
 import { ClicksGraph, Header, Loader, ModalContainer, PieChart, TypeSelector, URLItem } from "../component";
-import { Authorization, BASE_URL, toastConfig } from "../configs";
+import { toastConfig } from "../configs";
+import { fetchMyParticularURL } from "../api";
 
 const ScreenLoader = React.memo(({ display }) => {
     return (
@@ -158,27 +158,24 @@ const URLStats = () => {
     const [tableDisplay, setTableDisplay] = React.useState(false);
 
     const fetchURL = React.useCallback(() => {
-        const url = `${BASE_URL}url/${urlID}`;
         if (state.token) {
-            axios
-                .get(url, {
-                    headers: {
-                        Authorization,
-                        accessToken: state.token,
-                    },
-                })
-                .then((value) => {
+            fetchMyParticularURL(
+                urlID,
+                state.token,
+                (value) => {
                     setURLData(value.data);
-                    setLoading(false);
-                })
-                .catch((e) => {
+                },
+                (e) => {
                     console.log(e);
                     toast("😵 Internal Error", {
                         type: "error",
                         ...toastConfig,
                     });
+                },
+                () => {
                     setLoading(false);
-                });
+                }
+            );
         }
     }, [state]);
 
@@ -208,7 +205,7 @@ const URLStats = () => {
                     <div className="flex flex-col list">
                         <URLItem item={URLData?.info} setModalContent={setModalContent} reFetch={() => nav.goBack()} />
                         <h1 className="text-blue-500 text-xl my-2 text-center font-bold mx-5">
-                            {Object.keys(URLData?.meta)?.length ? (
+                            {URLData?.meta && Object.keys(URLData?.meta)?.length > 0 ? (
                                 <TypeSelector
                                     isFirst={!tableDisplay}
                                     setType={(type) => setTableDisplay(type === 1 ? false : true)}
@@ -218,10 +215,10 @@ const URLStats = () => {
                                     buttonClassName="w-50"
                                 />
                             ) : (
-                                "No One Visited 🥲"
+                                "No One Visited Yet 🥲"
                             )}
                         </h1>
-                        {Object.keys(URLData?.meta).length ? (
+                        {URLData?.meta && Object.keys(URLData?.meta).length > 0 ? (
                             <div>
                                 <Statistics
                                     display={!tableDisplay}

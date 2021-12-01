@@ -1,7 +1,6 @@
 import createDataContext from "./createDataContext";
 
 const reducer = (state, action) => {
-    console.log(action);
     switch (action.type) {
         case "set_name": {
             return { ...state, name: action.payload };
@@ -39,42 +38,36 @@ const reducer = (state, action) => {
 
 const setName = (dispatch) => {
     return (newName) => {
-        // console.log(newName);
         dispatch({ type: "set_name", payload: newName });
     };
 };
 
 const setEmail = (dispatch) => {
     return (newEmail) => {
-        // console.log(newEmail);
         return dispatch({ type: "set_email", payload: newEmail });
     };
 };
 
 const setUID = (dispatch) => {
     return (newUID) => {
-        console.log("uid", newUID);
         return dispatch({ type: "set_uid", payload: newUID });
     };
 };
 
 const setPhotoImg = (dispatch) => {
     return (new_photo_img) => {
-        // console.log("photo", new_photo_img);
         return dispatch({ type: "set_photo_img", payload: new_photo_img });
     };
 };
 
 const setError = (dispatch) => {
     return (errorMsg) => {
-        // console.log('')
         return dispatch({ type: "set_error", payload: errorMsg });
     };
 };
 
 const setUserDetails = (dispatch) => {
     return (user_details) => {
-        // console.log('')
         localStorage.setItem("USER_DETAILS", JSON.stringify(user_details));
         return dispatch({ type: "set_user_details", payload: user_details });
     };
@@ -82,7 +75,6 @@ const setUserDetails = (dispatch) => {
 
 const tryLocalLogin = (dispatch) => {
     return (onFound, onNotFound) => {
-        // console.log('')
         const dataStr = localStorage.getItem("USER_DETAILS");
         if (dataStr) {
             const user_details = JSON.parse(dataStr);

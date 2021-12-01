@@ -1,16 +1,17 @@
 import * as React from "react";
 import validator from "validator";
-import axios from "axios";
 import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 
 import { Context as AuthContext } from "../context";
-import { Authorization, BASE_URL, toastConfig } from "../configs";
+import { toastConfig } from "../configs";
 import Link from "../assets/svgs/link.svg";
 import Cursor from "../assets/svgs/cursor.svg";
 import NewLink from "../assets/svgs/newLink.svg";
 import Logo from "../assets/images/logo.png";
 import { ClicksGraph, Footer, Header, Stats, ThemedButton, TopLinks } from "../component";
+import { fetchMeta, generateURL } from "../api";
+import { desc } from "../constants";
 
 const makeURLValid = (url) => {
     let temp = url;
@@ -39,17 +40,16 @@ const Home = () => {
     const fetchMetaData = React.useCallback(
         (withoutAuth) => {
             if (withoutAuth || state.token)
-                axios
-                    .get(`${BASE_URL}meta?withoutAuth=${withoutAuth}`, {
-                        headers: {
-                            Authorization,
-                            accessToken: state.token,
-                        },
-                    })
-                    .then((res) => {
+                fetchMeta(
+                    withoutAuth,
+                    state.token,
+                    (res) => {
                         setMeta(res.data);
-                    })
-                    .catch((e) => console.log(e));
+                    },
+                    (e) => {
+                        console.log(e);
+                    }
+                );
         },
         [state]
     );
@@ -66,34 +66,24 @@ const Home = () => {
         textRef.current.focus();
     }, [state.token]);
 
-    const onSubmit = async () => {
+    const onSubmit = React.useCallback(async () => {
         if (state.token) {
             setLoading(true);
             set_short_url();
             if (url) {
                 if (validator.isURL(url)) {
                     const newURL = makeURLValid(url);
-                    axios
-                        .post(
-                            `${BASE_URL}generate_short_url`,
-                            {
-                                url: newURL,
-                            },
-                            {
-                                headers: {
-                                    Authorization,
-                                    accessToken: state.token,
-                                },
-                            }
-                        )
-                        .then((value) => {
+                    generateURL(
+                        newURL,
+                        state.token,
+                        (value) => {
                             set_short_url(value.data.short_url);
                             toast("👍 Success", {
                                 type: "success",
                                 ...toastConfig,
                             });
-                        })
-                        .catch((e) => {
+                        },
+                        (e) => {
                             console.log("error", e?.response);
                             if (e?.response?.status === 409) {
                                 set_short_url(e.response.data.short_url);
@@ -103,8 +93,9 @@ const Home = () => {
                                 type: "error",
                                 ...toastConfig,
                             });
-                        })
-                        .finally(() => setLoading(false));
+                        },
+                        () => setLoading(false)
+                    );
                 } else {
                     setLoading(false);
                     setError("URL doesn't exists");
@@ -124,7 +115,7 @@ const Home = () => {
         } else {
             history.push("/login");
         }
-    };
+    }, [state, url]);
 
     const onCopy = () => {
         navigator.clipboard.writeText(short_url);
@@ -148,10 +139,10 @@ const Home = () => {
             >
                 <div className="flex flex-col items-center justify-center py-20 md:mx-0 mx-3">
                     <div className="absolute top-20 left-0" style={{ transform: "rotate(90deg)" }}>
-                        <img src={Link} height={150} width={150} />
+                        <img src={Link} height={150} width={150} alt="" />
                     </div>
                     <div className="absolute top-72 right-0" style={{ transform: "rotate(180deg)" }}>
-                        <img src={Link} height={200} width={200} />
+                        <img src={Link} height={200} width={200} alt="" />
                     </div>
                     <div className="flex flex-col flex-1 self-start text-white mb-10" style={{ zIndex: 2 }}>
                         <h1 className=" text-gray-300 text-xl">URL Shortener</h1>
@@ -216,20 +207,34 @@ const Home = () => {
                 <div className="lg:mx-40">
                     <div className="flex flex-col border-2 p-2 rounded-xl mb-3" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
                         <div className="flex flex-1 md:flex-row flex-col">
-                            <Stats title="ALL URLS" value={meta?.all_links} icon={Logo} color="bg-green-200" />
-                            <Stats title="TOTAL CLICKS" value={meta?.all_clicks} icon={Cursor} color="bg-blue-200" />
+                            <Stats
+                                title="ALL URLS"
+                                value={meta?.all_links}
+                                icon={Logo}
+                                color="bg-green-200"
+                                contentAvailable={Boolean(meta?.all_links)}
+                            />
+                            <Stats
+                                title="TOTAL CLICKS"
+                                value={meta?.all_clicks}
+                                icon={Cursor}
+                                color="bg-blue-200"
+                                contentAvailable={Boolean(meta?.all_clicks)}
+                            />
                         </div>
                         <div className="flex flex-1 md:flex-row flex-col">
                             <Stats
                                 title="LINKS ADDED THIS MONTH"
                                 value={meta?.links_added?.[currDate.getFullYear()]?.[currDate.toLocaleString("default", { month: "long" })]?.count}
                                 icon={NewLink}
+                                contentAvailable={Boolean(meta?.links_added)}
                                 color="bg-red-200"
                             />
                             <Stats
                                 title="LINKS ADDED THIS YEAR"
                                 value={meta?.links_added?.[currDate.getFullYear()]?.count}
                                 icon={NewLink}
+                                contentAvailable={Boolean(meta?.links_added)}
                                 color="bg-yellow-200"
                             />
                         </div>
@@ -240,25 +245,25 @@ const Home = () => {
                                 ) : null}
                                 {meta?.top_three?.[0]?.url ? (
                                     <TopLinks
-                                        title={meta?.top_three?.[0]?.title}
-                                        url={meta?.top_three?.[0]?.url}
-                                        short_url={meta?.top_three?.[0]?.short_url}
+                                        title={meta?.top_three?.[0]?.title ?? ""}
+                                        url={meta?.top_three?.[0]?.url ?? ""}
+                                        short_url={meta?.top_three?.[0]?.short_url ?? ""}
                                         color="#FFD700"
                                     />
                                 ) : null}
                                 {meta?.top_three?.[1]?.url ? (
                                     <TopLinks
-                                        title={meta?.top_three?.[1]?.title}
-                                        url={meta?.top_three?.[1]?.url}
-                                        short_url={meta?.top_three?.[1]?.short_url}
+                                        title={meta?.top_three?.[1]?.title ?? ""}
+                                        url={meta?.top_three?.[1]?.url ?? ""}
+                                        short_url={meta?.top_three?.[1]?.short_url ?? ""}
                                         color="#C0C0C0"
                                     />
                                 ) : null}
                                 {meta?.top_three?.[2]?.url ? (
                                     <TopLinks
-                                        title={meta?.top_three?.[2]?.title}
-                                        url={meta?.top_three?.[2]?.url}
-                                        short_url={meta?.top_three?.[2]?.short_url}
+                                        title={meta?.top_three?.[2]?.title ?? ""}
+                                        url={meta?.top_three?.[2]?.url ?? ""}
+                                        short_url={meta?.top_three?.[2]?.short_url ?? ""}
                                         color="#CD7F32"
                                     />
                                 ) : null}
@@ -267,7 +272,7 @@ const Home = () => {
                     </div>
                     <div className="flex flex-col border-2 p-3 rounded-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
                         <div className="flex items-center my-2">
-                            <img src={Cursor} height="35px" width="35px" className="bg-blue-400 rounded-full p-2 mr-2 inline" />
+                            <img src={Cursor} height="35px" width="35px" className="bg-blue-400 rounded-full p-2 mr-2 inline" alt="" />
                             <h1 className="text-2xl text-blue-500 font-bold inline">Clicks</h1>
                         </div>
                         <ClicksGraph data={meta?.clicks} />
@@ -275,14 +280,7 @@ const Home = () => {
                 </div>
                 <div className="lg:mx-40">
                     <div className="text-center mx-3 mt-5 ">
-                        <h1 class="text-xl my-3 text-gray-500">
-                            Shorty URLs allows you to measure the click-through rates of your links, so you can find out what is happening with your
-                            links. Thanks to this, you can learn about the habits and preferences of your users and customers. This allows you to
-                            improve and increase the click-through rate of your links to get the highest possible click-through and visit rates for
-                            your website or store, and this will increase your sales. In addition, thanks to the ability to independently set
-                            uniqueness in the link click-through analysis, you have one of the most advanced link management platforms at your
-                            disposal. See features and pricing
-                        </h1>
+                        <h1 className="text-xl my-3 text-gray-500">{desc}</h1>
                     </div>
                 </div>
             </div>

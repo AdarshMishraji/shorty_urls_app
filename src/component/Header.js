@@ -46,7 +46,7 @@ export const Header = React.memo(({ requireBackground }) => {
         >
             <div className="flex justify-between py-2 px-2 bg-transparent">
                 <div className="flex justify-start items-center md:ml-5 ml-2 cursor-pointer" onClick={() => history?.push("/home")}>
-                    <img src={Logo} height="50" width="50" className="bg-white rounded-full p-2 mr-3" />
+                    <img src={Logo} height="50" width="50" className="bg-white rounded-full p-2 mr-3" alt="" />
                     <h3 className="font-bold sm:text-2xl text-lg"> Shorty URLs </h3>
                 </div>
                 <div className="flex-row items-center justify-center md:flex hidden">
@@ -58,6 +58,7 @@ export const Header = React.memo(({ requireBackground }) => {
                             className="bg-white rounded-3xl p-1 mr-3"
                             height="50"
                             width="50"
+                            alt="zxcvbnm"
                             onClick={() => setAccountMenu(!accountMenu)}
                         />
                     ) : (
@@ -66,7 +67,7 @@ export const Header = React.memo(({ requireBackground }) => {
                 </div>
                 <div className="md:hidden flex items-center text-gray-600 md:mr-10 mr-2 z-50 relative">
                     <div className="rounded-3xl focus:outline-none border-0" style={{ height: 40, width: 40 }} onClick={() => setHamburgerOpen(true)}>
-                        <img src={Hamburger} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} />
+                        <img src={Hamburger} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} alt="zxcvbnm" />
                     </div>
                 </div>
 
@@ -79,6 +80,7 @@ export const Header = React.memo(({ requireBackground }) => {
                         src={HamburgerClose}
                         height={40}
                         width={40}
+                        alt="zxcvbnm"
                         className="bg-gray-600 self-end rounded-full p-1 cursor-pointer"
                         onClick={() => setAccountMenu(false)}
                     />
@@ -113,6 +115,7 @@ export const Header = React.memo(({ requireBackground }) => {
                         src={HamburgerClose}
                         height={40}
                         width={40}
+                        alt="zxcvbnm"
                         className="bg-gray-600 self-end rounded-full p-1 cursor-pointer"
                         onClick={() => setHamburgerOpen(false)}
                     />
