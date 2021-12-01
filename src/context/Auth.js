@@ -1,3 +1,5 @@
+import jwtDecode from "jwt-decode";
+
 import createDataContext from "./createDataContext";
 
 const reducer = (state, action) => {
@@ -11,18 +13,14 @@ const reducer = (state, action) => {
         case "set_user_details": {
             return {
                 ...state,
-                uid: action.payload.uid,
-                name: action.payload.displayName,
-                email: action.payload.email,
-                photo_img: action.payload.photoURL,
-                token: action.payload.token,
+                ...action.payload,
             };
         }
         case "set_uid": {
             return { ...state, uid: action.payload };
         }
-        case "set_photo_img": {
-            return { ...state, photo_img: action.payload };
+        case "set_profile_img": {
+            return { ...state, profile_img: action.payload };
         }
         case "set_error": {
             return { ...state, error: action.payload };
@@ -56,7 +54,7 @@ const setUID = (dispatch) => {
 
 const setPhotoImg = (dispatch) => {
     return (new_photo_img) => {
-        return dispatch({ type: "set_photo_img", payload: new_photo_img });
+        return dispatch({ type: "set_profile_img", payload: new_photo_img });
     };
 };
 
@@ -67,19 +65,18 @@ const setError = (dispatch) => {
 };
 
 const setUserDetails = (dispatch) => {
-    return (user_details) => {
-        localStorage.setItem("USER_DETAILS", JSON.stringify(user_details));
-        return dispatch({ type: "set_user_details", payload: user_details });
+    return ({ token }) => {
+        localStorage.setItem("TOKEN", token);
+        return dispatch({ type: "set_user_details", payload: { ...jwtDecode(token), token } });
     };
 };
 
 const tryLocalLogin = (dispatch) => {
     return (onFound, onNotFound) => {
-        const dataStr = localStorage.getItem("USER_DETAILS");
-        if (dataStr) {
-            const user_details = JSON.parse(dataStr);
+        const token = localStorage.getItem("TOKEN");
+        if (token) {
             onFound();
-            return dispatch({ type: "set_user_details", payload: user_details });
+            return dispatch({ type: "set_user_details", payload: { ...jwtDecode(token), token } });
         } else {
             onNotFound();
             return dispatch({ type: "" });
@@ -89,7 +86,7 @@ const tryLocalLogin = (dispatch) => {
 
 const clearUserData = (dispatch) => {
     return () => {
-        localStorage.removeItem("USER_DETAILS");
+        localStorage.removeItem("TOKEN");
         return dispatch({ type: "clear_data" });
     };
 };
@@ -107,11 +104,14 @@ export const { Context, Provider } = createDataContext(
         clearUserData,
     },
     {
+        uid: undefined,
         name: undefined,
         email: undefined,
-        uid: undefined,
-        photo_img: undefined,
+        email_verified: undefined,
+        profile_img: undefined,
         error: undefined,
+        last_login_at: undefined,
+        joined_at: undefined,
         token: undefined,
     }
 );
