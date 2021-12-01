@@ -73,7 +73,7 @@ export const Header = React.memo(({ requireBackground }) => {
                     <Link text="URLs" onPress={() => history?.push("/urls")} />
                     {state.token ? (
                         <img
-                            src={state.photo_img || account}
+                            src={state.profile_img || account}
                             style={{ display: state.name ? "block" : "none" }}
                             className="bg-white rounded-3xl p-1 mr-3"
                             height="50"

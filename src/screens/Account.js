@@ -3,7 +3,6 @@ import { useHistory } from "react-router";
 import { ToastContainer } from "react-toastify";
 
 import { Context as AuthContext } from "../context";
-import "../configs/firebaseConfig";
 import { Header } from "../component";
 
 const Account = () => {
@@ -30,7 +29,7 @@ const Account = () => {
                     style={{ boxShadow: "0px 0px 15px 0.5px blue", maxWidth: "90vw" }}
                 >
                     <div className="flex p-1 mb-3 rounded-full" style={{ boxShadow: "0px 0px 15px 1px blue" }}>
-                        <img src={state.photo_img} height={100} width={100} style={{ borderRadius: 50 }} alt="zxcvbnm" />
+                        <img src={state.profile_img} height={100} width={100} style={{ borderRadius: 50 }} alt="zxcvbnm" />
                     </div>
                     <div className="flex flex-col md:w-100 items-center justify-center" style={{ maxWidth: "70vw" }}>
                         <p
