@@ -14,7 +14,7 @@ export const Dropdown = React.memo(
             <h1 className="text-lg text-black font-bold mb-2 inline">{title}</h1>
             <div className="flex border-2 border-blue-400 justify-between rounded-xl px-2 py-1">
                 <h1 className="text-xl text-blue-500 font-bold inline">{value}</h1>
-                <img src={isOpen ? ExpandMore : ExpandLess} />
+                <img src={isOpen ? ExpandMore : ExpandLess} alt="zxcvbnm" />
             </div>
             <div
                 className={`absolute right-0 top-16 z-20 rounded-2xl flex-col text-blue-500 p-2 bg-white overflow-auto cursor-pointer`}

@@ -19,6 +19,26 @@ const Link = ({ text, onPress, last }) => {
     );
 };
 
+const ButtonLinks = ({ onClick, text }) => {
+    return (
+        <button
+            className="bg-blue-500 w-full py-1 px-4 rounded-xl mr-10 text-white z-50
+                        text-lg font-bold"
+            onClick={onClick}
+        >
+            {text}
+        </button>
+    );
+};
+
+const MenuLinks = ({ onClick, text }) => {
+    return (
+        <h1 className={`z-20 rounded-2xl flex-col text-blue-500 p-2 my-1 overflow-auto cursor-pointer `} onClick={onClick}>
+            {text}
+        </h1>
+    );
+};
+
 export const Header = React.memo(({ requireBackground }) => {
     const [hamburgerOpen, setHamburgerOpen] = React.useState(false);
     const [accountMenu, setAccountMenu] = React.useState(false);
@@ -46,7 +66,7 @@ export const Header = React.memo(({ requireBackground }) => {
         >
             <div className="flex justify-between py-2 px-2 bg-transparent">
                 <div className="flex justify-start items-center md:ml-5 ml-2 cursor-pointer" onClick={() => history?.push("/home")}>
-                    <img src={Logo} height="50" width="50" className="bg-white rounded-full p-2 mr-3" />
+                    <img src={Logo} height="50" width="50" className="bg-white rounded-full p-2 mr-3" alt="" />
                     <h3 className="font-bold sm:text-2xl text-lg"> Shorty URLs </h3>
                 </div>
                 <div className="flex-row items-center justify-center md:flex hidden">
@@ -58,6 +78,7 @@ export const Header = React.memo(({ requireBackground }) => {
                             className="bg-white rounded-3xl p-1 mr-3"
                             height="50"
                             width="50"
+                            alt="zxcvbnm"
                             onClick={() => setAccountMenu(!accountMenu)}
                         />
                     ) : (
@@ -66,86 +87,85 @@ export const Header = React.memo(({ requireBackground }) => {
                 </div>
                 <div className="md:hidden flex items-center text-gray-600 md:mr-10 mr-2 z-50 relative">
                     <div className="rounded-3xl focus:outline-none border-0" style={{ height: 40, width: 40 }} onClick={() => setHamburgerOpen(true)}>
-                        <img src={Hamburger} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} />
+                        <img src={Hamburger} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} alt="zxcvbnm" />
                     </div>
                 </div>
 
                 <div
                     ref={accountMenuRef}
-                    className="menu p-3 mt-2 absolute top-2 right-5 flex-col bg-gray-200 rounded-2xl z-50"
-                    style={{ display: accountMenu ? "flex" : "none", boxShadow: "0px 0px 25px 5px black" }}
+                    className="menu p-3 mt-2 absolute top-2 right-5 flex-col bg-gray-200 rounded-2xl z-50 flex"
+                    style={{
+                        transform: accountMenu ? "scale(1)" : "scale(0)",
+                        transition: "all 0.2s ease-in-out",
+                        boxShadow: "0px 0px 25px 5px black",
+                    }}
                 >
                     <img
                         src={HamburgerClose}
                         height={40}
                         width={40}
+                        alt="zxcvbnm"
                         className="bg-gray-600 self-end rounded-full p-1 cursor-pointer"
                         onClick={() => setAccountMenu(false)}
                     />
-                    <h1
-                        className={`z-20 rounded-2xl flex-col text-blue-500 p-2 my-2 overflow-auto cursor-pointer `}
+                    <MenuLinks
                         onClick={() => {
                             setAccountMenu(false);
                             history?.push("/account");
                         }}
-                    >
-                        View Profile
-                    </h1>
-                    <button
-                        className="bg-blue-500 w-full py-1 rounded-xl mr-10 text-white 
-                    hover:bg-blue-600 transition duration-300 ease-in-out text-lg font-bold"
+                        text="View Profile"
+                    />
+                    <ButtonLinks
+                        text="Logout"
                         onClick={() => {
                             clearUserData();
                             setAccountMenu(false);
                             history?.push("/login");
                         }}
-                    >
-                        Logout
-                    </button>
+                    />
                 </div>
 
                 <div
                     ref={hamburgerRef}
-                    className="menu p-3 mt-2 absolute top-2 right-5 flex-col bg-gray-200 rounded-2xl z-50"
-                    style={{ display: hamburgerOpen ? "flex" : "none", boxShadow: "0px 0px 25px 5px black" }}
+                    className="menu p-3 mt-2 absolute top-2 right-5 flex flex-col bg-gray-200 rounded-2xl z-50"
+                    style={{
+                        transform: hamburgerOpen ? "scale(1)" : "scale(0)",
+                        transition: "all 0.2s ease-in-out",
+                        boxShadow: "0px 0px 25px 5px black",
+                    }}
                 >
                     <img
                         src={HamburgerClose}
                         height={40}
                         width={40}
-                        className="bg-gray-600 self-end rounded-full p-1 cursor-pointer"
+                        alt="zxcvbnm"
+                        className="bg-gray-600 rounded-full p-1 cursor-pointer self-end"
                         onClick={() => setHamburgerOpen(false)}
                     />
-                    <h1
-                        className={`z-20 rounded-2xl flex-col text-blue-500 p-2  mb-2  overflow-auto cursor-pointer`}
+                    <MenuLinks
                         onClick={() => {
                             setHamburgerOpen(false);
                             history?.push("/urls");
                         }}
-                    >
-                        URLs
-                    </h1>
-                    <h1
-                        style={{ display: state.token ? "block" : "none" }}
-                        className={`z-20 rounded-2xl flex-col text-blue-500 p-2 mb-2 overflow-auto cursor-pointer`}
-                        onClick={() => {
-                            setHamburgerOpen(false);
-                            history?.push("/account");
-                        }}
-                    >
-                        View Profile
-                    </h1>
-                    <button
-                        className="bg-blue-500 w-full py-1 px-4 rounded-xl mr-10 text-white z-50
-                        hover:bg-blue-600 transition duration-300 ease-in-out text-lg font-bold"
+                        text="URLs"
+                    />
+                    {state.token ? (
+                        <MenuLinks
+                            onClick={() => {
+                                setAccountMenu(false);
+                                history?.push("/account");
+                            }}
+                            text="View Profile"
+                        />
+                    ) : null}
+                    <ButtonLinks
+                        text={state.token ? "Logout" : "Login / Signup"}
                         onClick={() => {
                             clearUserData();
                             setHamburgerOpen(false);
                             history?.push("/login");
                         }}
-                    >
-                        {state.token ? "Logout" : "Login / Signup"}
-                    </button>
+                    />
                 </div>
             </div>
         </header>

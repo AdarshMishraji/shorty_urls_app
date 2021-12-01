@@ -213,7 +213,7 @@ export const ClicksGraph = React.memo(({ data }) => {
                         style={{ backgroundColor: "rgba(0,0,0,0.2)", filter: "blur(0.5px)", display: data ? "none" : "flex" }}
                     >
                         <div className="spinner-grow text-white" role="status" style={{ height: 100, width: 100 }}>
-                            <span class="sr-only">Loading...</span>
+                            <span className="sr-only">Loading...</span>
                         </div>
                         <span className="text-2xl ml-2">Loading...</span>
                     </div>

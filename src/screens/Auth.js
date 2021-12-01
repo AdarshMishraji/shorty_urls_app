@@ -1,17 +1,16 @@
 import * as React from "react";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { useHistory } from "react-router";
-import axios from "axios";
 
 import { Context as AuthContext } from "../context";
 import "../configs/firebaseConfig";
-import { Authorization, BASE_URL } from "../configs";
 import Link from "../assets/svgs/link.svg";
 import GoogleIcon from "../assets/svgs/google_icon.svg";
 import { Header } from "../component";
+import { authenticate } from "../api";
 
 const Auth = () => {
-    const { state, setUserDetails, tryLocalLogin } = React.useContext(AuthContext);
+    const { setUserDetails, tryLocalLogin } = React.useContext(AuthContext);
     const [loading, setLoading] = React.useState(false);
 
     const history = useHistory();
@@ -25,25 +24,32 @@ const Auth = () => {
         );
     }, []);
 
-    const onLogin = () => {
+    const onLogin = React.useCallback(() => {
         setLoading(true);
         const googleAuthProvider = new GoogleAuthProvider();
 
         signInWithPopup(getAuth(), googleAuthProvider)
             .then((res) => {
                 res.user.getIdToken().then((token) => {
-                    axios.post(`${BASE_URL}authenticate`, { token }, { headers: { Authorization } }).then((res1) => {
-                        setUserDetails({ ...res.user, token: res1.data.token });
-                        history.replace("/home");
-                        setLoading(false);
-                    });
+                    authenticate(
+                        token,
+                        (res1) => {
+                            setUserDetails({ ...res.user, token: res1.data.token });
+                            history.replace("/home");
+                            setLoading(false);
+                        },
+                        (e) => {
+                            console.log(e);
+                            setLoading(false);
+                        }
+                    );
                 });
             })
             .catch((e) => {
                 console.log(e);
                 setLoading(false);
             });
-    };
+    }, []);
 
     return (
         <div className="bg-white">
@@ -56,10 +62,10 @@ const Auth = () => {
                 }}
             >
                 <div className="absolute top-20 left-0" style={{ transform: "rotate(90deg)" }}>
-                    <img src={Link} height={150} width={150} />
+                    <img src={Link} height={150} width={150} alt="zxcvbnm" />
                 </div>
                 <div className="absolute bottom-20 right-0" style={{ transform: "rotate(180deg)" }}>
-                    <img src={Link} height={200} width={200} />
+                    <img src={Link} height={200} width={200} alt="zxcvbnm" />
                 </div>
                 <div
                     className="flex flex-col justify-center items-center px-5 py-4 bg-white rounded-3xl mx-2 z-20 w"
@@ -75,18 +81,18 @@ const Auth = () => {
                             }
                         }}
                     >
-                        <img src={GoogleIcon} height="50px" width="50px" className="mr-3" />
+                        <img src={GoogleIcon} height="50px" width="50px" className="mr-3" alt="zxcvbnm" />
 
                         {loading ? (
                             <svg
-                                class="animate-spin h-8 w-8 mx-auto text-blue-500"
+                                className="animate-spin h-8 w-8 mx-auto text-blue-500"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
                             >
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path
-                                    class="opacity-75"
+                                    className="opacity-75"
                                     fill="currentColor"
                                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                 ></path>

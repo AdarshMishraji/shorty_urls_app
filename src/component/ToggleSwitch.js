@@ -18,7 +18,7 @@ export const ToggleSwitch = React.memo(({ isActive, setStatus, className, disabl
                     }}
                     className="flex items-center text-white left-0 w-20  text-center py-2 cursor-pointer"
                 >
-                    <img src={Close} className="ml-2" />
+                    <img src={Close} className="ml-2" alt="zxcvbnm" />
                 </div>
                 <div
                     onClick={() => {
@@ -28,7 +28,7 @@ export const ToggleSwitch = React.memo(({ isActive, setStatus, className, disabl
                     }}
                     className="flex items-center justify-center text-white right-0 w-20  text-center  py-2 cursor-pointer"
                 >
-                    <img src={Done} className="mr-2" />
+                    <img src={Done} className="mr-2" alt="zxcvbnm" />
                 </div>
                 <div
                     className="absolute w-6 h-6 bg-gray-300 rounded-full text-center py-2 left-0 font-semibold"

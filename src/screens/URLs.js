@@ -1,12 +1,12 @@
 import * as React from "react";
-import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useHistory } from "react-router";
 
 import { Context as AuthContext } from "../context";
-import { Authorization, BASE_URL, toastConfig } from "../configs";
-import { Header, Loader, ModalContainer, SearchBar, URLItem } from "../component";
+import { toastConfig } from "../configs";
+import { Header, Loader, ModalContainer, URLItem } from "../component";
+import { fetchMyURLs } from "../api";
 
 const URLs = () => {
     const [loading, setLoading] = React.useState();
@@ -14,7 +14,6 @@ const URLs = () => {
     const [isAtEnd, setIsAtEnd] = React.useState(false);
     const [modalContent, setModalContent] = React.useState();
     const [hasMore, setMore] = React.useState(true);
-    const [isSearchMode, setSearchMode] = React.useState(false);
 
     const { state, tryLocalLogin } = React.useContext(AuthContext);
     const nav = useHistory();
@@ -23,17 +22,13 @@ const URLs = () => {
 
     const fetchHistory = React.useCallback(
         (skipCount, query) => {
-            const url = `${BASE_URL}urls?limit=10&skip=${skipCount}${query ? `&query=${query}` : null}`;
             if (state.token) {
-                axios
-                    .get(url, {
-                        headers: {
-                            Authorization,
-                            accessToken: state.token,
-                        },
-                    })
-                    .then((value) => {
-                        console.log(value.data);
+                fetchMyURLs(
+                    10,
+                    skipCount,
+                    query,
+                    state.token,
+                    (value) => {
                         if (value.data?.urls.length === 0) {
                             setMore(false);
                         } else {
@@ -44,18 +39,19 @@ const URLs = () => {
                                 setURLs(value.data?.urls?.reverse());
                             }
                         }
-                    })
-                    .catch((e) => {
+                    },
+                    (e) => {
                         console.log(e);
                         toast("😵 Internal Error", {
                             type: "error",
                             ...toastConfig,
                         });
-                    })
-                    .finally(() => {
+                    },
+                    () => {
                         setLoading(false);
                         setIsAtEnd(false);
-                    });
+                    }
+                );
             }
         },
         [urls, state]
@@ -78,18 +74,16 @@ const URLs = () => {
     const lastElementRef = React.useCallback(
         (node) => {
             if (loading) return;
-            if (isSearchMode && urls.length <= 10) return;
             if (observer.current) observer.current.disconnect();
             observer.current = new IntersectionObserver((entries) => {
                 if (entries[0].isIntersecting && hasMore) {
                     setIsAtEnd(true);
-                    console.log("at end");
                     if (state.token) fetchHistory(urls?.length);
                 }
             });
             if (node) observer.current.observe(node);
         },
-        [loading, isSearchMode, urls.length, hasMore]
+        [loading, urls.length, hasMore]
     );
 
     return (
@@ -97,24 +91,6 @@ const URLs = () => {
             <ToastContainer className="z-50 text-center" />
             <Header requireBackground />
             <div className="flex flex-col mt-20 md:mx-5 lg:mx-40">
-                <SearchBar
-                    isVisible={true}
-                    onClose={() => {
-                        setLoading(true);
-                        setSearchMode(false);
-                        setMore(true);
-                        fetchHistory();
-                    }}
-                    onSubmit={(query) => {
-                        if (urls.length === 0) {
-                            return;
-                        }
-                        setLoading(true);
-                        setURLs([]);
-                        setSearchMode(true);
-                        fetchHistory(undefined, query);
-                    }}
-                />
                 <Loader display={loading} />
                 {loading ? null : (
                     <div className="flex flex-col list" onScroll={(e) => {}}>

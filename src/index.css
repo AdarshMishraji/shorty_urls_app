@@ -36,6 +36,11 @@ button {
     outline: none;
 }
 
+button:hover {
+    background-color: rgba(0, 0, 255, 0.5);
+    transition: 0.3 ease-in-out;
+}
+
 button:active,
 input:focus {
     outline: none;

@@ -2,7 +2,6 @@ import * as React from "react";
 import qr from "qrcode";
 import ReactTooltip from "react-tooltip";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { useHistory } from "react-router";
 import moment from "moment";
 
@@ -19,18 +18,39 @@ import QrCode from "../assets/svgs/qrcode.svg";
 import Edit from "../assets/svgs/edit.svg";
 import Warning from "../assets/svgs/warning.svg";
 import ChangePassword from "../assets/svgs/changePassword.svg";
-import { Authorization, BASE_URL, toastConfig } from "../configs";
+import { toastConfig } from "../configs";
+import { BASE_URL, changeAlias, changeStatus, deleteURL, removePassword, setExpiration, updatePassword } from "../api";
 
 export const ModalContainer = React.memo(({ onClose, children }) => {
+    const [showContent, setShowContent] = React.useState(false);
+    const [showContainer, setShowContainer] = React.useState(false);
+    React.useEffect(() => {
+        if (children) {
+            setShowContainer(true);
+            setTimeout(() => {
+                setShowContent(true);
+            }, 50);
+        } else {
+            setShowContent(false);
+            setTimeout(() => {
+                setShowContainer(false);
+            }, 200);
+        }
+    }, [children]);
     return (
         <div
             className="justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50"
             style={{
-                display: children ? "flex" : "none",
+                display: showContainer ? "flex" : "none",
             }}
         >
             <div
-                style={{ boxShadow: "0px 0px 15px 0.5px blue", width: "95vw" }}
+                style={{
+                    boxShadow: "0px 0px 15px 0.5px blue",
+                    width: "95vw",
+                    transition: "all 0.2s ease-in-out",
+                    transform: showContent ? "scale(1)" : "scale(0)",
+                }}
                 className="p-3 rounded-xl bg-white z-20 flex items-center justify-center mx-5 md:max-w-md"
             >
                 {children}
@@ -242,6 +262,27 @@ export const ExpirationModalContent = React.memo(({ onSelect, onClose }) => {
 export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
     const [password, setPassword] = React.useState("");
     const [confirmPassword, setConfirmPassword] = React.useState("");
+
+    const onOK = React.useCallback(() => {
+        if (password.length >= 8) {
+            if (password === confirmPassword) {
+                onSubmit(password);
+            } else {
+                toast("🤨 Password is not same as Confirm Password", {
+                    type: "error",
+                    ...toastConfig,
+                    position: "top-center",
+                });
+            }
+        } else {
+            toast("🤨 Password must be more than equals to 8 characters", {
+                type: "error",
+                ...toastConfig,
+                position: "top-center",
+            });
+        }
+    }, [password, confirmPassword]);
+
     return (
         <div className="flex flex-col items-center">
             <h1 className="text-white text-2xl mb-2 text-center"></h1>Enter Password
@@ -253,6 +294,11 @@ export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
                     onChange={(e) => {
                         setPassword(e.target.value);
                     }}
+                    onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                            onOK();
+                        }
+                    }}
                 />
                 <input
                     className="outline-none focus:shadow-2xl rounded-xl pl-3 flex-1 mr-2 md:w-96 w-full border-b-2"
@@ -261,33 +307,15 @@ export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
                     onChange={(e) => {
                         setConfirmPassword(e.target.value);
                     }}
+                    onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                            onOK();
+                        }
+                    }}
                 />
                 <div className="flex flex-row self-center mt-3">
                     <ThemedButton title="Cancel" onClickHandler={onClose} color="bg-gray-500" className="mx-2" />
-                    <ThemedButton
-                        title="OK"
-                        onClickHandler={() => {
-                            if (password.length >= 8) {
-                                if (password === confirmPassword) {
-                                    onSubmit(password);
-                                } else {
-                                    toast("🤨 Password is not same as Confirm Password", {
-                                        type: "error",
-                                        ...toastConfig,
-                                        position: "top-center",
-                                    });
-                                }
-                            } else {
-                                toast("🤨 Password must be more than equals to 8 characters", {
-                                    type: "error",
-                                    ...toastConfig,
-                                    position: "top-center",
-                                });
-                            }
-                        }}
-                        className="mx-2"
-                        color="bg-green-500"
-                    />
+                    <ThemedButton title="OK" onClickHandler={onOK} className="mx-2" color="bg-green-500" />
                 </div>
             </div>
         </div>
@@ -302,7 +330,16 @@ export const ChangeAliasModalContent = React.memo(({ prevAlias, onClose, onSubmi
             <div className="flex flex-col items-center justify-center rounded-2xl mx-2">
                 <span className="border-2 p-2 overflow-scroll whitespace-nowrap rounded-2xl w-11/12">{BASE_URL}</span>
                 <label className="mt-2 mb-1 text-gray-500 text-lg w-11/12 text-left pl-2">Alias</label>
-                <input value={alias} onChange={(e) => setAlias(e.target.value)} className="outline-none p-2 rounded-2xl border-2 w-11/12" />
+                <input
+                    value={alias}
+                    onChange={(e) => setAlias(e.target.value)}
+                    className="outline-none p-2 rounded-2xl border-2 w-11/12"
+                    onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                            onSubmit(alias);
+                        }
+                    }}
+                />
             </div>
             <div className="flex mt-3">
                 <ThemedButton title="Cancel" onClickHandler={onClose} color="bg-gray-500" className="mx-2" />
@@ -322,7 +359,7 @@ export const ChangeAliasModalContent = React.memo(({ prevAlias, onClose, onSubmi
 export const URLItem = React.memo(
     React.forwardRef(({ item, index, setModalContent, reFetch, showBtn }, ref) => {
         const [active, setActive] = React.useState(item.is_active);
-        const [isPasswordProtected, setPasswordProtected] = React.useState(Boolean(item?.protection?.password));
+        const [isPasswordProtected, setPasswordProtected] = React.useState(Boolean(item?.is_password_protected));
         const [expirationTime, setExpirationTime] = React.useState(item.expired_at);
         const [disabled, setDisabled] = React.useState(false);
         const [shortURL, setShortURL] = React.useState(item.short_url);
@@ -341,164 +378,137 @@ export const URLItem = React.memo(
         const onChangeStatus = React.useCallback(
             (status) => {
                 setDisabled(true);
-                axios
-                    .patch(
-                        `${BASE_URL}update_url_status`,
-                        { urlID: item._id, status },
-                        {
-                            headers: {
-                                Authorization,
-                                accessToken: state.token,
-                            },
-                        }
-                    )
-                    .then((val) => {
+                changeStatus(
+                    item._id,
+                    status,
+                    state.token,
+                    (val) => {
                         setActive(status);
-                        setDisabled(false);
                         toast("👍 Success", {
                             type: "success",
                             ...toastConfig,
                         });
-                    })
-                    .catch((e) => {
+                    },
+                    (e) => {
                         console.log(e);
-                        setDisabled(false);
+
                         toast("😵 " + e?.response?.data?.error, {
                             type: "error",
                             ...toastConfig,
                         });
-                    });
+                    },
+                    () => {
+                        setDisabled(false);
+                    }
+                );
             },
             [item, state]
         );
 
         const onDelete = React.useCallback(() => {
             setDisabled(true);
-            axios
-                .delete(`${BASE_URL}delete_url`, {
-                    data: {
-                        urlID: item._id,
-                    },
-                    headers: {
-                        Authorization,
-                        accessToken: state.token,
-                    },
-                })
-                .then((val) => {
-                    setDisabled(false);
+            deleteURL(
+                item._id,
+                state.token,
+                (val) => {
                     reFetch();
                     toast("👍 Success", {
                         type: "success",
                         ...toastConfig,
                     });
-                })
-                .catch((e) => {
+                },
+                (e) => {
                     console.log(e);
-                    setDisabled(false);
                     toast("😵 " + e?.response?.data?.error, {
                         type: "error",
                         ...toastConfig,
                     });
-                });
+                },
+                () => {
+                    setDisabled(false);
+                }
+            );
         }, [state, item]);
 
         const setPassword = React.useCallback(
             (password) => {
                 setDisabled(true);
-                axios
-                    .patch(
-                        `${BASE_URL}update_password`,
-                        { urlID: item._id, password },
-                        {
-                            headers: {
-                                Authorization,
-                                accessToken: state.token,
-                            },
-                        }
-                    )
-                    .then((val) => {
-                        setDisabled(false);
+                updatePassword(
+                    item._id,
+                    password,
+                    state.token,
+                    (val) => {
                         setPasswordProtected(true);
                         toast("👍 Success", {
                             type: "success",
                             ...toastConfig,
                         });
-                    })
-                    .catch((e) => {
+                    },
+                    (e) => {
                         console.log(e);
-                        setDisabled(false);
                         toast("😵 " + e?.response?.data?.error, {
                             type: "error",
                             ...toastConfig,
                         });
-                    });
+                    },
+                    () => {
+                        setDisabled(false);
+                    }
+                );
             },
             [state, item]
         );
 
         const onRemovePassword = React.useCallback(() => {
             setDisabled(true);
-            axios
-                .delete(`${BASE_URL}remove_password`, {
-                    headers: {
-                        Authorization,
-                        accessToken: state.token,
-                    },
-                    data: {
-                        urlID: item._id,
-                    },
-                })
-                .then((val) => {
-                    setDisabled(false);
+            removePassword(
+                item._id,
+                state.token,
+                (val) => {
                     setPasswordProtected(false);
                     toast("👍 Success", {
                         type: "success",
                         ...toastConfig,
                     });
-                })
-                .catch((e) => {
+                },
+                (e) => {
                     console.log(e);
-                    setDisabled(false);
                     toast("😵 " + e?.response?.data?.error, {
                         type: "error",
                         ...toastConfig,
                     });
-                });
+                },
+                () => {
+                    setDisabled(false);
+                }
+            );
         }, [state, item]);
 
         const setExpireDuration = React.useCallback(
             (expired_at) => {
                 setDisabled(true);
-                axios
-                    .patch(
-                        `${BASE_URL}set_expiration_time`,
-                        {
-                            urlID: item._id,
-                            expired_at: expired_at === "Infinite" ? false : expired_at,
-                        },
-                        {
-                            headers: {
-                                Authorization,
-                                accessToken: state.token,
-                            },
-                        }
-                    )
-                    .then((val) => {
+                setExpiration(
+                    item._id,
+                    expired_at === "Infinite" ? false : expired_at,
+                    state.token,
+                    (val) => {
                         setExpirationTime(expired_at === "Infinite" ? false : expired_at);
-                        setDisabled(false);
                         toast("👍 Success", {
                             type: "success",
                             ...toastConfig,
                         });
-                    })
-                    .catch((e) => {
+                    },
+                    (e) => {
                         console.log(e);
-                        setDisabled(false);
                         toast("😵 " + e?.response?.data?.error, {
                             type: "error",
                             ...toastConfig,
                         });
-                    });
+                    },
+                    () => {
+                        setDisabled(false);
+                    }
+                );
             },
             [state, item]
         );
@@ -506,36 +516,29 @@ export const URLItem = React.memo(
         const changeAliasName = React.useCallback(
             (alias) => {
                 setDisabled(true);
-                axios
-                    .patch(
-                        `${BASE_URL}change_alias`,
-                        {
-                            urlID: item._id,
-                            alias,
-                        },
-                        {
-                            headers: {
-                                Authorization,
-                                accessToken: state.token,
-                            },
-                        }
-                    )
-                    .then((val) => {
+                changeAlias(
+                    item._id,
+                    alias,
+                    state.token,
+                    (val) => {
                         setShortURL(BASE_URL + alias);
-                        setDisabled(false);
                         toast("👍 Success", {
                             type: "success",
                             ...toastConfig,
                         });
-                    })
-                    .catch((e) => {
+                    },
+                    (e) => {
                         console.log(e);
-                        setDisabled(false);
+
                         toast("😵" + e?.response?.data?.message || e?.response?.data?.error || "Internal Error", {
                             type: "error",
                             ...toastConfig,
                         });
-                    });
+                    },
+                    () => {
+                        setDisabled(false);
+                    }
+                );
             },
             [state, item]
         );
@@ -549,7 +552,7 @@ export const URLItem = React.memo(
                         {disabled ? (
                             <div className="flex items-center justify-center" style={{ opacity: 0.7 }}>
                                 <div className="spinner-grow mr-3" role="status" style={{ color: "black", height: 35, width: 35 }}>
-                                    <span class="sr-only">Loading...</span>
+                                    <span className="sr-only">Loading...</span>
                                 </div>
                             </div>
                         ) : null}
@@ -557,17 +560,24 @@ export const URLItem = React.memo(
                     <div className="border-b-2 pb-3">
                         <h1
                             className="text-gray-800 font-bold overflow-scroll whitespace-nowrap py-1"
-                            style={{ display: item.title ? "block" : "none" }}
+                            style={{ display: item?.meta_data?.title ? "block" : "none" }}
                         >
-                            {item.title}
+                            {item?.meta_data?.title}
                         </h1>
                         <h1
                             className="text-gray-500 font-bold overflow-scroll whitespace-nowrap pt-1 pb-3"
-                            style={{ display: item.title ? "block" : "none" }}
+                            style={{ display: item?.meta_data?.title ? "block" : "none" }}
                         >
-                            {item.description}
+                            {item?.meta_data?.description}
                         </h1>
-                        <h1 className="text-gray-500 overflow-scroll whitespace-nowrap">{item.url}</h1>
+                        <h1
+                            className="text-gray-500 overflow-scroll whitespace-nowrap"
+                            onClick={() => {
+                                window.open(item.url, "_blank");
+                            }}
+                        >
+                            {item.url}
+                        </h1>
                         <h1
                             className="text-blue-500 overflow-scroll whitespace-nowrap cursor-pointer"
                             onClick={() => {
@@ -577,8 +587,15 @@ export const URLItem = React.memo(
                             {shortURL}
                         </h1>
                         <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">
-                            <span className="text-gray-600 font-bold">Created At: </span> {moment(item.created_at).format("YYYY - MMM - DD, hh:mm A")}
+                            <span className="text-gray-600 font-bold">Created At: </span>{" "}
+                            {moment(item?.created_at).format("YYYY - MMM - DD, hh:mm A")}
                         </h1>
+                        {item.last_clicked_at && (
+                            <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">
+                                <span className="text-gray-600 font-bold">Last Clicked At: </span>{" "}
+                                {moment(item?.last_clicked_at).format("YYYY - MMM - DD, hh:mm A")}
+                            </h1>
+                        )}
                         {expirationTime ? (
                             <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">
                                 <span className="text-gray-600 font-bold">Expired At: </span>{" "}
@@ -594,6 +611,7 @@ export const URLItem = React.memo(
                                 height="30"
                                 width="30"
                                 data-tip="Copy the URL"
+                                alt="zxcvbnm"
                                 className="mr-3 cursor-pointer"
                                 onClick={() => {
                                     navigator.clipboard.writeText(shortURL);
@@ -610,12 +628,13 @@ export const URLItem = React.memo(
                                     src={KeyOff}
                                     height="30"
                                     width="30"
+                                    alt="zxcvbnm"
                                     className="mr-3 cursor-pointer"
                                     onClick={() => {
                                         if (!disabled)
                                             setModalContent(
                                                 <div className="flex flex-col items-center justify-center">
-                                                    <img src={Warning} height={75} width={75} />
+                                                    <img src={Warning} height={75} width={75} alt="zxcvbnm" />
                                                     <h1 className="text-red-500 overflow-scroll text-center">
                                                         Are you sure to remove password protection for this url?
                                                     </h1>
@@ -648,6 +667,7 @@ export const URLItem = React.memo(
                                     src={ChangePassword}
                                     height="30"
                                     width="30"
+                                    alt="zxcvbnm"
                                     className="mr-3 cursor-pointer"
                                     onClick={() => {
                                         if (!disabled)
@@ -670,6 +690,7 @@ export const URLItem = React.memo(
                                     ref={keyRef}
                                     height="30"
                                     width="30"
+                                    alt="zxcvbnm"
                                     className="mr-3 cursor-pointer"
                                     onClick={() => {
                                         if (!disabled)
@@ -691,6 +712,7 @@ export const URLItem = React.memo(
                                 src={Edit}
                                 height="30"
                                 width="30"
+                                alt="zxcvbnm"
                                 className="mr-3 cursor-pointer"
                                 onClick={() => {
                                     if (!disabled) {
@@ -714,6 +736,7 @@ export const URLItem = React.memo(
                                 src={Clock}
                                 height="30"
                                 width="30"
+                                alt="zxcvbnm"
                                 className="mr-3 cursor-pointer"
                                 onClick={() => {
                                     if (!disabled)
@@ -734,6 +757,7 @@ export const URLItem = React.memo(
                                 src={QrCode}
                                 height="30"
                                 width="30"
+                                alt="zxcvbnm"
                                 className="mr-3 cursor-pointer"
                                 onClick={() => {
                                     if (!disabled)
@@ -755,12 +779,13 @@ export const URLItem = React.memo(
                                 src={Delete}
                                 height="30"
                                 width="30"
+                                alt="zxcvbnm"
                                 className="mr-3 cursor-pointer"
                                 onClick={() => {
                                     if (!disabled) {
                                         setModalContent(
                                             <div className="flex flex-col items-center justify-center">
-                                                <img src={Warning} height={75} width={75} />
+                                                <img src={Warning} height={75} width={75} alt="zxcvbnm" />
                                                 <h1 className="text-red-500 overflow-scroll whitespace-nowrap">Are you sure to delete?</h1>
                                                 <div className="flex items-center mt-2">
                                                     <ThemedButton
