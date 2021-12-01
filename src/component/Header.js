@@ -19,6 +19,26 @@ const Link = ({ text, onPress, last }) => {
     );
 };
 
+const ButtonLinks = ({ onClick, text }) => {
+    return (
+        <button
+            className="bg-blue-500 w-full py-1 px-4 rounded-xl mr-10 text-white z-50
+                        text-lg font-bold"
+            onClick={onClick}
+        >
+            {text}
+        </button>
+    );
+};
+
+const MenuLinks = ({ onClick, text }) => {
+    return (
+        <h1 className={`z-20 rounded-2xl flex-col text-blue-500 p-2 my-1 overflow-auto cursor-pointer `} onClick={onClick}>
+            {text}
+        </h1>
+    );
+};
+
 export const Header = React.memo(({ requireBackground }) => {
     const [hamburgerOpen, setHamburgerOpen] = React.useState(false);
     const [accountMenu, setAccountMenu] = React.useState(false);
@@ -73,8 +93,12 @@ export const Header = React.memo(({ requireBackground }) => {
 
                 <div
                     ref={accountMenuRef}
-                    className="menu p-3 mt-2 absolute top-2 right-5 flex-col bg-gray-200 rounded-2xl z-50"
-                    style={{ display: accountMenu ? "flex" : "none", boxShadow: "0px 0px 25px 5px black" }}
+                    className="menu p-3 mt-2 absolute top-2 right-5 flex-col bg-gray-200 rounded-2xl z-50 flex"
+                    style={{
+                        transform: accountMenu ? "scale(1)" : "scale(0)",
+                        transition: "all 0.2s ease-in-out",
+                        boxShadow: "0px 0px 25px 5px black",
+                    }}
                 >
                     <img
                         src={HamburgerClose}
@@ -84,71 +108,64 @@ export const Header = React.memo(({ requireBackground }) => {
                         className="bg-gray-600 self-end rounded-full p-1 cursor-pointer"
                         onClick={() => setAccountMenu(false)}
                     />
-                    <h1
-                        className={`z-20 rounded-2xl flex-col text-blue-500 p-2 my-2 overflow-auto cursor-pointer `}
+                    <MenuLinks
                         onClick={() => {
                             setAccountMenu(false);
                             history?.push("/account");
                         }}
-                    >
-                        View Profile
-                    </h1>
-                    <button
-                        className="bg-blue-500 w-full py-1 rounded-xl mr-10 text-white 
-                    hover:bg-blue-600 transition duration-300 ease-in-out text-lg font-bold"
+                        text="View Profile"
+                    />
+                    <ButtonLinks
+                        text="Logout"
                         onClick={() => {
                             clearUserData();
                             setAccountMenu(false);
                             history?.push("/login");
                         }}
-                    >
-                        Logout
-                    </button>
+                    />
                 </div>
 
                 <div
                     ref={hamburgerRef}
-                    className="menu p-3 mt-2 absolute top-2 right-5 flex-col bg-gray-200 rounded-2xl z-50"
-                    style={{ display: hamburgerOpen ? "flex" : "none", boxShadow: "0px 0px 25px 5px black" }}
+                    className="menu p-3 mt-2 absolute top-2 right-5 flex flex-col bg-gray-200 rounded-2xl z-50"
+                    style={{
+                        transform: hamburgerOpen ? "scale(1)" : "scale(0)",
+                        transition: "all 0.2s ease-in-out",
+                        boxShadow: "0px 0px 25px 5px black",
+                    }}
                 >
                     <img
                         src={HamburgerClose}
                         height={40}
                         width={40}
                         alt="zxcvbnm"
-                        className="bg-gray-600 self-end rounded-full p-1 cursor-pointer"
+                        className="bg-gray-600 rounded-full p-1 cursor-pointer self-end"
                         onClick={() => setHamburgerOpen(false)}
                     />
-                    <h1
-                        className={`z-20 rounded-2xl flex-col text-blue-500 p-2  mb-2  overflow-auto cursor-pointer`}
+                    <MenuLinks
                         onClick={() => {
                             setHamburgerOpen(false);
                             history?.push("/urls");
                         }}
-                    >
-                        URLs
-                    </h1>
-                    <h1
-                        style={{ display: state.token ? "block" : "none" }}
-                        className={`z-20 rounded-2xl flex-col text-blue-500 p-2 mb-2 overflow-auto cursor-pointer`}
-                        onClick={() => {
-                            setHamburgerOpen(false);
-                            history?.push("/account");
-                        }}
-                    >
-                        View Profile
-                    </h1>
-                    <button
-                        className="bg-blue-500 w-full py-1 px-4 rounded-xl mr-10 text-white z-50
-                        hover:bg-blue-600 transition duration-300 ease-in-out text-lg font-bold"
+                        text="URLs"
+                    />
+                    {state.token ? (
+                        <MenuLinks
+                            onClick={() => {
+                                setAccountMenu(false);
+                                history?.push("/account");
+                            }}
+                            text="View Profile"
+                        />
+                    ) : null}
+                    <ButtonLinks
+                        text={state.token ? "Logout" : "Login / Signup"}
                         onClick={() => {
                             clearUserData();
                             setHamburgerOpen(false);
                             history?.push("/login");
                         }}
-                    >
-                        {state.token ? "Logout" : "Login / Signup"}
-                    </button>
+                    />
                 </div>
             </div>
         </header>

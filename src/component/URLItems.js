@@ -22,15 +22,35 @@ import { toastConfig } from "../configs";
 import { BASE_URL, changeAlias, changeStatus, deleteURL, removePassword, setExpiration, updatePassword } from "../api";
 
 export const ModalContainer = React.memo(({ onClose, children }) => {
+    const [showContent, setShowContent] = React.useState(false);
+    const [showContainer, setShowContainer] = React.useState(false);
+    React.useEffect(() => {
+        if (children) {
+            setShowContainer(true);
+            setTimeout(() => {
+                setShowContent(true);
+            }, 50);
+        } else {
+            setShowContent(false);
+            setTimeout(() => {
+                setShowContainer(false);
+            }, 200);
+        }
+    }, [children]);
     return (
         <div
             className="justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50"
             style={{
-                display: children ? "flex" : "none",
+                display: showContainer ? "flex" : "none",
             }}
         >
             <div
-                style={{ boxShadow: "0px 0px 15px 0.5px blue", width: "95vw" }}
+                style={{
+                    boxShadow: "0px 0px 15px 0.5px blue",
+                    width: "95vw",
+                    transition: "all 0.2s ease-in-out",
+                    transform: showContent ? "scale(1)" : "scale(0)",
+                }}
                 className="p-3 rounded-xl bg-white z-20 flex items-center justify-center mx-5 md:max-w-md"
             >
                 {children}
@@ -567,8 +587,15 @@ export const URLItem = React.memo(
                             {shortURL}
                         </h1>
                         <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">
-                            <span className="text-gray-600 font-bold">Created At: </span> {moment(item.created_at).format("YYYY - MMM - DD, hh:mm A")}
+                            <span className="text-gray-600 font-bold">Created At: </span>{" "}
+                            {moment(item?.created_at).format("YYYY - MMM - DD, hh:mm A")}
                         </h1>
+                        {item.last_clicked_at && (
+                            <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">
+                                <span className="text-gray-600 font-bold">Last Clicked At: </span>{" "}
+                                {moment(item?.last_clicked_at).format("YYYY - MMM - DD, hh:mm A")}
+                            </h1>
+                        )}
                         {expirationTime ? (
                             <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">
                                 <span className="text-gray-600 font-bold">Expired At: </span>{" "}
