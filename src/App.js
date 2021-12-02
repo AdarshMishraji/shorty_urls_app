@@ -1,4 +1,4 @@
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 
 import { Provider as AuthProvider } from "./context";
 import Home from "./screens/Home";
@@ -17,7 +17,8 @@ const App = () => {
                         <Route exact path="/url/:urlID" component={URLStats} />
                         <Route exact path="/urls" component={URLs} />
                         <Route exact path="/account" component={Account} />
-                        <Route path="/" component={Home} />
+                        <Route exact path="/home" component={Home} />
+                        <Redirect from="*" to="/home" />
                     </Switch>
                 </BrowserRouter>
             </AuthProvider>
