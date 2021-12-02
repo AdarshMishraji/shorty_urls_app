@@ -66,6 +66,7 @@ const Auth = () => {
                         clientId={GOOGLE_CLIENT_ID}
                         onFailure={(error) => {
                             console.log({ error });
+                            setLoading(false);
                             toast("😵 " + "Unable to Sign you in!", {
                                 type: "error",
                                 ...toastConfig,
