@@ -16,7 +16,7 @@ export const Stats = React.memo(({ title, value, icon, color, contentAvailable }
                     </ContentLoader>
                 )}
             </div>
-            <img src={icon} height="35" width="35" className="bg-white rounded-full p-2 ml-3" />
+            <img src={icon} height="35" width="35" className="bg-white rounded-full p-2 ml-3" alt="zxcvbnm" />
         </div>
     );
 });

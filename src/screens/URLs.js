@@ -5,8 +5,9 @@ import { useHistory } from "react-router";
 
 import { Context as AuthContext } from "../context";
 import { toastConfig } from "../configs";
-import { Header, Loader, ModalContainer, URLItem } from "../component";
+import { Footer, Header, Loader, ModalContainer, URLItem } from "../component";
 import { fetchMyURLs } from "../api";
+import { afterTokenExpire } from "../helpers";
 
 const URLs = () => {
     const [loading, setLoading] = React.useState();
@@ -15,8 +16,8 @@ const URLs = () => {
     const [modalContent, setModalContent] = React.useState();
     const [hasMore, setMore] = React.useState(true);
 
-    const { state, tryLocalLogin } = React.useContext(AuthContext);
-    const nav = useHistory();
+    const { state, tryLocalLogin, clearUserData } = React.useContext(AuthContext);
+    const history = useHistory();
 
     const observer = React.useRef();
 
@@ -41,10 +42,12 @@ const URLs = () => {
                         }
                     },
                     (e) => {
-                        console.log(e);
-                        toast("😵 Internal Error", {
+                        toast("😵" + e?.response?.data?.error || "Internal Error", {
                             type: "error",
                             ...toastConfig,
+                            onClose: () => {
+                                afterTokenExpire(e, history, clearUserData);
+                            },
                         });
                     },
                     () => {
@@ -66,7 +69,7 @@ const URLs = () => {
                 }
             },
             () => {
-                nav.replace("/login");
+                history.replace("/login");
             }
         );
     }, [state.token]);
@@ -90,11 +93,11 @@ const URLs = () => {
         <div className="bg-white z-10">
             <ToastContainer className="z-50 text-center" />
             <Header requireBackground />
-            <div className="flex flex-col mt-20 md:mx-5 lg:mx-40">
+            <div className="flex flex-col mt-20 md:mx-5 lg:mx-40 min-h-screen">
                 <Loader display={loading} />
                 {loading ? null : (
                     <div className="flex flex-col list" onScroll={(e) => {}}>
-                        {urls?.length == 0 && (
+                        {urls?.length === 0 && (
                             <div>
                                 <h1 className="text-blue-500 text-2xl overflow-scroll text-center mb-3">No URLs found</h1>
                                 <h1 className="text-9xl text-center">😵</h1>
@@ -137,6 +140,7 @@ const URLs = () => {
                     </div>
                 )}
             </div>
+            <Footer />
         </div>
     );
 };

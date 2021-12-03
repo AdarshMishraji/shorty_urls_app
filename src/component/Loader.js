@@ -1,5 +1,6 @@
 import * as React from "react";
 import ContentLoader from "react-content-loader";
+
 import { ThemedButton, ToggleSwitch } from ".";
 
 export const Loader = React.memo(

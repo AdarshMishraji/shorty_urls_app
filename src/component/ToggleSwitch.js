@@ -34,7 +34,7 @@ export const ToggleSwitch = React.memo(({ isActive, setStatus, className, disabl
                     className="absolute w-6 h-6 bg-gray-300 rounded-full text-center py-2 left-0 font-semibold"
                     style={{
                         transform: isActive ? "translateX(10px)" : "translateX(46px)",
-                        transition: "0.5s linear",
+                        transition: "0.2s linear",
                         boxShadow: "0px 0px 10px 0.5px black",
                     }}
                 ></div>

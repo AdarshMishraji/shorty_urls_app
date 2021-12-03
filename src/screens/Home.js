@@ -5,13 +5,15 @@ import { toast, ToastContainer } from "react-toastify";
 
 import { Context as AuthContext } from "../context";
 import { toastConfig } from "../configs";
+import { ClicksGraph, Footer, Header, Stats, ThemedButton, TopLinks } from "../component";
+import { fetchMeta, generateURL } from "../api";
+import { desc } from "../constants";
+import { afterTokenExpire } from "../helpers";
+
 import Link from "../assets/svgs/link.svg";
 import Cursor from "../assets/svgs/cursor.svg";
 import NewLink from "../assets/svgs/newLink.svg";
 import Logo from "../assets/images/logo.png";
-import { ClicksGraph, Footer, Header, Stats, ThemedButton, TopLinks } from "../component";
-import { fetchMeta, generateURL } from "../api";
-import { desc } from "../constants";
 
 const makeURLValid = (url) => {
     let temp = url;
@@ -34,7 +36,7 @@ const Home = () => {
     const [meta, setMeta] = React.useState({});
     let textRef = React.useRef();
 
-    const { state, tryLocalLogin } = React.useContext(AuthContext);
+    const { state, tryLocalLogin, clearUserData } = React.useContext(AuthContext);
     const history = useHistory();
 
     const fetchMetaData = React.useCallback(
@@ -47,7 +49,13 @@ const Home = () => {
                         setMeta(res.data);
                     },
                     (e) => {
-                        console.log(e);
+                        toast("😵" + e?.response?.data?.error || "Internal Error", {
+                            type: "error",
+                            ...toastConfig,
+                            onClose: () => {
+                                afterTokenExpire(e, history, clearUserData);
+                            },
+                        });
                     }
                 );
         },
@@ -84,14 +92,16 @@ const Home = () => {
                             });
                         },
                         (e) => {
-                            console.log("error", e?.response);
                             if (e?.response?.status === 409) {
                                 set_short_url(e.response.data.short_url);
                             }
 
-                            toast("😵 " + e?.response?.data?.error, {
+                            toast("😵" + e?.response?.data?.error || "Internal Error", {
                                 type: "error",
                                 ...toastConfig,
+                                onClose: () => {
+                                    afterTokenExpire(e, history, clearUserData);
+                                },
                             });
                         },
                         () => setLoading(false)
@@ -212,14 +222,14 @@ const Home = () => {
                                 value={meta?.all_links}
                                 icon={Logo}
                                 color="bg-green-200"
-                                contentAvailable={Boolean(meta?.all_links)}
+                                contentAvailable={meta?.all_links === 0 ? true : Boolean(meta?.all_links)}
                             />
                             <Stats
                                 title="TOTAL CLICKS"
                                 value={meta?.all_clicks}
                                 icon={Cursor}
                                 color="bg-blue-200"
-                                contentAvailable={Boolean(meta?.all_clicks)}
+                                contentAvailable={meta?.all_clicks === 0 ? true : Boolean(meta?.all_clicks)}
                             />
                         </div>
                         <div className="flex flex-1 md:flex-row flex-col">

@@ -3,12 +3,13 @@ import { useHistory } from "react-router";
 import GoogleLogin from "react-google-login";
 import { toast, ToastContainer } from "react-toastify";
 
-import { Context as AuthContext } from "../context";
-import Link from "../assets/svgs/link.svg";
-import GoogleIcon from "../assets/svgs/google_icon.svg";
-import { Header } from "../component";
+import { Footer, Header } from "../component";
 import { authenticate } from "../api";
 import { GOOGLE_CLIENT_ID, toastConfig } from "../configs";
+import { Context as AuthContext } from "../context";
+
+import Link from "../assets/svgs/link.svg";
+import GoogleIcon from "../assets/svgs/google_icon.svg";
 
 const Auth = () => {
     const { setUserDetails, tryLocalLogin } = React.useContext(AuthContext);
@@ -25,6 +26,14 @@ const Auth = () => {
         );
     }, []);
 
+    const onLoginFail = ({ error }) => {
+        setLoading(false);
+        toast("😵 " + "Unable to Sign you in!", {
+            type: "error",
+            ...toastConfig,
+        });
+    };
+
     const onLogin = React.useCallback((response) => {
         authenticate(
             response.tokenId,
@@ -34,8 +43,10 @@ const Auth = () => {
                 setLoading(false);
             },
             (e) => {
-                console.log(e);
-                setLoading(false);
+                toast("😵" + e?.response?.data?.error || "Internal Error", {
+                    type: "error",
+                    ...toastConfig,
+                });
             }
         );
     }, []);
@@ -45,7 +56,7 @@ const Auth = () => {
             <ToastContainer />
             <Header />
             <div
-                className="flex flex-col items-center justify-center h-screen"
+                className="flex flex-col items-center justify-center min-h-screen"
                 style={{
                     background: "linear-gradient(-45deg,#2225ff 10%,#2254ff 90%)",
                     boxShadow: "0px 5px 40px 2px black",
@@ -64,14 +75,7 @@ const Auth = () => {
                     <h1 className="text-3xl font-bold mb-3 text-gray-800 text-center">Sign Up / Log In</h1>
                     <GoogleLogin
                         clientId={GOOGLE_CLIENT_ID}
-                        onFailure={(error) => {
-                            console.log({ error });
-                            setLoading(false);
-                            toast("😵 " + "Unable to Sign you in!", {
-                                type: "error",
-                                ...toastConfig,
-                            });
-                        }}
+                        onFailure={onLoginFail}
                         render={({ onClick }) => (
                             <button
                                 style={{ boxShadow: "0px 0px 15px 0.5px blue", maxWidth: "80vw", borderRadius: 50 }}
@@ -108,6 +112,7 @@ const Auth = () => {
                     />
                 </div>
             </div>
+            <Footer />
         </div>
     );
 };

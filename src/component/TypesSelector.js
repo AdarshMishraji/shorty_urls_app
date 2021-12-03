@@ -22,7 +22,7 @@ export const TypeSelector = React.memo(({ isFirst, setType, className, buttonCla
                     className={`absolute w-28 bg-blue-600 rounded-2xl text-center py-2 left-0 font-semibold text-white ${buttonClassName}`}
                     style={{
                         transform: isFirst ? "translateX(0%)" : "translateX(100%)",
-                        transition: "0.5s linear",
+                        transition: "0.2s linear",
                         boxShadow: "0px 0px 20px 0.5px black",
                     }}
                 >

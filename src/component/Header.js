@@ -3,11 +3,13 @@ import { useHistory } from "react-router";
 
 import { Context as AuthContext } from "../context";
 import { useOutsideAlerter } from "../hooks";
+import { ModalContainer, ThemedButton } from ".";
 
 import Logo from "../assets/images/logo.png";
 import account from "../assets/svgs/account.svg";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import HamburgerClose from "../assets/svgs/close.svg";
+import Warning from "../assets/svgs/warning.svg";
 
 const Link = ({ text, onPress, last }) => {
     return (
@@ -42,6 +44,7 @@ const MenuLinks = ({ onClick, text }) => {
 export const Header = React.memo(({ requireBackground }) => {
     const [hamburgerOpen, setHamburgerOpen] = React.useState(false);
     const [accountMenu, setAccountMenu] = React.useState(false);
+    const [logoutConfirmation, setLogoutConfirm] = React.useState(false);
     const history = useHistory();
     const { state, clearUserData } = React.useContext(AuthContext);
 
@@ -55,6 +58,12 @@ export const Header = React.memo(({ requireBackground }) => {
     useOutsideAlerter(hamburgerRef, () => {
         setHamburgerOpen(false);
     });
+
+    const logout = React.useCallback(() => {
+        clearUserData();
+        setHamburgerOpen(false);
+        history?.push("/login");
+    }, []);
 
     return (
         <header
@@ -118,9 +127,7 @@ export const Header = React.memo(({ requireBackground }) => {
                     <ButtonLinks
                         text="Logout"
                         onClick={() => {
-                            clearUserData();
-                            setAccountMenu(false);
-                            history?.push("/login");
+                            setLogoutConfirm(true);
                         }}
                     />
                 </div>
@@ -161,13 +168,23 @@ export const Header = React.memo(({ requireBackground }) => {
                     <ButtonLinks
                         text={state.token ? "Logout" : "Login / Signup"}
                         onClick={() => {
-                            clearUserData();
-                            setHamburgerOpen(false);
-                            history?.push("/login");
+                            setLogoutConfirm(true);
                         }}
                     />
                 </div>
             </div>
+            <ModalContainer onClose={() => setLogoutConfirm(false)}>
+                {logoutConfirmation && (
+                    <div className="flex flex-col items-center justify-center">
+                        <img src={Warning} height={75} width={75} alt="zxcvbnm" />
+                        <h1 className="text-red-500 overflow-scroll whitespace-nowrap">Are you sure to Logout?</h1>
+                        <div className="flex items-center mt-2">
+                            <ThemedButton title="No" onClickHandler={() => setLogoutConfirm(false)} color="bg-green-500" className="mx-2" />
+                            <ThemedButton title="Yes" onClickHandler={logout} className="mx-2" color="bg-red-500" />
+                        </div>
+                    </div>
+                )}
+            </ModalContainer>
         </header>
     );
 });

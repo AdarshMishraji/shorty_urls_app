@@ -18,7 +18,6 @@ const Account = () => {
             }
         );
     }, []);
-
     return (
         <div className="bg-white z-10 flex justify-center">
             <ToastContainer />

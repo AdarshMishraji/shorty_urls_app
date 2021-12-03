@@ -8,6 +8,9 @@ import moment from "moment";
 import { Context as AuthContext } from "../context";
 import { Dropdown, ToggleSwitch, Option, ThemedButton } from ".";
 import { useOutsideAlerter } from "../hooks";
+import { toastConfig } from "../configs";
+import { BASE_URL, changeAlias, changeStatus, deleteURL, removePassword, setExpiration, updatePassword } from "../api";
+import { afterTokenExpire } from "../helpers";
 
 import Copy from "../assets/svgs/copy.svg";
 import Delete from "../assets/svgs/delete.svg";
@@ -18,8 +21,6 @@ import QrCode from "../assets/svgs/qrcode.svg";
 import Edit from "../assets/svgs/edit.svg";
 import Warning from "../assets/svgs/warning.svg";
 import ChangePassword from "../assets/svgs/changePassword.svg";
-import { toastConfig } from "../configs";
-import { BASE_URL, changeAlias, changeStatus, deleteURL, removePassword, setExpiration, updatePassword } from "../api";
 
 export const ModalContainer = React.memo(({ onClose, children }) => {
     const [showContent, setShowContent] = React.useState(false);
@@ -34,7 +35,7 @@ export const ModalContainer = React.memo(({ onClose, children }) => {
             setShowContent(false);
             setTimeout(() => {
                 setShowContainer(false);
-            }, 200);
+            }, 250);
         }
     }, [children]);
     return (
@@ -363,8 +364,8 @@ export const URLItem = React.memo(
         const [expirationTime, setExpirationTime] = React.useState(item.expired_at);
         const [disabled, setDisabled] = React.useState(false);
         const [shortURL, setShortURL] = React.useState(item.short_url);
-        const { state } = React.useContext(AuthContext);
-        const nav = useHistory();
+        const { state, clearUserData } = React.useContext(AuthContext);
+        const history = useHistory();
 
         let copyRef = React.useRef();
         let keyoffRef = React.useRef();
@@ -390,11 +391,12 @@ export const URLItem = React.memo(
                         });
                     },
                     (e) => {
-                        console.log(e);
-
-                        toast("😵 " + e?.response?.data?.error, {
+                        toast("😵" + e?.response?.data?.error || "Internal Error", {
                             type: "error",
                             ...toastConfig,
+                            onClose: () => {
+                                afterTokenExpire(e, history, clearUserData);
+                            },
                         });
                     },
                     () => {
@@ -418,10 +420,12 @@ export const URLItem = React.memo(
                     });
                 },
                 (e) => {
-                    console.log(e);
-                    toast("😵 " + e?.response?.data?.error, {
+                    toast("😵" + e?.response?.data?.error || "Internal Error", {
                         type: "error",
                         ...toastConfig,
+                        onClose: () => {
+                            afterTokenExpire(e, history, clearUserData);
+                        },
                     });
                 },
                 () => {
@@ -445,10 +449,12 @@ export const URLItem = React.memo(
                         });
                     },
                     (e) => {
-                        console.log(e);
-                        toast("😵 " + e?.response?.data?.error, {
+                        toast("😵" + e?.response?.data?.error || "Internal Error", {
                             type: "error",
                             ...toastConfig,
+                            onClose: () => {
+                                afterTokenExpire(e, history, clearUserData);
+                            },
                         });
                     },
                     () => {
@@ -472,10 +478,12 @@ export const URLItem = React.memo(
                     });
                 },
                 (e) => {
-                    console.log(e);
-                    toast("😵 " + e?.response?.data?.error, {
+                    toast("😵" + e?.response?.data?.error || "Internal Error", {
                         type: "error",
                         ...toastConfig,
+                        onClose: () => {
+                            afterTokenExpire(e, history, clearUserData);
+                        },
                     });
                 },
                 () => {
@@ -499,10 +507,12 @@ export const URLItem = React.memo(
                         });
                     },
                     (e) => {
-                        console.log(e);
-                        toast("😵 " + e?.response?.data?.error, {
+                        toast("😵" + e?.response?.data?.error || "Internal Error", {
                             type: "error",
                             ...toastConfig,
+                            onClose: () => {
+                                afterTokenExpire(e, history, clearUserData);
+                            },
                         });
                     },
                     () => {
@@ -528,11 +538,12 @@ export const URLItem = React.memo(
                         });
                     },
                     (e) => {
-                        console.log(e);
-
-                        toast("😵" + e?.response?.data?.message || e?.response?.data?.error || "Internal Error", {
+                        toast("😵" + e?.response?.data?.error || "Internal Error", {
                             type: "error",
                             ...toastConfig,
+                            onClose: () => {
+                                afterTokenExpire(e, history, clearUserData);
+                            },
                         });
                     },
                     () => {
@@ -764,7 +775,7 @@ export const URLItem = React.memo(
                                         qr.toDataURL(shortURL, { type: "image/png" }).then((value) => {
                                             setModalContent(
                                                 <div className="flex flex-col items-center justify-center">
-                                                    <img src={value} className="md:h-64 md:w-64 w-40 h-40" />
+                                                    <img src={value} className="md:h-64 md:w-64 w-40 h-40" alt="zxcvbnm" />
                                                     <h1 className="text-blue-500 overflow-scroll text-center" aria-multiline>
                                                         {shortURL}
                                                     </h1>
@@ -813,7 +824,7 @@ export const URLItem = React.memo(
                         <div>
                             {showBtn ? (
                                 <ThemedButton
-                                    onClickHandler={() => nav.push(`/url/${item._id}`)}
+                                    onClickHandler={() => history.push(`/url/${item._id}`)}
                                     title="Statistics"
                                     color="bg-blue-500"
                                     disabled={disabled}

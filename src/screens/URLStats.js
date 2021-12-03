@@ -5,9 +5,10 @@ import moment from "moment";
 import ContentLoader from "react-content-loader";
 
 import { Context as AuthContext } from "../context";
-import { ClicksGraph, Header, Loader, ModalContainer, PieChart, TypeSelector, URLItem } from "../component";
+import { ClicksGraph, Footer, Header, Loader, ModalContainer, PieChart, TypeSelector, URLItem } from "../component";
 import { toastConfig } from "../configs";
 import { fetchMyParticularURL } from "../api";
+import { afterTokenExpire } from "../helpers";
 
 const ScreenLoader = React.memo(({ display }) => {
     return (
@@ -85,20 +86,20 @@ const Statistics = React.memo(({ year_month_day_click, browser_clicks, os_clicks
 const History = React.memo(({ display, data }) => {
     const Row = React.memo(({ sno, ip, clicked_at, browser, device, OS, location }) => {
         return (
-            <div className={`w-max border-b-2 rounded-2xl ${sno === 1 ? "border-t-2" : null}`}>
-                <span className=" text-center w-24 inline-block font-bold my-2">{sno}</span>
+            <div className={`w-max border-b-2 rounded-2xl flex items-center ${sno === 1 ? "border-t-2" : null}`}>
+                <span className=" text-center whitespace-normal overscroll-none w-24 inline-block font-bold my-2">{sno}</span>
                 <span className="font-bold inline-block"> | </span>
-                <span className=" text-center w-64 inline-block font-bold my-2">{ip || "NA"}</span>
+                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{ip || "NA"}</span>
                 <span className="font-bold inline-block"> | </span>
-                <span className=" text-center w-64 inline-block font-bold my-2">{clicked_at}</span>
+                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{clicked_at}</span>
                 <span className=" font-bold inline-block"> | </span>
-                <span className=" text-center w-64 inline-block font-bold my-2">{browser}</span>
+                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{browser}</span>
                 <span className=" font-bold inline-block"> | </span>
-                <span className=" text-center w-64 inline-block font-bold my-2">{device}</span>
+                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{device}</span>
                 <span className=" font-bold inline-block"> | </span>
-                <span className=" text-center w-64 inline-block font-bold my-2">{OS}</span>
+                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{OS}</span>
                 <span className=" font-bold inline-block"> | </span>
-                <span className=" text-center w-64 inline-block font-bold my-2">{location}</span>
+                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{location}</span>
             </div>
         );
     });
@@ -149,13 +150,15 @@ const History = React.memo(({ display, data }) => {
 });
 
 const URLStats = () => {
-    const nav = useHistory();
+    const history = useHistory();
     const { urlID } = useParams();
-    const { state, tryLocalLogin } = React.useContext(AuthContext);
+
     const [loading, setLoading] = React.useState(true);
     const [URLData, setURLData] = React.useState({});
     const [modalContent, setModalContent] = React.useState();
     const [tableDisplay, setTableDisplay] = React.useState(false);
+
+    const { state, tryLocalLogin, clearUserData } = React.useContext(AuthContext);
 
     const fetchURL = React.useCallback(() => {
         if (state.token) {
@@ -166,10 +169,12 @@ const URLStats = () => {
                     setURLData(value.data);
                 },
                 (e) => {
-                    console.log(e);
-                    toast("😵 Internal Error", {
+                    toast("😵" + e?.response?.data?.error || "Internal Error", {
                         type: "error",
                         ...toastConfig,
+                        onClose: () => {
+                            afterTokenExpire(e, history, clearUserData);
+                        },
                     });
                 },
                 () => {
@@ -186,12 +191,12 @@ const URLStats = () => {
                     if (urlID) {
                         fetchURL();
                     } else {
-                        nav.replace("/urls");
+                        history.replace("/urls");
                     }
                 }
             },
             () => {
-                nav.replace("/login");
+                history.replace("/login");
             }
         );
     }, [state.token]);
@@ -203,7 +208,7 @@ const URLStats = () => {
                 <ScreenLoader display={loading} />
                 {loading ? null : (
                     <div className="flex flex-col list">
-                        <URLItem item={URLData?.info} setModalContent={setModalContent} reFetch={() => nav.goBack()} />
+                        <URLItem item={URLData?.info} setModalContent={setModalContent} reFetch={() => history.goBack()} />
                         <h1 className="text-blue-500 text-xl my-2 text-center font-bold mx-5">
                             {URLData?.meta && Object.keys(URLData?.meta)?.length > 0 ? (
                                 <TypeSelector
@@ -235,6 +240,7 @@ const URLStats = () => {
                     </div>
                 )}
             </div>
+            <Footer />
         </div>
     );
 };
