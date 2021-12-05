@@ -61,6 +61,7 @@ const URLs = () => {
     );
 
     React.useEffect(() => {
+        window.scrollTo({ top: 0 });
         tryLocalLogin(
             () => {
                 if (state.token) {
@@ -140,7 +141,6 @@ const URLs = () => {
                     </div>
                 )}
             </div>
-            <Footer />
         </div>
     );
 };

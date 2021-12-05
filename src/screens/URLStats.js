@@ -185,6 +185,7 @@ const URLStats = () => {
     }, [state]);
 
     React.useEffect(() => {
+        window.scrollTo({ top: 0 });
         tryLocalLogin(
             () => {
                 if (state.token) {
@@ -240,7 +241,6 @@ const URLStats = () => {
                     </div>
                 )}
             </div>
-            <Footer />
         </div>
     );
 };
