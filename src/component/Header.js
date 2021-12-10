@@ -162,7 +162,8 @@ export const Header = React.memo(({ requireBackground }) => {
                     <ButtonLinks
                         text={state.token ? "Logout" : "Login / Signup"}
                         onClick={() => {
-                            setLogoutConfirm(true);
+                            if (state.token) setLogoutConfirm(true);
+                            else history.push("/login");
                         }}
                     />
                 </Menu>

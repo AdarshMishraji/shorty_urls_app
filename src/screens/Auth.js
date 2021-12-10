@@ -64,7 +64,7 @@ const Auth = () => {
                 <div className="absolute top-20 left-0" style={{ transform: "rotate(90deg)" }}>
                     <Link height={150} width={150} color="#ffffff40" />
                 </div>
-                <div className="absolute top-72 right-0" style={{ transform: "rotate(180deg)" }}>
+                <div className="absolute top-100 right-0" style={{ transform: "rotate(180deg)" }}>
                     <Link height={200} width={200} color="#ffffff40" />
                 </div>
                 <Container extraStyle={{ maxWidth: "90vw" }} className="px-5 py-4 bg-gray-100 dark:bg-gray-900 rounded-3xl zoom-container">
