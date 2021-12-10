@@ -25,3 +25,8 @@ export { ReactComponent as Search } from "./svgs/search.svg";
 export { ReactComponent as Trophy } from "./svgs/trophy.svg";
 export { ReactComponent as Warning } from "./svgs/warning.svg";
 export { ReactComponent as URL } from "./svgs/url.svg";
+export { ReactComponent as Browser } from "./svgs/browser.svg";
+export { ReactComponent as Device } from "./svgs/device.svg";
+export { ReactComponent as IP } from "./svgs/ip.svg";
+export { ReactComponent as Location } from "./svgs/location.svg";
+export { ReactComponent as OS } from "./svgs/os.svg";

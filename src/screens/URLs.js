@@ -114,7 +114,7 @@ const URLs = () => {
                                         reFetch={() => fetchHistory()}
                                         index={index}
                                         ref={lastElementRef}
-                                        showBtn
+                                        showBtn={true}
                                     />
                                 );
                             } else {
@@ -125,7 +125,7 @@ const URLs = () => {
                                         setModalContent={setModalContent}
                                         reFetch={() => fetchHistory()}
                                         index={index}
-                                        showBtn
+                                        showBtn={true}
                                     />
                                 );
                             }

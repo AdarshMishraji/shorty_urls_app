@@ -24,7 +24,7 @@ export const ScreenWrapper = ({ children }) => {
                               borderTopLeftRadius: 9999,
                           }),
                     zIndex: -1,
-                    backgroundColor: "rgba(0, 0, 10)",
+                    backgroundColor: "rgba(0, 0, 5)",
                 }}
                 className="flex fixed bottom-0 md:-right-52 right-0"
             />

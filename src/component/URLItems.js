@@ -585,11 +585,7 @@ export const URLItem = React.memo(
                         ) : null}
                     </div>
                     <div className="items-center md:justify-between flex  md:flex-row flex-col">
-                        <div
-                            className={`flex items-center my-3 md:${
-                                showBtn ? "justify-start" : "justify-center"
-                            } justify-center overflow-scroll w-full`}
-                        >
+                        <div className={`flex items-center my-3 md:${showBtn ? "justify-start" : "justify-center"}  overflow-scroll w-full`}>
                             <Copy
                                 ref={copyRef}
                                 data-tip="Copy the URL"

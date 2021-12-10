@@ -3,12 +3,15 @@ import { useHistory, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import moment from "moment";
 import ContentLoader from "react-content-loader";
+import ReactTooltip from "react-tooltip";
 
 import { AuthContext, ThemeContext } from "../context";
 import { ClicksGraph, Container, Header, Loader, ModalContainer, PieChart, TypeSelector, URLItem } from "../component";
 import { toastConfig } from "../configs";
 import { fetchMyParticularURL } from "../api";
 import { afterTokenExpire } from "../helpers";
+
+import { Browser, Clock, Device, IP, Location, OS } from "../assets";
 
 const ScreenLoader = React.memo(({ display }) => {
     const {
@@ -44,7 +47,7 @@ const ScreenLoader = React.memo(({ display }) => {
                             height="50vh"
                             backgroundColor={theme === "dark" ? "rgba(17, 24, 39,1)" : "#f3f3f3"}
                             foregroundColor={theme === "dark" ? "#223344" : "#cccccc"}
-                            className="flex flex-col my-3 text-xl w-full md:w-5/12"
+                            className="my-3 w-full xl:w-1/5 justify-between"
                         >
                             <rect height="50vh" width="100%" rx="12" ry="12" />
                         </ContentLoader>
@@ -53,7 +56,7 @@ const ScreenLoader = React.memo(({ display }) => {
                             height="50vh"
                             backgroundColor={theme === "dark" ? "rgba(17, 24, 39,1)" : "#f3f3f3"}
                             foregroundColor={theme === "dark" ? "#223344" : "#cccccc"}
-                            className="flex flex-col my-3 text-xl w-full md:w-5/12"
+                            className="my-3 w-full xl:w-1/5 justify-between"
                         >
                             <rect height="50vh" width="100%" rx="12" ry="12" />
                         </ContentLoader>
@@ -62,7 +65,7 @@ const ScreenLoader = React.memo(({ display }) => {
                             height="50vh"
                             backgroundColor={theme === "dark" ? "rgba(17, 24, 39,1)" : "#f3f3f3"}
                             foregroundColor={theme === "dark" ? "#223344" : "#cccccc"}
-                            className="flex flex-col my-3 text-xl w-full md:w-5/12"
+                            className="my-3 w-full xl:w-1/5 justify-between"
                         >
                             <rect height="50vh" width="100%" rx="12" ry="12" />
                         </ContentLoader>
@@ -71,7 +74,7 @@ const ScreenLoader = React.memo(({ display }) => {
                             height="50vh"
                             backgroundColor={theme === "dark" ? "rgba(17, 24, 39,1)" : "#f3f3f3"}
                             foregroundColor={theme === "dark" ? "#223344" : "#cccccc"}
-                            className="flex flex-col my-3 text-xl w-full md:w-5/12"
+                            className="my-3 w-full xl:w-1/5 justify-between"
                         >
                             <rect height="50vh" width="100%" rx="12" ry="12" />
                         </ContentLoader>
@@ -96,65 +99,135 @@ const Statistics = React.memo(({ year_month_day_click, browser_clicks, os_clicks
     );
 });
 
-const History = React.memo(({ display, data }) => {
-    const Row = React.memo(({ sno, ip, clicked_at, browser, device, OS, location }) => {
+const Timeline = React.memo(({ display, data }) => {
+    const currentMonth = React.useRef();
+    const currentYear = React.useRef();
+    currentMonth.current = -1;
+    currentYear.current = -1;
+
+    const TimelineRow = React.memo(({ sno, ip, clicked_at, browser, device, os, location, monthRequired, yearRequired }) => {
         return (
-            <div className={`w-max border-b-2 rounded-2xl flex items-center ${sno === 1 ? "border-t-2" : null}`}>
-                <span className=" text-center whitespace-normal overscroll-none w-24 inline-block font-bold my-2">{sno}</span>
-                <span className="font-bold inline-block"> | </span>
-                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{ip || "NA"}</span>
-                <span className="font-bold inline-block"> | </span>
-                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{clicked_at}</span>
-                <span className=" font-bold inline-block"> | </span>
-                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{browser}</span>
-                <span className=" font-bold inline-block"> | </span>
-                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{device}</span>
-                <span className=" font-bold inline-block"> | </span>
-                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{OS}</span>
-                <span className=" font-bold inline-block"> | </span>
-                <span className=" text-center whitespace-normal overscroll-none w-72 inline-block font-bold my-2">{location}</span>
+            <div className={monthRequired ? "pt-4" : ""}>
+                <ReactTooltip />
+                <div className="z-0 border-l-2 ml-4 border-gray-500 relative">
+                    <div
+                        className="rounded-full h-7 w-7 absolute top-10"
+                        style={{ background: "linear-gradient(-45deg,#05f05f 10%,#0fffff 90%)", left: -15, boxShadow: "0px 0px 20px 0.5px green" }}
+                    ></div>
+                    <div className="p-3 z-10 flex">
+                        <Container className="ml-3 w-full zoom-container">
+                            <p
+                                className="font-bold my-2 text-gray-600 whitespace-nowrap overflow-scroll"
+                                data-tip="IP Address"
+                                style={{ cursor: "alias" }}
+                            >
+                                <IP color="grey" height={30} width={30} className="inline-block mx-3" />
+                                <span>{ip || "NA"}</span>
+                            </p>
+                            <p
+                                className="font-bold my-2 text-gray-600 whitespace-nowrap overflow-scroll"
+                                data-tip="Clicked At"
+                                style={{ cursor: "alias" }}
+                            >
+                                <Clock color="grey" height={30} width={30} className="inline-block mx-3" />
+                                <span>{moment(clicked_at).format("YYYY MMMM DD, hh:mm A")}</span>
+                            </p>
+                            <p
+                                className="font-bold my-2 text-gray-600 whitespace-nowrap overflow-scroll"
+                                data-tip="Browser"
+                                style={{ cursor: "alias" }}
+                            >
+                                <Browser color="grey" height={30} width={30} className="inline-block mx-3" />
+                                <span>{browser}</span>
+                            </p>
+                            <p
+                                className="font-bold my-2 text-gray-600 whitespace-nowrap overflow-scroll"
+                                data-tip="Device"
+                                style={{ cursor: "alias" }}
+                            >
+                                <Device color="grey" height={30} width={30} className="inline-block mx-3" />
+                                <span>{device}</span>
+                            </p>
+                            <p
+                                className="font-bold my-2 text-gray-600 whitespace-nowrap overflow-scroll"
+                                data-tip="Operating System"
+                                style={{ cursor: "alias" }}
+                            >
+                                <OS color="grey" height={30} width={30} className="inline-block mx-3" />
+                                <span>{os}</span>
+                            </p>
+                            <p
+                                className="font-bold my-2 text-gray-600 whitespace-nowrap overflow-scroll"
+                                data-tip="Geo Location"
+                                style={{ cursor: "alias" }}
+                            >
+                                <Location color="grey" height={30} width={30} className="inline-block mx-3" />
+                                <span>{location}</span>
+                            </p>
+                        </Container>
+                    </div>
+                </div>
             </div>
         );
     });
 
     return (
-        <Container extraStyle={{ display: display ? "flex" : "none" }} className="my-4 mx-3">
-            {data?.length > 0 ? (
-                <div>
-                    <div className="flex flex-col rounded-xl text-xl py-3 whitespace-nowrap overflow-scroll text-gray-700">
-                        <div className="mb-3 w-max border-2 rounded-xl bg-blue-500 text-white">
-                            <Row
-                                sno="S No."
-                                ip="IP"
-                                clicked_at="Clicked At"
-                                browser="Browser"
-                                device="Device"
-                                OS="System (OS)"
-                                location="Geo Location"
+        <Container className="m-3" extraStyle={{ display: display ? "flex" : "none" }}>
+            {data.map((value, index) => {
+                let date = moment(value.requested_at).format("YYYY-MM");
+                let monthRequired = false;
+                let yearRequired = false;
+                console.log(value.requested_at);
+                let [cY, cM] = date.split("-");
+                let currYear = parseInt(cY);
+                let currMon = parseInt(cM);
+                if (currYear > currentYear.current) {
+                    currentYear.current = currYear;
+                    yearRequired = true;
+                }
+                if (currMon > currentMonth.current) {
+                    currentMonth.current = currMon;
+                    monthRequired = true;
+                }
+
+                return (
+                    <div>
+                        <h1 className="text-gray-600 font-bold text-3xl">{yearRequired ? currYear : null}</h1>
+                        <div className="border-l-2 ml-3 border-gray-500">
+                            {monthRequired ? (
+                                <div className="relative">
+                                    <div className="flex items-center relative pt-4">
+                                        <div
+                                            className="rounded-full h-7 w-7 absolute"
+                                            style={{
+                                                background: "linear-gradient(-45deg,#2225ff 10%,#2254ff 90%)",
+                                                left: -15,
+                                                boxShadow: "0px 0px 20px 0.5px blue",
+                                            }}
+                                        ></div>
+                                        <span className="text-gray-600 text-2xl ml-10 font-bold">
+                                            {monthRequired ? moment(value.requested_at).format("MMMM") : null}
+                                        </span>
+                                    </div>
+                                    <div className="bg-gray-500 absolute w-0.5 h-8 left-3" style={{ transform: "rotate(-55deg)" }}></div>
+                                </div>
+                            ) : null}
+                            <TimelineRow
+                                key={index}
+                                sno={index + 1}
+                                ip={value?.ip || "NA"}
+                                clicked_at={value?.requested_at}
+                                browser={value?.client_info?.client_name || "NA"}
+                                device={value?.client_info?.device_type?.[0].toUpperCase() + value?.client_info?.device_type?.slice(1) || "NA"}
+                                os={value?.client_info?.OS || "NA"}
+                                location={value?.location ? `${value.location.city}, ${value?.location?.country}. ${value?.location?.zipCode}` : "NA"}
+                                monthRequired={monthRequired}
+                                yearRequired={yearRequired}
                             />
                         </div>
-                        {data?.map((value, index) => {
-                            const location = value?.location
-                                ? `${value.location.city}, ${value?.location?.country}. ${value?.location?.zipCode}`
-                                : "NA";
-                            const date = moment(value?.requested_at).format("YYYY - MMM - DD, hh:mm A");
-
-                            return (
-                                <Row
-                                    key={index}
-                                    sno={index + 1}
-                                    ip={value?.ip || "NA"}
-                                    clicked_at={date}
-                                    browser={value?.client_info?.client_name || "NA"}
-                                    device={value?.client_info?.device_type?.[0].toUpperCase() + value?.client_info?.device_type?.slice(1) || "NA"}
-                                    OS={value?.client_info?.OS || "NA"}
-                                    location={location}
-                                />
-                            );
-                        })}
                     </div>
-                </div>
-            ) : null}
+                );
+            })}
         </Container>
     );
 });
@@ -166,7 +239,7 @@ const URLStats = () => {
     const [loading, setLoading] = React.useState(true);
     const [URLData, setURLData] = React.useState({});
     const [modalContent, setModalContent] = React.useState();
-    const [tableDisplay, setTableDisplay] = React.useState(false);
+    const [timelineDisplay, setTimelineView] = React.useState(false);
 
     const { state, tryLocalLogin, clearUserData } = React.useContext(AuthContext);
 
@@ -223,10 +296,10 @@ const URLStats = () => {
                         <h1 className="text-blue-500 text-xl my-2 text-center font-bold mx-5">
                             {URLData?.meta && Object.keys(URLData?.meta)?.length > 0 ? (
                                 <TypeSelector
-                                    isFirst={!tableDisplay}
-                                    setType={(type) => setTableDisplay(type === 1 ? false : true)}
+                                    isFirst={!timelineDisplay}
+                                    setType={(type) => setTimelineView(type === 1 ? false : true)}
                                     text1="Statistics"
-                                    text2="Histories"
+                                    text2="Timeline"
                                     className=""
                                     buttonClassName="w-50"
                                 />
@@ -237,14 +310,14 @@ const URLStats = () => {
                         {URLData?.meta && Object.keys(URLData?.meta).length > 0 ? (
                             <div>
                                 <Statistics
-                                    display={!tableDisplay}
+                                    display={!timelineDisplay}
                                     year_month_day_click={URLData?.meta?.year_month_day_click}
                                     browser_clicks={URLData?.meta?.browser_clicks}
                                     os_clicks={URLData?.meta?.os_clicks}
                                     device_clicks={URLData?.meta?.device_clicks}
                                     country_clicks={URLData?.meta?.country_clicks}
                                 />
-                                <History display={tableDisplay} data={URLData?.info?.from_visited} />
+                                <Timeline display={timelineDisplay} data={URLData?.info?.from_visited} />
                             </div>
                         ) : null}
                         <ModalContainer onClose={() => setModalContent()} children={modalContent} />

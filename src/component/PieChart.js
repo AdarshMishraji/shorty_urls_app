@@ -60,7 +60,10 @@ export const PieChart = React.memo(({ data, title }) => {
     };
 
     return (
-        <Container className="my-3 w-full md:w-5/12 text-blue-500 text-2xl text-center zoom-container">
+        <Container
+            className="my-3 w-full xl:w-1/5 text-blue-500 text-2xl text-center zoom-container justify-between"
+            extraStyle={{ minHeight: "45vh" }}
+        >
             <h1 className="my-2 text-gray-600">{title}</h1>
             {Object.keys(data).length > 0 ? (
                 <Doughnut data={dataSet} options={options} style={{ maxHeight: "40vh", marginTop: ".5rem" }} />
