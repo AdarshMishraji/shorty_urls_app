@@ -1,15 +1,11 @@
 import * as React from "react";
-import { useHistory } from "react-router";
+import { useHistory } from "react-router-dom";
 
-import { Context as AuthContext } from "../context";
+import { AuthContext } from "../context";
 import { useOutsideAlerter } from "../hooks";
 import { ModalContainer, ThemedButton } from ".";
 
-import Logo from "../assets/images/logo.png";
-import account from "../assets/svgs/account.svg";
-import Hamburger from "../assets/svgs/hamburger.svg";
-import HamburgerClose from "../assets/svgs/close.svg";
-import Warning from "../assets/svgs/warning.svg";
+import { Account, Close, Hamburger, Logo, Warning } from "../assets";
 
 const Link = ({ text, onPress, last }) => {
     return (
@@ -40,6 +36,25 @@ const MenuLinks = ({ onClick, text }) => {
         </h1>
     );
 };
+
+const Menu = React.memo(
+    React.forwardRef(({ children, isOn, onClose }, ref) => {
+        return (
+            <div
+                ref={ref}
+                className="menu p-3 mt-2 absolute top-2 right-5 flex-col bg-gray-200 dark:bg-gray-900 rounded-2xl z-50 flex"
+                style={{
+                    transform: isOn ? "scale(1)" : "scale(0)",
+                    transition: "all 0.2s ease-in-out",
+                    boxShadow: "0px 0px 25px 5px black",
+                }}
+            >
+                <Close height={40} width={40} className="bg-gray-600 self-end rounded-full p-1 cursor-pointer" onClick={onClose} />
+                {children}
+            </div>
+        );
+    })
+);
 
 export const Header = React.memo(({ requireBackground }) => {
     const [hamburgerOpen, setHamburgerOpen] = React.useState(false);
@@ -81,42 +96,37 @@ export const Header = React.memo(({ requireBackground }) => {
                 <div className="flex-row items-center justify-center md:flex hidden">
                     <Link text="URLs" onPress={() => history?.push("/urls")} />
                     {state.token ? (
-                        <img
-                            src={state.profile_img || account}
-                            style={{ display: state.name ? "block" : "none" }}
-                            className="bg-white rounded-3xl p-1 mr-3"
-                            height="50"
-                            width="50"
-                            alt="zxcvbnm"
-                            onClick={() => setAccountMenu(!accountMenu)}
-                        />
+                        <div>
+                            {state.profile_img ? (
+                                <img
+                                    src={state.profile_img}
+                                    style={{ display: state.name ? "block" : "none" }}
+                                    className="bg-white rounded-3xl p-1 mr-3"
+                                    height="50"
+                                    width="50"
+                                    onClick={() => setAccountMenu(!accountMenu)}
+                                />
+                            ) : (
+                                <Account
+                                    style={{ display: state.name ? "block" : "none" }}
+                                    className="bg-white rounded-3xl p-1 mr-3"
+                                    height="50"
+                                    width="50"
+                                    onClick={() => setAccountMenu(!accountMenu)}
+                                />
+                            )}
+                        </div>
                     ) : (
                         <Link text="Login / Signup" onPress={() => history?.push("/login")} />
                     )}
                 </div>
                 <div className="md:hidden flex items-center text-gray-600 md:mr-10 mr-2 z-50 relative">
                     <div className="rounded-3xl focus:outline-none border-0" style={{ height: 40, width: 40 }} onClick={() => setHamburgerOpen(true)}>
-                        <img src={Hamburger} height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} alt="zxcvbnm" />
+                        <Hamburger height={hamburgerOpen ? 35 : 40} width={hamburgerOpen ? 35 : 40} color="white" />
                     </div>
                 </div>
 
-                <div
-                    ref={accountMenuRef}
-                    className="menu p-3 mt-2 absolute top-2 right-5 flex-col bg-gray-200 rounded-2xl z-50 flex"
-                    style={{
-                        transform: accountMenu ? "scale(1)" : "scale(0)",
-                        transition: "all 0.2s ease-in-out",
-                        boxShadow: "0px 0px 25px 5px black",
-                    }}
-                >
-                    <img
-                        src={HamburgerClose}
-                        height={40}
-                        width={40}
-                        alt="zxcvbnm"
-                        className="bg-gray-600 self-end rounded-full p-1 cursor-pointer"
-                        onClick={() => setAccountMenu(false)}
-                    />
+                <Menu isOn={accountMenu} ref={accountMenuRef} onClose={() => setAccountMenu(false)}>
                     <MenuLinks
                         onClick={() => {
                             setAccountMenu(false);
@@ -130,25 +140,9 @@ export const Header = React.memo(({ requireBackground }) => {
                             setLogoutConfirm(true);
                         }}
                     />
-                </div>
+                </Menu>
 
-                <div
-                    ref={hamburgerRef}
-                    className="menu p-3 mt-2 absolute top-2 right-5 flex flex-col bg-gray-200 rounded-2xl z-50"
-                    style={{
-                        transform: hamburgerOpen ? "scale(1)" : "scale(0)",
-                        transition: "all 0.2s ease-in-out",
-                        boxShadow: "0px 0px 25px 5px black",
-                    }}
-                >
-                    <img
-                        src={HamburgerClose}
-                        height={40}
-                        width={40}
-                        alt="zxcvbnm"
-                        className="bg-gray-600 rounded-full p-1 cursor-pointer self-end"
-                        onClick={() => setHamburgerOpen(false)}
-                    />
+                <Menu isOn={hamburgerOpen} onClose={() => setHamburgerOpen(false)} ref={hamburgerRef}>
                     <MenuLinks
                         onClick={() => {
                             setHamburgerOpen(false);
@@ -171,12 +165,12 @@ export const Header = React.memo(({ requireBackground }) => {
                             setLogoutConfirm(true);
                         }}
                     />
-                </div>
+                </Menu>
             </div>
             <ModalContainer onClose={() => setLogoutConfirm(false)}>
                 {logoutConfirmation && (
                     <div className="flex flex-col items-center justify-center">
-                        <img src={Warning} height={75} width={75} alt="zxcvbnm" />
+                        <Warning height={75} width={75} />
                         <h1 className="text-red-500 overflow-scroll whitespace-nowrap">Are you sure to Logout?</h1>
                         <div className="flex items-center mt-2">
                             <ThemedButton title="No" onClickHandler={() => setLogoutConfirm(false)} color="bg-green-500" className="mx-2" />

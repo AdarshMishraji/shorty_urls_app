@@ -1,19 +1,16 @@
 import * as React from "react";
 import validator from "validator";
-import { useHistory } from "react-router";
+import { useHistory } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 
-import { Context as AuthContext } from "../context";
+import { AuthContext, ThemeContext } from "../context";
 import { toastConfig } from "../configs";
-import { ClicksGraph, Footer, Header, Stats, ThemedButton, TopLinks } from "../component";
+import { ClicksGraph, Container, Header, Stats, ThemedButton, TopLinks } from "../component";
 import { fetchMeta, generateURL } from "../api";
 import { desc } from "../constants";
 import { afterTokenExpire } from "../helpers";
 
-import Link from "../assets/svgs/link.svg";
-import Cursor from "../assets/svgs/cursor.svg";
-import NewLink from "../assets/svgs/newLink.svg";
-import Logo from "../assets/images/logo.png";
+import { Link, Cursor, NewLink, URL } from "../assets";
 
 const makeURLValid = (url) => {
     let temp = url;
@@ -27,7 +24,7 @@ const makeURLValid = (url) => {
     return url;
 };
 
-const Home = () => {
+const Home = React.memo(() => {
     const currDate = new Date();
     const [url, setUrl] = React.useState("");
     const [loading, setLoading] = React.useState(false);
@@ -37,6 +34,9 @@ const Home = () => {
     let textRef = React.useRef();
 
     const { state, tryLocalLogin, clearUserData } = React.useContext(AuthContext);
+    const {
+        state: { theme },
+    } = React.useContext(ThemeContext);
     const history = useHistory();
 
     const fetchMetaData = React.useCallback(
@@ -52,6 +52,7 @@ const Home = () => {
                         toast("😵" + e?.response?.data?.error || "Internal Error", {
                             type: "error",
                             ...toastConfig,
+                            theme,
                             onClose: () => {
                                 afterTokenExpire(e, history, clearUserData);
                             },
@@ -90,6 +91,7 @@ const Home = () => {
                             toast("👍 Success", {
                                 type: "success",
                                 ...toastConfig,
+                                theme,
                             });
                         },
                         (e) => {
@@ -100,6 +102,7 @@ const Home = () => {
                             toast("😵" + e?.response?.data?.error || "Internal Error", {
                                 type: "error",
                                 ...toastConfig,
+                                theme,
                                 onClose: () => {
                                     afterTokenExpire(e, history, clearUserData);
                                 },
@@ -113,6 +116,7 @@ const Home = () => {
                     toast("😵 URL doesn't exists", {
                         type: "error",
                         ...toastConfig,
+                        theme,
                     });
                 }
             } else {
@@ -121,6 +125,7 @@ const Home = () => {
                 toast("😵 Enter valid URL", {
                     type: "error",
                     ...toastConfig,
+                    theme,
                 });
             }
         } else {
@@ -133,6 +138,7 @@ const Home = () => {
         toast("👍 Copied", {
             type: "success",
             ...toastConfig,
+            theme,
         });
     };
 
@@ -141,7 +147,7 @@ const Home = () => {
     };
 
     return (
-        <div className="bg-white z-10">
+        <div className="z-10">
             <ToastContainer />
             <Header requireBackground />
             <div
@@ -150,10 +156,10 @@ const Home = () => {
             >
                 <div className="flex flex-col items-center justify-center py-20 md:mx-0 mx-3">
                     <div className="absolute top-20 left-0" style={{ transform: "rotate(90deg)" }}>
-                        <img src={Link} height={150} width={150} alt="" />
+                        <Link height={150} width={150} color="#ffffff40" />
                     </div>
                     <div className="absolute top-72 right-0" style={{ transform: "rotate(180deg)" }}>
-                        <img src={Link} height={200} width={200} alt="" />
+                        <Link height={200} width={200} color="#ffffff40" />
                     </div>
                     <div className="flex flex-col flex-1 self-start text-white mb-10" style={{ zIndex: 2 }}>
                         <h1 className=" text-gray-300 text-xl">URL Shortener</h1>
@@ -214,22 +220,22 @@ const Home = () => {
                 <h1 className="text-3xl font-bold text-center text-blue-500">{state.token ? "Your Statistics" : "Our Statistics"}</h1>
             </div>
 
-            <div className="flex flex-col self-center bg-white text-white m-3 relative">
+            <div className="flex flex-col self-center text-white m-3 relative">
                 <div className="lg:mx-40">
-                    <div className="flex flex-col border-2 p-2 rounded-xl mb-3" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
+                    <Container>
                         <div className="flex flex-1 md:flex-row flex-col">
                             <Stats
                                 title="ALL URLS"
                                 value={meta?.all_links}
-                                icon={Logo}
-                                color="bg-green-200"
+                                Icon={URL}
+                                color="bg-green-400"
                                 contentAvailable={meta?.all_links === 0 ? true : Boolean(meta?.all_links)}
                             />
                             <Stats
                                 title="TOTAL CLICKS"
                                 value={meta?.all_clicks}
-                                icon={Cursor}
-                                color="bg-blue-200"
+                                Icon={Cursor}
+                                color="bg-blue-400"
                                 contentAvailable={meta?.all_clicks === 0 ? true : Boolean(meta?.all_clicks)}
                             />
                         </div>
@@ -237,16 +243,16 @@ const Home = () => {
                             <Stats
                                 title="LINKS ADDED THIS MONTH"
                                 value={meta?.links_added?.[currDate.getFullYear()]?.[currDate.toLocaleString("default", { month: "long" })]?.count}
-                                icon={NewLink}
+                                Icon={NewLink}
                                 contentAvailable={Boolean(meta?.links_added)}
-                                color="bg-red-200"
+                                color="bg-red-400"
                             />
                             <Stats
                                 title="LINKS ADDED THIS YEAR"
                                 value={meta?.links_added?.[currDate.getFullYear()]?.count}
-                                icon={NewLink}
+                                Icon={NewLink}
                                 contentAvailable={Boolean(meta?.links_added)}
-                                color="bg-yellow-200"
+                                color="bg-yellow-400"
                             />
                         </div>
                         {state.token ? (
@@ -280,14 +286,14 @@ const Home = () => {
                                 ) : null}
                             </div>
                         ) : null}
-                    </div>
-                    <div className="flex flex-col border-2 p-3 rounded-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }}>
+                    </Container>
+                    <Container className="mt-4">
                         <div className="flex items-center my-2">
-                            <img src={Cursor} height="35px" width="35px" className="bg-blue-400 rounded-full p-2 mr-2 inline" alt="" />
+                            <Cursor height="35px" width="35px" className="bg-blue-400 rounded-full p-2 mr-2 inline" />
                             <h1 className="text-2xl text-blue-500 font-bold inline">Clicks</h1>
                         </div>
                         <ClicksGraph data={meta?.clicks} />
-                    </div>
+                    </Container>
                 </div>
                 <div className="lg:mx-40">
                     <div className="text-center mx-3 mt-5 ">
@@ -295,9 +301,8 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
-};
+});
 
 export default Home;

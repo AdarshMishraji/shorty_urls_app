@@ -2,6 +2,8 @@ import * as React from "react";
 import { Doughnut, Chart } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
+import { Container } from ".";
+
 Chart.register(ChartDataLabels);
 
 const options = {
@@ -10,11 +12,9 @@ const options = {
     plugins: {
         ...ChartDataLabels,
         datalabels: {
-            backgroundColor: function (context) {
-                return context.dataset.backgroundColor;
-            },
+            backgroundColor: "#5151ff",
             borderRadius: 10,
-            color: "black",
+            color: "white",
             font: {
                 weight: "bold",
             },
@@ -39,37 +39,34 @@ export const PieChart = React.memo(({ data, title }) => {
                     return data[key].count;
                 }),
                 backgroundColor: [
-                    "rgba(255, 99, 132, 0.5)",
-                    "rgba(54, 162, 235, 0.5)",
-                    "rgba(255, 206, 86, 0.5)",
-                    "rgba(75, 192, 192, 0.5)",
-                    "rgba(153, 102, 255, 0.5)",
-                    "rgba(255, 159, 64, 0.5)",
+                    "rgba(255, 99, 132)",
+                    "rgba(54, 162, 235)",
+                    "rgba(255, 206, 86)",
+                    "rgba(75, 192, 192)",
+                    "rgba(153, 102, 255)",
+                    "rgba(255, 159, 64)",
                 ],
                 borderColor: [
-                    "rgba(255, 99, 132, 1)",
-                    "rgba(54, 162, 235, 1)",
-                    "rgba(255, 206, 86, 1)",
-                    "rgba(75, 192, 192, 1)",
-                    "rgba(153, 102, 255, 1)",
-                    "rgba(255, 159, 64, 1)",
+                    "rgba(255, 99, 102, 1)",
+                    "rgba(54, 162, 255, 1)",
+                    "rgba(255, 255, 86, 1)",
+                    "rgba(75, 225, 192, 1)",
+                    "rgba(183, 102, 255, 1)",
+                    "rgba(255, 179, 84, 1)",
                 ],
-                borderWidth: 1,
+                borderWidth: 2,
             },
         ],
     };
 
     return (
-        <div
-            className="flex flex-col border-2 p-3 rounded-xl my-3 w-full md:w-5/12 text-blue-500 text-2xl text-center"
-            style={{ boxShadow: "0px 0px 15px 0.5px blue" }}
-        >
-            <h1 className="my-2">{title}</h1>
+        <Container className="my-3 w-full md:w-5/12 text-blue-500 text-2xl text-center zoom-container">
+            <h1 className="my-2 text-gray-600">{title}</h1>
             {Object.keys(data).length > 0 ? (
                 <Doughnut data={dataSet} options={options} style={{ maxHeight: "40vh", marginTop: ".5rem" }} />
             ) : (
                 <h1 className="text-red-600">Not Available</h1>
             )}
-        </div>
+        </Container>
     );
 });

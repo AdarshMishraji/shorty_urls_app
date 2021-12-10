@@ -91,7 +91,7 @@ const clearUserData = (dispatch) => {
     };
 };
 
-export const { Context, Provider } = createDataContext(
+const { Context, Provider } = createDataContext(
     reducer,
     {
         setName,
@@ -115,3 +115,5 @@ export const { Context, Provider } = createDataContext(
         token: undefined,
     }
 );
+
+export { Context as AuthContext, Provider as AuthProvider };

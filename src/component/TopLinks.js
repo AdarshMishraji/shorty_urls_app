@@ -1,13 +1,13 @@
 import * as React from "react";
 
-import { Trophy } from "./Trophy";
+import { Trophy } from "../assets";
 
 export const TopLinks = React.memo(({ title, url, short_url, color }) => {
     return (
         <div
-            className={`px-4 py-2 rounded-xl mx-2 flex flex-1 justify-between items-center my-2`}
+            className={`px-4 py-2 rounded-xl mx-2 flex flex-1 justify-between items-center my-2 zoom-container transition transform duration-500`}
             style={{
-                backgroundColor: `${color}aa`,
+                backgroundColor: `${color}ee`,
             }}
         >
             <div className="whitespace-nowrap overflow-scroll">

@@ -1,15 +1,14 @@
 import * as React from "react";
-import { useHistory } from "react-router";
+import { useHistory } from "react-router-dom";
 import GoogleLogin from "react-google-login";
 import { toast, ToastContainer } from "react-toastify";
 
-import { Footer, Header } from "../component";
+import { Container, Header } from "../component";
 import { authenticate } from "../api";
 import { GOOGLE_CLIENT_ID, toastConfig } from "../configs";
-import { Context as AuthContext } from "../context";
+import { AuthContext } from "../context";
 
-import Link from "../assets/svgs/link.svg";
-import GoogleIcon from "../assets/svgs/google_icon.svg";
+import { Google, Link } from "../assets";
 
 const Auth = () => {
     const { setUserDetails, tryLocalLogin } = React.useContext(AuthContext);
@@ -63,29 +62,26 @@ const Auth = () => {
                 }}
             >
                 <div className="absolute top-20 left-0" style={{ transform: "rotate(90deg)" }}>
-                    <img src={Link} height={150} width={150} alt="zxcvbnm" />
+                    <Link height={150} width={150} color="#ffffff40" />
                 </div>
-                <div className="absolute bottom-20 right-0" style={{ transform: "rotate(180deg)" }}>
-                    <img src={Link} height={200} width={200} alt="zxcvbnm" />
+                <div className="absolute top-72 right-0" style={{ transform: "rotate(180deg)" }}>
+                    <Link height={200} width={200} color="#ffffff40" />
                 </div>
-                <div
-                    className="flex flex-col justify-center items-center px-5 py-4 bg-white rounded-3xl mx-2 z-20 w"
-                    style={{ boxShadow: "0px 0px 15px 0.5px blue", maxWidth: "90vw" }}
-                >
-                    <h1 className="text-3xl font-bold mb-3 text-gray-800 text-center">Sign Up / Log In</h1>
+                <Container extraStyle={{ maxWidth: "90vw" }} className="px-5 py-4 bg-gray-100 dark:bg-gray-900 rounded-3xl zoom-container">
+                    <h1 className="text-3xl font-bold mb-3 text-blue-600 text-center">Sign Up / Log In</h1>
                     <GoogleLogin
                         clientId={GOOGLE_CLIENT_ID}
                         onFailure={onLoginFail}
                         render={({ onClick }) => (
                             <button
                                 style={{ boxShadow: "0px 0px 15px 0.5px blue", maxWidth: "80vw", borderRadius: 50 }}
-                                className="flex items-center bg-white rounded-3xl font-bold text-xl hover:bg-red-600"
+                                className="flex items-center bg-gray-100 dark:bg-gray-900 rounded-3xl font-bold text-xl "
                                 onClick={() => {
                                     setLoading(true);
                                     onClick();
                                 }}
                             >
-                                <img src={GoogleIcon} height="50px" width="50px" className="mr-3" alt="zxcvbnm" />
+                                <Google height="50px" width="50px" className="mr-3" />
 
                                 {loading ? (
                                     <svg
@@ -102,7 +98,7 @@ const Auth = () => {
                                         ></path>
                                     </svg>
                                 ) : (
-                                    <h1 className="w-full md:mr-5 mr-0 text-gray-700 text-2xl">
+                                    <h1 className="w-full md:mr-5 mr-0 text-blue-600 text-2xl">
                                         Log in <h1 className="md:inline-block hidden">using Google</h1>
                                     </h1>
                                 )}
@@ -110,9 +106,8 @@ const Auth = () => {
                         )}
                         onSuccess={onLogin}
                     />
-                </div>
+                </Container>
             </div>
-            <Footer />
         </div>
     );
 };

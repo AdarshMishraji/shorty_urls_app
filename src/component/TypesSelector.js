@@ -23,7 +23,7 @@ export const TypeSelector = React.memo(({ isFirst, setType, className, buttonCla
                     style={{
                         transform: isFirst ? "translateX(0%)" : "translateX(100%)",
                         transition: "0.2s linear",
-                        boxShadow: "0px 0px 20px 0.5px black",
+                        boxShadow: "0px 0px 15px 0.5px blue",
                     }}
                 >
                     {isFirst ? text1 : text2}

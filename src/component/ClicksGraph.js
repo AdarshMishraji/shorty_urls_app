@@ -5,6 +5,7 @@ import ContentLoader from "react-content-loader";
 
 import { GraphDropdown, TypeSelector } from ".";
 import { noMonths, monthNo } from "../constants";
+import { ThemeContext } from "../context";
 
 Chart.register(ChartDataLabels);
 
@@ -41,24 +42,38 @@ const options = {
             ticks: {
                 beginAtZero: true,
                 precision: 0,
+                color: "rgba(54, 162, 235)",
+            },
+            grid: {
+                color: "#FFFFFF",
+                display: false,
             },
         },
-        xAxes: { grid: { display: false } },
+        xAxes: {
+            ticks: {
+                color: "rgba(54, 162, 235)",
+            },
+            grid: {
+                display: false,
+                color: "#FFFFFF",
+            },
+        },
     },
 };
 
 const commonStyle = {
     bar: {
-        backgroundColor: ["rgba(54, 162, 235,0.25)"],
-        borderColor: ["rgba(54,162,235,1)"],
-        borderRadius: 10,
-        borderWidth: 1,
+        backgroundColor: ["rgba(54, 162, 235)"],
+        borderColor: ["rgba(54,102,255)"],
+        borderRadius: 20,
+        borderWidth: 5,
     },
     line: {
         type: "line",
-        borderColor: "rgba(54,162,235,1)",
-        borderWidth: 1,
+        borderColor: "rgba(54,162,235)",
+        borderWidth: 5,
         pointStyle: "circle",
+        backgroundColor: "rgba(54, 162, 235, 0.5)",
         fill: true,
     },
 };
@@ -70,6 +85,10 @@ export const ClicksGraph = React.memo(({ data }) => {
     const [type, setType] = React.useState("monthly");
     const [month, setMonth] = React.useState(noMonths[currDate.getMonth() + 1]);
     const [year, setYear] = React.useState(currDate.getFullYear());
+
+    const {
+        state: { theme },
+    } = React.useContext(ThemeContext);
 
     const commonData =
         type === "monthly"
@@ -195,7 +214,7 @@ export const ClicksGraph = React.memo(({ data }) => {
                             text2="Lines"
                         />
                         <h1 className="text-blue-500 text-2xl mb-2 mt-3 text-center">{type[0].toUpperCase() + type.slice(1)} Clicks</h1>
-                        <Bar style={{ maxHeight: "40vh", marginTop: ".5rem" }} data={content} options={options} />
+                        <Bar style={{ maxHeight: "50vh", marginTop: ".5rem" }} className="rounded-2xl p-2" data={content} options={options} />
                         <div>
                             <GraphDropdown
                                 type={type}
@@ -220,11 +239,11 @@ export const ClicksGraph = React.memo(({ data }) => {
                 </div>
             ) : (
                 <ContentLoader
-                    className="flex flex-col justify-center items-center"
+                    className="flex flex-col justify-center items-center dark:bg-gray-900 bg-gray-100"
                     width="100%"
                     height="50vh"
-                    backgroundColor="#f3f3f3"
-                    foregroundColor="#cccccc"
+                    backgroundColor={theme === "dark" ? "rgba(17, 24, 39,1)" : "#f3f3f3"}
+                    foregroundColor={theme === "dark" ? "#223344" : "#cccccc"}
                 >
                     <rect height="50vh" width="100%" rx="12" ry="12" />
                 </ContentLoader>

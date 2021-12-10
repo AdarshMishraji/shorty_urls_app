@@ -1,11 +1,11 @@
 import * as React from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useHistory } from "react-router";
+import { useHistory } from "react-router-dom";
 
-import { Context as AuthContext } from "../context";
+import { AuthContext } from "../context";
 import { toastConfig } from "../configs";
-import { Footer, Header, Loader, ModalContainer, URLItem } from "../component";
+import { Header, Loader, ModalContainer, URLItem } from "../component";
 import { fetchMyURLs } from "../api";
 import { afterTokenExpire } from "../helpers";
 
@@ -91,11 +91,11 @@ const URLs = () => {
     );
 
     return (
-        <div className="bg-white z-10">
+        <div className="z-10">
             <ToastContainer className="z-50 text-center" />
             <Header requireBackground />
             <div className="flex flex-col mt-20 md:mx-5 lg:mx-40 min-h-screen">
-                <Loader display={loading} />
+                <Loader display={loading} requiredButton />
                 {loading ? null : (
                     <div className="flex flex-col list" onScroll={(e) => {}}>
                         {urls?.length === 0 && (

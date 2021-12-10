@@ -2,73 +2,21 @@ import * as React from "react";
 import qr from "qrcode";
 import ReactTooltip from "react-tooltip";
 import { toast } from "react-toastify";
-import { useHistory } from "react-router";
+import { useHistory } from "react-router-dom";
 import moment from "moment";
 
-import { Context as AuthContext } from "../context";
-import { Dropdown, ToggleSwitch, Option, ThemedButton } from ".";
+import { AuthContext, ThemeContext } from "../context";
+import { Dropdown, ToggleSwitch, Option, ThemedButton, Container } from ".";
 import { useOutsideAlerter } from "../hooks";
 import { toastConfig } from "../configs";
 import { BASE_URL, changeAlias, changeStatus, deleteURL, removePassword, setExpiration, updatePassword } from "../api";
 import { afterTokenExpire } from "../helpers";
 
-import Copy from "../assets/svgs/copy.svg";
-import Delete from "../assets/svgs/delete.svg";
-import Clock from "../assets/svgs/clock.svg";
-import Key from "../assets/svgs/key.svg";
-import KeyOff from "../assets/svgs/keyoff.svg";
-import QrCode from "../assets/svgs/qrcode.svg";
-import Edit from "../assets/svgs/edit.svg";
-import Warning from "../assets/svgs/warning.svg";
-import ChangePassword from "../assets/svgs/changePassword.svg";
+import { ChangePassword, Clock, Copy, Delete, Edit, KeyOff, KeyOn, QrCode, Warning } from "../assets";
 
-export const ModalContainer = React.memo(({ onClose, children }) => {
-    const [showContent, setShowContent] = React.useState(false);
-    const [showContainer, setShowContainer] = React.useState(false);
-    React.useEffect(() => {
-        if (children) {
-            setShowContainer(true);
-            setTimeout(() => {
-                setShowContent(true);
-            }, 50);
-        } else {
-            setShowContent(false);
-            setTimeout(() => {
-                setShowContainer(false);
-            }, 250);
-        }
-    }, [children]);
-    return (
-        <div
-            className="justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50"
-            style={{
-                display: showContainer ? "flex" : "none",
-            }}
-        >
-            <div
-                style={{
-                    boxShadow: "0px 0px 15px 0.5px blue",
-                    width: "95vw",
-                    transition: "all 0.2s ease-in-out",
-                    transform: showContent ? "scale(1)" : "scale(0)",
-                }}
-                className="p-3 rounded-xl bg-white z-20 flex items-center justify-center mx-5 md:max-w-md"
-            >
-                {children}
-            </div>
-            <div
-                className="w-full h-full z-10 absolute top-0 right-0 bottom-0 left-0"
-                style={{
-                    backgroundColor: "rgba(0,0,0,0.25)",
-                    transition: "1s ease-in-out",
-                }}
-                onClick={onClose}
-            ></div>
-        </div>
-    );
-});
+const CommonIconProp = { color: "grey", height: "30px", width: "30px", className: "mx-2 cursor-pointer border-none outline-none" };
 
-export const ExpirationModalContent = React.memo(({ onSelect, onClose }) => {
+export const ExpirationModalContent = React.memo(({ onSelect, onClose, theme }) => {
     const [type, setType] = React.useState(0);
     const [afterIndex, setAfterIndex] = React.useState(0);
 
@@ -102,7 +50,7 @@ export const ExpirationModalContent = React.memo(({ onSelect, onClose }) => {
             <div className="flex flex-col items-start">
                 <div>
                     <div onClick={() => setType(0)} className="cursor-pointer">
-                        <input type="radio" title="After" name="type" checked={type === 0} />{" "}
+                        <input type="radio" title="After" name="type" checked={type === 0} />
                         <span className="text-xl text-blue-500 font-bold inline ml-2">After</span>
                     </div>
                     <div className="flex flex-wrap" style={{ opacity: type === 0 ? 1 : 0.5 }}>
@@ -214,7 +162,7 @@ export const ExpirationModalContent = React.memo(({ onSelect, onClose }) => {
                             defaultValue={Date.now() + 10800}
                             disabled={type === 0}
                             type="datetime-local"
-                            className="border-2 p-2 rounded-xl border-blue-400 outline-none"
+                            className=" p-2 rounded-xl border-blue-400 outline-none bg-transparent text-blue-600 text-lg border-2"
                             onChange={(e) => {
                                 if (e.target.valueAsNumber - Date.now() > 10800) setTimestamp(e.target.valueAsNumber);
                                 else {
@@ -222,6 +170,7 @@ export const ExpirationModalContent = React.memo(({ onSelect, onClose }) => {
                                     toast("🤨 Select expiration time after 3 Hrs", {
                                         type: "error",
                                         ...toastConfig,
+                                        theme,
                                         position: "top-center",
                                     });
                                 }
@@ -230,7 +179,7 @@ export const ExpirationModalContent = React.memo(({ onSelect, onClose }) => {
                     </div>
                 </div>
                 <div className="flex items-center mt-3 self-center">
-                    <ThemedButton title="Cancel" onClickHandler={onClose} color="bg-gray-500" className="mx-2" />
+                    <ThemedButton title="Cancel" onClickHandler={onClose} color="bg-red-500" className="mx-2" />
                     <ThemedButton
                         title="OK"
                         onClickHandler={() => {
@@ -260,7 +209,7 @@ export const ExpirationModalContent = React.memo(({ onSelect, onClose }) => {
     );
 });
 
-export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
+export const PasswordModalContent = React.memo(({ onClose, onSubmit, theme }) => {
     const [password, setPassword] = React.useState("");
     const [confirmPassword, setConfirmPassword] = React.useState("");
 
@@ -272,6 +221,7 @@ export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
                 toast("🤨 Password is not same as Confirm Password", {
                     type: "error",
                     ...toastConfig,
+                    theme,
                     position: "top-center",
                 });
             }
@@ -279,6 +229,7 @@ export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
             toast("🤨 Password must be more than equals to 8 characters", {
                 type: "error",
                 ...toastConfig,
+                theme,
                 position: "top-center",
             });
         }
@@ -286,10 +237,10 @@ export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
 
     return (
         <div className="flex flex-col items-center">
-            <h1 className="text-white text-2xl mb-2 text-center"></h1>Enter Password
-            <div className="flex flex-col justify-between bg-white rounded-xl p-2 border-0 text-xl mb-2" style={{ zIndex: 2 }}>
+            <h1 className="text-gray-500 text-2xl mb-2 text-center">Enter Password</h1>
+            <div className="flex flex-col justify-between rounded-xl p-2 text-xl mb-2" style={{ zIndex: 2 }}>
                 <input
-                    className="outline-none focus:shadow-2xl rounded-xl pl-3 flex-1 mr-2 md:w-96 w-full border-b-2 mb-2"
+                    className=" p-2 rounded-xl border-blue-400 outline-none bg-transparent text-blue-600 text-lg border-2 mb-2"
                     placeholder="Password"
                     type="password"
                     onChange={(e) => {
@@ -302,7 +253,7 @@ export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
                     }}
                 />
                 <input
-                    className="outline-none focus:shadow-2xl rounded-xl pl-3 flex-1 mr-2 md:w-96 w-full border-b-2"
+                    className=" p-2 rounded-xl border-blue-400 outline-none bg-transparent text-blue-600 text-lg border-2"
                     placeholder="Confirm Password"
                     type="password"
                     onChange={(e) => {
@@ -315,7 +266,7 @@ export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
                     }}
                 />
                 <div className="flex flex-row self-center mt-3">
-                    <ThemedButton title="Cancel" onClickHandler={onClose} color="bg-gray-500" className="mx-2" />
+                    <ThemedButton title="Cancel" onClickHandler={onClose} color="bg-red-500" className="mx-2" />
                     <ThemedButton title="OK" onClickHandler={onOK} className="mx-2" color="bg-green-500" />
                 </div>
             </div>
@@ -326,15 +277,16 @@ export const PasswordModalContent = React.memo(({ onClose, onSubmit }) => {
 export const ChangeAliasModalContent = React.memo(({ prevAlias, onClose, onSubmit }) => {
     const [alias, setAlias] = React.useState(prevAlias);
     return (
-        <div className="flex flex-col items-center justify-center">
-            <h1 className="text-gray-500 text-2xl mb-2 text-center">Change the Alias</h1>
+        <div className="flex flex-col items-center justify-cente">
+            <h1 className="text-gray-500 text-2xl mb-2 text-center ">Change the Alias</h1>
             <div className="flex flex-col items-center justify-center rounded-2xl mx-2">
-                <span className="border-2 p-2 overflow-scroll whitespace-nowrap rounded-2xl w-11/12">{BASE_URL}</span>
+                <span className=" p-2 overflow-scroll whitespace-nowrap rounded-xl w-11/12 text-blue-600 border-2 border-blue-400">{BASE_URL}</span>
                 <label className="mt-2 mb-1 text-gray-500 text-lg w-11/12 text-left pl-2">Alias</label>
                 <input
                     value={alias}
                     onChange={(e) => setAlias(e.target.value)}
-                    className="outline-none p-2 rounded-2xl border-2 w-11/12"
+                    className="outline-none p-2 rounded-2xl  w-11/12"
+                    className=" p-2 rounded-xl border-blue-400 outline-none bg-transparent text-blue-600 text-lg border-2"
                     onKeyPress={(e) => {
                         if (e.key === "Enter") {
                             onSubmit(alias);
@@ -343,7 +295,7 @@ export const ChangeAliasModalContent = React.memo(({ prevAlias, onClose, onSubmi
                 />
             </div>
             <div className="flex mt-3">
-                <ThemedButton title="Cancel" onClickHandler={onClose} color="bg-gray-500" className="mx-2" />
+                <ThemedButton title="Cancel" onClickHandler={onClose} color="bg-red-500" className="mx-2" />
                 <ThemedButton
                     title="Change It"
                     onClickHandler={() => {
@@ -364,7 +316,13 @@ export const URLItem = React.memo(
         const [expirationTime, setExpirationTime] = React.useState(item.expired_at);
         const [disabled, setDisabled] = React.useState(false);
         const [shortURL, setShortURL] = React.useState(item.short_url);
+
         const { state, clearUserData } = React.useContext(AuthContext);
+
+        const {
+            state: { theme },
+        } = React.useContext(ThemeContext);
+
         const history = useHistory();
 
         let copyRef = React.useRef();
@@ -388,12 +346,14 @@ export const URLItem = React.memo(
                         toast("👍 Success", {
                             type: "success",
                             ...toastConfig,
+                            theme,
                         });
                     },
                     (e) => {
                         toast("😵" + e?.response?.data?.error || "Internal Error", {
                             type: "error",
                             ...toastConfig,
+                            theme,
                             onClose: () => {
                                 afterTokenExpire(e, history, clearUserData);
                             },
@@ -417,12 +377,14 @@ export const URLItem = React.memo(
                     toast("👍 Success", {
                         type: "success",
                         ...toastConfig,
+                        theme,
                     });
                 },
                 (e) => {
                     toast("😵" + e?.response?.data?.error || "Internal Error", {
                         type: "error",
                         ...toastConfig,
+                        theme,
                         onClose: () => {
                             afterTokenExpire(e, history, clearUserData);
                         },
@@ -446,12 +408,14 @@ export const URLItem = React.memo(
                         toast("👍 Success", {
                             type: "success",
                             ...toastConfig,
+                            theme,
                         });
                     },
                     (e) => {
                         toast("😵" + e?.response?.data?.error || "Internal Error", {
                             type: "error",
                             ...toastConfig,
+                            theme,
                             onClose: () => {
                                 afterTokenExpire(e, history, clearUserData);
                             },
@@ -475,12 +439,14 @@ export const URLItem = React.memo(
                     toast("👍 Success", {
                         type: "success",
                         ...toastConfig,
+                        theme,
                     });
                 },
                 (e) => {
                     toast("😵" + e?.response?.data?.error || "Internal Error", {
                         type: "error",
                         ...toastConfig,
+                        theme,
                         onClose: () => {
                             afterTokenExpire(e, history, clearUserData);
                         },
@@ -504,12 +470,14 @@ export const URLItem = React.memo(
                         toast("👍 Success", {
                             type: "success",
                             ...toastConfig,
+                            theme,
                         });
                     },
                     (e) => {
                         toast("😵" + e?.response?.data?.error || "Internal Error", {
                             type: "error",
                             ...toastConfig,
+                            theme,
                             onClose: () => {
                                 afterTokenExpire(e, history, clearUserData);
                             },
@@ -535,12 +503,14 @@ export const URLItem = React.memo(
                         toast("👍 Success", {
                             type: "success",
                             ...toastConfig,
+                            theme,
                         });
                     },
                     (e) => {
                         toast("😵" + e?.response?.data?.error || "Internal Error", {
                             type: "error",
                             ...toastConfig,
+                            theme,
                             onClose: () => {
                                 afterTokenExpire(e, history, clearUserData);
                             },
@@ -555,22 +525,22 @@ export const URLItem = React.memo(
         );
 
         return (
-            <div className="flex flex-col border-2 p-3 rounded-xl m-3 text-xl" style={{ boxShadow: "0px 0px 15px 0.5px blue" }} ref={ref}>
+            <Container ref={ref} className="m-3 zoom-container ">
                 <ReactTooltip />
                 <div className="relative">
                     <div className="flex justify-between items-center">
                         <ToggleSwitch isActive={active} setStatus={onChangeStatus} className="mb-3" disbled={disabled} />
                         {disabled ? (
                             <div className="flex items-center justify-center" style={{ opacity: 0.7 }}>
-                                <div className="spinner-grow mr-3" role="status" style={{ color: "black", height: 35, width: 35 }}>
+                                <div className="spinner-grow mr-3 dark:text-white text-black" role="status" style={{ height: 35, width: 35 }}>
                                     <span className="sr-only">Loading...</span>
                                 </div>
                             </div>
                         ) : null}
                     </div>
-                    <div className="border-b-2 pb-3">
+                    <div className="border-b-2 pb-3 border-gray-500">
                         <h1
-                            className="text-gray-800 font-bold overflow-scroll whitespace-nowrap py-1"
+                            className="text-gray-600 font-bold overflow-scroll whitespace-nowrap py-1"
                             style={{ display: item?.meta_data?.title ? "block" : "none" }}
                         >
                             {item?.meta_data?.title}
@@ -608,44 +578,41 @@ export const URLItem = React.memo(
                             </h1>
                         )}
                         {expirationTime ? (
-                            <h1 className="text-blue-500 overflow-scroll whitespace-nowrap mt-2">
+                            <h1 className="text-blue-500 mt-2">
                                 <span className="text-gray-600 font-bold">Expired At: </span>{" "}
                                 {moment(expirationTime).format("YYYY - MMM - DD, hh:mm A")}
                             </h1>
                         ) : null}
                     </div>
-                    <div className="flex items-center mt-2 justify-between">
-                        <div className="flex items-center overflow-scroll whitespace-nowrap">
-                            <img
+                    <div className="items-center md:justify-between flex  md:flex-row flex-col">
+                        <div
+                            className={`flex items-center my-3 md:${
+                                showBtn ? "justify-start" : "justify-center"
+                            } justify-center overflow-scroll w-full`}
+                        >
+                            <Copy
                                 ref={copyRef}
-                                src={Copy}
-                                height="30"
-                                width="30"
                                 data-tip="Copy the URL"
-                                alt="zxcvbnm"
-                                className="mr-3 cursor-pointer"
+                                {...CommonIconProp}
                                 onClick={() => {
                                     navigator.clipboard.writeText(shortURL);
                                     toast("👍 Copied", {
                                         type: "success",
                                         ...toastConfig,
+                                        theme: theme,
                                     });
                                 }}
                             />
                             {isPasswordProtected ? (
-                                <img
-                                    data-tip="Remove Password Protection"
+                                <KeyOff
                                     ref={keyoffRef}
-                                    src={KeyOff}
-                                    height="30"
-                                    width="30"
-                                    alt="zxcvbnm"
-                                    className="mr-3 cursor-pointer"
+                                    data-tip="Remove Password Protection"
+                                    {...CommonIconProp}
                                     onClick={() => {
                                         if (!disabled)
                                             setModalContent(
                                                 <div className="flex flex-col items-center justify-center">
-                                                    <img src={Warning} height={75} width={75} alt="zxcvbnm" />
+                                                    <Warning height={75} width={75} />
                                                     <h1 className="text-red-500 overflow-scroll text-center">
                                                         Are you sure to remove password protection for this url?
                                                     </h1>
@@ -672,18 +639,15 @@ export const URLItem = React.memo(
                                 />
                             ) : null}
                             {isPasswordProtected ? (
-                                <img
-                                    data-tip="Update Password"
+                                <ChangePassword
                                     ref={keyeditRef}
-                                    src={ChangePassword}
-                                    height="30"
-                                    width="30"
-                                    alt="zxcvbnm"
-                                    className="mr-3 cursor-pointer"
+                                    data-tip="Update Password"
+                                    {...CommonIconProp}
                                     onClick={() => {
                                         if (!disabled)
                                             setModalContent(
                                                 <PasswordModalContent
+                                                    theme={theme}
                                                     onClose={() => setModalContent()}
                                                     onSubmit={(password) => {
                                                         setPassword(password);
@@ -695,14 +659,10 @@ export const URLItem = React.memo(
                                 />
                             ) : null}
                             {!isPasswordProtected ? (
-                                <img
-                                    data-tip="Add Password Protection"
-                                    src={Key}
+                                <KeyOn
                                     ref={keyRef}
-                                    height="30"
-                                    width="30"
-                                    alt="zxcvbnm"
-                                    className="mr-3 cursor-pointer"
+                                    data-tip="Add Password Protection"
+                                    {...CommonIconProp}
                                     onClick={() => {
                                         if (!disabled)
                                             setModalContent(
@@ -717,14 +677,10 @@ export const URLItem = React.memo(
                                     }}
                                 />
                             ) : null}
-                            <img
-                                data-tip="Edit Alias Name"
+                            <Edit
                                 ref={editRef}
-                                src={Edit}
-                                height="30"
-                                width="30"
-                                alt="zxcvbnm"
-                                className="mr-3 cursor-pointer"
+                                data-tip="Edit Alias Name"
+                                {...CommonIconProp}
                                 onClick={() => {
                                     if (!disabled) {
                                         const prevAlias = shortURL.split("/").splice(-1)[0];
@@ -741,18 +697,15 @@ export const URLItem = React.memo(
                                     }
                                 }}
                             />
-                            <img
-                                data-tip="Set Expiration Time"
+                            <Clock
                                 ref={timerRef}
-                                src={Clock}
-                                height="30"
-                                width="30"
-                                alt="zxcvbnm"
-                                className="mr-3 cursor-pointer"
+                                data-tip="Set Expiration Time"
+                                {...CommonIconProp}
                                 onClick={() => {
                                     if (!disabled)
                                         setModalContent(
                                             <ExpirationModalContent
+                                                theme={theme}
                                                 onClose={() => setModalContent()}
                                                 onSelect={(res) => {
                                                     setExpireDuration(res);
@@ -762,20 +715,16 @@ export const URLItem = React.memo(
                                         );
                                 }}
                             />
-                            <img
-                                data-tip="Show QR Code"
+                            <QrCode
                                 ref={qrcodeRef}
-                                src={QrCode}
-                                height="30"
-                                width="30"
-                                alt="zxcvbnm"
-                                className="mr-3 cursor-pointer"
+                                data-tip="Show QR Code"
+                                {...CommonIconProp}
                                 onClick={() => {
                                     if (!disabled)
                                         qr.toDataURL(shortURL, { type: "image/png" }).then((value) => {
                                             setModalContent(
                                                 <div className="flex flex-col items-center justify-center">
-                                                    <img src={value} className="md:h-64 md:w-64 w-40 h-40" alt="zxcvbnm" />
+                                                    <img src={value} className="md:h-64 md:w-64 w-40 h-40 mb-2 rounded-xl" alt="zxcvbnm" />
                                                     <h1 className="text-blue-500 overflow-scroll text-center" aria-multiline>
                                                         {shortURL}
                                                     </h1>
@@ -784,19 +733,15 @@ export const URLItem = React.memo(
                                         });
                                 }}
                             />
-                            <img
-                                data-tip="Delete the URL"
+                            <Delete
                                 ref={deletRef}
-                                src={Delete}
-                                height="30"
-                                width="30"
-                                alt="zxcvbnm"
-                                className="mr-3 cursor-pointer"
+                                data-tip="Delete the URL"
+                                {...CommonIconProp}
                                 onClick={() => {
                                     if (!disabled) {
                                         setModalContent(
                                             <div className="flex flex-col items-center justify-center">
-                                                <img src={Warning} height={75} width={75} alt="zxcvbnm" />
+                                                <Warning height={75} width={75} />
                                                 <h1 className="text-red-500 overflow-scroll whitespace-nowrap">Are you sure to delete?</h1>
                                                 <div className="flex items-center mt-2">
                                                     <ThemedButton
@@ -821,16 +766,14 @@ export const URLItem = React.memo(
                                 }}
                             />
                         </div>
-                        <div>
-                            {showBtn ? (
-                                <ThemedButton
-                                    onClickHandler={() => history.push(`/url/${item._id}`)}
-                                    title="Statistics"
-                                    color="bg-blue-500"
-                                    disabled={disabled}
-                                />
-                            ) : null}
-                        </div>
+                        {showBtn ? (
+                            <ThemedButton
+                                onClickHandler={() => history.push(`/url/${item._id}`)}
+                                title="Statistics"
+                                color="bg-blue-500"
+                                disabled={disabled}
+                            />
+                        ) : null}
                     </div>
                     {expirationTime && expirationTime < Date.now() ? (
                         <div className="flex flex-col items-center justify-center flex-1">
@@ -855,7 +798,7 @@ export const URLItem = React.memo(
                         </div>
                     ) : null}
                 </div>
-            </div>
+            </Container>
         );
     })
 );
