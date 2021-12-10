@@ -30,8 +30,8 @@ export const Loader = React.memo(
                             <rect y="7.5rem" height="1.75rem" width="50%" rx="12" />
                         </ContentLoader>
                     </div>
-                    <div className={`flex ${props.requiredButton ? "flex-row" : "flex-col"} items-center mt-3 justify-between`}>
-                        <div className="flex items-center justify-center overflow-scroll whitespace-nowrap">
+                    <div className={`flex ${props.requiredButton ? "md:flex-row" : "flex-col"} flex-col items-center mt-3 justify-between`}>
+                        <div className="flex items-center justify-center overflow-scroll whitespace-nowrap mx-2 md:my-0 my-2">
                             <ContentLoader
                                 height="2.5rem"
                                 width="100%"

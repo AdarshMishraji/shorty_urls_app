@@ -584,8 +584,8 @@ export const URLItem = React.memo(
                             </h1>
                         ) : null}
                     </div>
-                    <div className="items-center md:justify-between flex  md:flex-row flex-col">
-                        <div className={`flex items-center my-3 md:${showBtn ? "justify-start" : "justify-center"}  overflow-scroll w-full`}>
+                    <div className={`flex ${showBtn ? "md:flex-row" : "flex-col"} flex-col items-center mt-2 justify-between`}>
+                        <div className="flex items-center justify-center overflow-scroll whitespace-nowrap mx-2 md:my-0 my-2">
                             <Copy
                                 ref={copyRef}
                                 data-tip="Copy the URL"
@@ -762,14 +762,16 @@ export const URLItem = React.memo(
                                 }}
                             />
                         </div>
-                        {showBtn ? (
-                            <ThemedButton
-                                onClickHandler={() => history.push(`/url/${item._id}`)}
-                                title="Statistics"
-                                color="bg-blue-500"
-                                disabled={disabled}
-                            />
-                        ) : null}
+                        <div className="md:mr-2">
+                            {showBtn ? (
+                                <ThemedButton
+                                    onClickHandler={() => history.push(`/url/${item._id}`)}
+                                    title="Statistics"
+                                    color="bg-blue-500"
+                                    disabled={disabled}
+                                />
+                            ) : null}
+                        </div>
                     </div>
                     {expirationTime && expirationTime < Date.now() ? (
                         <div className="flex flex-col items-center justify-center flex-1">
