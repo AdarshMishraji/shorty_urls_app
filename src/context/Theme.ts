@@ -1,5 +1,10 @@
 import createDataContext from "./createDataContext";
 
+enum ThemeStateEnum {
+    LIGHT = "LIGHT",
+    DARK = "DARK",
+}
+
 const reducer = (state, action) => {
     switch (action.type) {
         case "set_theme": {
@@ -12,20 +17,22 @@ const reducer = (state, action) => {
 };
 
 const setTheme = (dispatch) => {
-    return (theme) => {
+    return (theme: ThemeStateEnum) => {
         localStorage.setItem("THEME", theme);
         dispatch({ type: "set_theme", payload: theme });
     };
 };
+
+const defaultValue= {
+    theme: ThemeStateEnum.LIGHT,
+}
 
 const { Context, Provider } = createDataContext(
     reducer,
     {
         setTheme,
     },
-    {
-        theme: "light",
-    }
+    defaultValue
 );
 
 export { Context as ThemeContext, Provider as ThemeProvider };

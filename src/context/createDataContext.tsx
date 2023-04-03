@@ -1,7 +1,10 @@
 import * as React from "react";
 
-export default (reducer, actions, defaultValue) => {
-    const Context = React.createContext();
+const createContext = <T extends any>(reducer: (state: T, action: {type: string, payload?: T})=>T, actions: Record<string, (dispatch:  React.Dispatch<{
+    type: string;
+    payload?: T | undefined;
+}>)=>void>, defaultValue: T) => {
+    const Context = React.createContext<{state: T}>({state: defaultValue});
     const Provider = ({ children }) => {
         const [state, dispatch] = React.useReducer(reducer, defaultValue);
         const bindActions = {};
@@ -14,3 +17,5 @@ export default (reducer, actions, defaultValue) => {
     };
     return { Context, Provider };
 };
+
+export default createContext;

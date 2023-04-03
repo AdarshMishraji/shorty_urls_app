@@ -38,7 +38,7 @@ const Screens = () => {
             <BrowserRouter>
                 <Switch>
                     <Route exact path="/login" component={Auth} />
-                    <Route exact path="/url/:urlID" component={URLStats} />
+                <Route exact path="/url/:urlID" component={URLStats} />
                     <Route exact path="/urls" component={URLs} />
                     <Route exact path="/account" component={Account} />
                     <Route exact path="/home" component={Home} />
